@@ -16,7 +16,7 @@ class WhatsAppClient
 
     /** Limite de Meta pour le texte d'un message à boutons. */
     private const CHOICE_BODY_LIMIT = 1024;
-    private const CHOICE_PROMPT = 'Votre demande est-elle traitée ?';
+    public const CHOICE_PROMPT = 'Votre demande est-elle traitée ?';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,

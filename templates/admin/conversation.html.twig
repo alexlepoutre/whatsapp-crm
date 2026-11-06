@@ -14,6 +14,19 @@
         </div>
     </header>
 
+    {% if conversation.accessToken %}
+        {% set privateLink = url('tracking_show', {slug: conversation.organization.slug, token: conversation.accessToken}) %}
+        <section class="private-link">
+            <label for="private-link">Lien privé du client</label>
+            <div class="private-link__row">
+                <input id="private-link" type="text" value="{{ privateLink }}" readonly>
+                <button type="button" class="btn btn--quiet" data-copy="#private-link">Copier</button>
+                <a class="btn btn--quiet" href="{{ privateLink }}" target="_blank" rel="noopener">Ouvrir</a>
+            </div>
+            <p class="muted">Ce qui est écrit depuis ce lien apparaît comme un message du client : pour répondre, utilisez le formulaire de cette page.</p>
+        </section>
+    {% endif %}
+
     <div class="thread">
         {% for message in conversation.messages %}
             <article class="bubble {{ message.isFromClient ? 'bubble--in' : (message.isFromBot ? 'bubble--bot' : 'bubble--out') }}">
@@ -57,4 +70,20 @@
             <button type="submit" class="btn btn--quiet">Clôturer la conversation</button>
         </form>
     {% endif %}
+
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                const field = document.querySelector(button.dataset.copy);
+                field.select();
+
+                try {
+                    await navigator.clipboard.writeText(field.value);
+                    button.textContent = 'Copié';
+                } catch {
+                    button.textContent = 'Lien sélectionné';
+                }
+            });
+        });
+    </script>
 {% endblock %}

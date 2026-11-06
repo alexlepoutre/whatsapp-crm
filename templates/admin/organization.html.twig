@@ -72,6 +72,24 @@
         </section>
     </div>
 
+    <section class="defaults">
+        <h2 id="messages-par-defaut">Messages par défaut</h2>
+        <p class="muted">Les textes envoyés automatiquement pour {{ edited.name }}. Le message automatique se modifie dans les <a href="{{ path('admin_settings') }}">réglages</a>.</p>
+
+        {% for group, messages in defaultMessages %}
+            <h3>{{ group }}</h3>
+            <div class="defaults__list">
+                {% for message in messages %}
+                    <article class="default-message">
+                        <h4>{{ message.title }}</h4>
+                        <p class="muted">{{ message.when }}</p>
+                        <p class="default-message__text">{{ message.text|nl2br }}</p>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </section>
+
     <script>
         // L'envoi peut durer plusieurs secondes : sans retour visuel, on reclique et on l'interrompt.
         document.querySelectorAll('form[data-pending]').forEach((form) => {

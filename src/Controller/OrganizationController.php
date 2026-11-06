@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
+use App\Entity\Conversation;
 use App\Entity\MailSettings;
 use App\Entity\Organization;
 use App\Entity\OrganizationLogo;
 use App\Entity\User;
+use App\Enum\Channel;
 use App\Form\AccountEditType;
 use App\Form\AccountType;
 use App\Form\MailSettingsType;
@@ -17,8 +20,10 @@ use App\Repository\OrganizationLogoRepository;
 use App\Repository\OrganizationRepository;
 use App\Repository\UserRepository;
 use App\Service\CurrentOrganization;
+use App\Service\Inbox;
 use App\Service\Notifier;
 use App\Service\SecretBox;
+use App\WhatsApp\WhatsAppClient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -142,10 +147,52 @@ class OrganizationController extends AbstractController
         return $this->render('admin/organization.html.twig', [
             'edited' => $organization,
             'accounts' => $users->findBy(['organization' => $organization], ['email' => 'ASC']),
+            'defaultMessages' => $this->defaultMessages($organization),
             'edit' => $edit,
             'mail' => $mail,
             'account' => $account,
         ]);
+    }
+
+    /**
+     * Les textes réels : constantes du code et vrais modèles de courriel, rendus avec un exemple
+     * qui n'est jamais enregistré. Cet écran ne peut donc pas diverger de ce qui part.
+     *
+     * @return array<string, array<int, array{title: string, when: string, text: string}>>
+     */
+    private function defaultMessages(Organization $organization): array
+    {
+        $client = (new Client($organization))->setName('Camille Martin');
+        $conversation = new Conversation($client, Channel::FORM, 'Objet de la demande');
+        $link = '[lien privé du client]';
+        $email = fn (string $template, array $context = []): string => trim($this->renderView($template, $context + [
+            'conversation' => $conversation,
+            'url' => $link,
+        ]));
+
+        return [
+            'Sur WhatsApp, au client' => [
+                [
+                    'title' => 'Message automatique',
+                    'when' => $organization->isBotEnabled()
+                        ? 'Première réponse, puis après 12 heures de silence.'
+                        : 'Désactivé dans les réglages : il ne part pas.',
+                    'text' => $organization->getBotMessage(),
+                ],
+                ['title' => 'Transcription d\'un vocal', 'when' => 'Après chaque message vocal transcrit.', 'text' => \sprintf(Inbox::VOICE_ECHO, 'Où en est ma commande ?')],
+                ['title' => 'Question de la dernière réponse', 'when' => 'Avec les boutons Clôturer et Continuer, si votre réponse dépasse 1024 caractères. Sinon, les boutons sont sous votre réponse.', 'text' => WhatsAppClient::CHOICE_PROMPT],
+                ['title' => 'Confirmation de clôture', 'when' => 'Quand le client touche Clôturer.', 'text' => Inbox::CLOSED_REPLY],
+                ['title' => 'Suite de la conversation', 'when' => 'Quand le client touche Continuer.', 'text' => Inbox::CONTINUE_REPLY],
+            ],
+            'Par courriel, au client' => [
+                ['title' => 'Lien de suivi', 'when' => 'Après l\'envoi du formulaire.', 'text' => $email('email/tracking_link.txt.twig')],
+                ['title' => 'Réponse', 'when' => 'À chaque réponse sur une demande du formulaire.', 'text' => $email('email/reply.txt.twig', ['body' => '[votre réponse]', 'final' => false])],
+                ['title' => 'Dernière réponse', 'when' => 'Quand vous cliquez sur Dernière réponse.', 'text' => $email('email/reply.txt.twig', ['body' => '[votre réponse]', 'final' => true])],
+            ],
+            'Par courriel, à l\'équipe' => [
+                ['title' => 'Nouveau message', 'when' => 'À chaque message d\'un client, sauf la phrase d\'ouverture WhatsApp.', 'text' => $email('email/owner_notification.txt.twig', ['body' => '[message du client]', 'url' => '[lien vers la conversation]'])],
+            ],
+        ];
     }
 
     private function applyMailSettings(Organization $organization, FormInterface $form): bool

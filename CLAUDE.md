@@ -108,9 +108,14 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
   caractères par Meta) ou bloc sur le lien de suivi (`Conversation::awaitingClosure`). Le lien de
   suivi garde en plus un bouton de clôture permanent. L'équipe est prévenue d'une clôture ;
   « Continuer » ne change rien tant que le client n'a pas écrit. Un nouveau message rouvre.
+- **Messages par défaut** : la fiche d'une organisation les affiche depuis les constantes de
+  `Inbox` et les vrais modèles de courriel. Un nouveau texte automatique s'y ajoute
+  (`OrganizationController::defaultMessages`).
 - **Alertes** : chaque message client prévient tous les comptes de l'organisation et son adresse
   d'alerte, sauf la phrase d'ouverture WhatsApp. L'envoi se fait après la réponse à la requête
   (`Notifier::sendPending`), jamais pendant : un SMTP lent bloquerait le client et le relais.
+- **Lien privé dans l'admin** : affiché dans la conversation pour l'équipe de l'organisation,
+  avec l'avertissement qu'écrire depuis ce lien revient à écrire comme le client.
 - **Lien privé** : `/<slug>/suivi/<jeton>`, un jeton par conversation, jamais par client. Détenir un lien ne donne
   accès qu'à ce fil, même si plusieurs demandes partagent la même adresse.
 - **Formulaire** : données déclaratives, elles complètent une fiche et ne l'écrasent jamais.

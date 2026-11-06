@@ -167,6 +167,35 @@ class OrganizationManagementTest extends AppTestCase
         self::assertResponseStatusCodeSame(403);
     }
 
+    public function testDefaultMessagesAreShownWithoutStoringTheExample(): void
+    {
+        $this->loginAsSuperAdmin();
+        $organization = $this->em->find(Organization::class, $this->itroom->getId());
+        $organization->setBotMessage('Bonjour, ici Arnaud.');
+        $this->em->flush();
+
+        $this->client->request('GET', '/admin/organisations/'.$this->itroom->getId());
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.defaults', 'Bonjour, ici Arnaud.');
+        self::assertSelectorTextContains('.defaults', 'Votre demande est clôturée');
+        self::assertSelectorTextContains('.defaults', 'compris de votre message vocal');
+        self::assertSelectorTextContains('.defaults', 'est bien reçue par IT-Room');
+        self::assertSelectorTextContains('.defaults', 'nouveau message de Camille Martin');
+        self::assertSame(0, $this->em->getRepository(\App\Entity\Client::class)->count([]));
+    }
+
+    public function testDisabledBotIsShownAsDisabled(): void
+    {
+        $this->loginAsSuperAdmin();
+        $this->em->find(Organization::class, $this->itroom->getId())->setBotEnabled(false);
+        $this->em->flush();
+
+        $this->client->request('GET', '/admin/organisations/'.$this->itroom->getId());
+
+        self::assertSelectorTextContains('.defaults', 'il ne part pas');
+    }
+
     public function testNormalAccountHasNoAccess(): void
     {
         $this->loginAsOwner();

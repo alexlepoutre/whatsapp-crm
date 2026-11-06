@@ -205,6 +205,35 @@ class AdminTest extends AppTestCase
         self::assertNotSame('Message IT-Room', $this->em->getRepository(Organization::class)->find($other->getId())->getBotMessage());
     }
 
+    public function testFormConversationShowsThePrivateLink(): void
+    {
+        $this->client->request('GET', '/itroom');
+        $this->client->submitForm('Envoyer ma demande', [
+            'contact[name]' => 'Dominique',
+            'contact[email]' => 'dominique@example.test',
+            'contact[subject]' => 'Devis',
+            'contact[body]' => 'Bonjour',
+        ]);
+        $conversation = $this->em->getRepository(Conversation::class)->findOneBy([]);
+        $this->loginAsOwner();
+
+        $this->client->request('GET', '/admin/conversations/'.$conversation->getId());
+
+        self::assertSelectorExists('.private-link a[href$="/itroom/suivi/'.$conversation->getAccessToken().'"]');
+        self::assertSelectorExists('.private-link [data-copy]');
+    }
+
+    public function testWhatsAppConversationHasNoPrivateLink(): void
+    {
+        $this->postWebhook($this->textMessage());
+        $this->loginAsOwner();
+        $id = $this->em->getRepository(Conversation::class)->findOneBy([])->getId();
+
+        $this->client->request('GET', '/admin/conversations/'.$id);
+
+        self::assertSelectorNotExists('.private-link');
+    }
+
     public function testDeletingClientRemovesConversations(): void
     {
         $this->postWebhook($this->textMessage());

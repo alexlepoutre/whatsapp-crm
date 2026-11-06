@@ -244,6 +244,15 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .public .wa-card h2 { margin: 0 0 .5rem; }
 .wa-card .lead { margin-bottom: 1rem; font-size: 1.05rem; }
 
+.defaults { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.defaults h2 { margin-top: 0; }
+.defaults h3 { margin: 1.75rem 0 .75rem; font-size: 1.05rem; }
+.defaults__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
+.default-message h4 { margin: 0; font-size: 1rem; }
+.default-message__text { margin-top: .5rem; padding: .7rem .9rem; border-radius: 10px; background: var(--surface); overflow-wrap: anywhere; font-size: .95rem; }
+.private-link { margin-block: 1rem; padding: .9rem 1rem; border-radius: 10px; background: var(--surface); }
+.private-link__row { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .4rem; }
+.private-link__row input { flex: 1 1 16rem; width: auto; min-width: 0; color: var(--muted); font-size: .9rem; }
 .composer { margin-bottom: 1rem; }
 .composer__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .5rem; }
 .closure-choice { margin-block: 1.5rem; padding: 1.25rem 1.5rem; border-radius: 12px; border: 2px solid var(--action); background: var(--surface); }
