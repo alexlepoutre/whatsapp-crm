@@ -4,7 +4,12 @@ namespace App\Service;
 
 use App\Entity\Conversation;
 use App\Entity\Organization;
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -18,14 +23,18 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Courriels de l'application. Chaque méthode dit si l'envoi a abouti : une panne de
  * messagerie ne doit jamais faire perdre le message déjà enregistré.
  */
-class Notifier
+class Notifier implements EventSubscriberInterface
 {
+    /** @var array<int, array{Conversation, string}> */
+    private array $pending = [];
+
     public function __construct(
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $urls,
         private readonly LoggerInterface $logger,
         private readonly OrganizationTransport $transports,
         private readonly BodyRendererInterface $bodyRenderer,
+        private readonly UserRepository $users,
         #[Autowire('%env(MAIL_FROM)%')] private readonly string $from,
     ) {
     }
@@ -40,18 +49,46 @@ class Notifier
         return $this->toClient($conversation, 'Nouvelle réponse : '.$conversation->getTitle(), 'email/reply.txt.twig', ['body' => $body]);
     }
 
-    public function notifyOwner(Conversation $conversation, string $body): bool
+    /**
+     * Prévient l'équipe, après la réponse à la requête : un envoi peut durer plus de 10 secondes.
+     * Le client n'a pas à attendre, et le relais WhatsApp expirerait.
+     */
+    public function notifyTeam(Conversation $conversation, string $body): void
     {
-        $recipient = $conversation->getOrganization()->getNotificationEmail();
+        $this->pending[] = [$conversation, $body];
+    }
 
-        if (null === $recipient) {
-            return false;
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::TERMINATE => 'sendPending',
+            ConsoleEvents::TERMINATE => 'sendPending',
+        ];
+    }
+
+    public function sendPending(): void
+    {
+        $pending = $this->pending;
+        $this->pending = [];
+
+        foreach ($pending as [$conversation, $body]) {
+            $this->sendToTeam($conversation, $body);
+        }
+    }
+
+    private function sendToTeam(Conversation $conversation, string $body): void
+    {
+        $organization = $conversation->getOrganization();
+        $recipients = $this->teamAddresses($organization);
+
+        if ([] === $recipients) {
+            return;
         }
 
-        return $this->send(
-            $conversation->getOrganization(),
+        $this->send(
+            $organization,
             (new TemplatedEmail())
-                ->to($recipient)
+                ->to(...$recipients)
                 ->subject(\sprintf('[%s] %s', $conversation->getChannel()->label(), $conversation->getClient()->getDisplayName()))
                 ->textTemplate('email/owner_notification.txt.twig')
                 ->context([
@@ -60,6 +97,18 @@ class Notifier
                     'url' => $this->urls->generate('admin_conversation', ['id' => $conversation->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
                 ]),
         );
+    }
+
+    /** @return string[] */
+    private function teamAddresses(Organization $organization): array
+    {
+        $addresses = array_map(static fn (User $user) => $user->getEmail(), $this->users->findBy(['organization' => $organization]));
+
+        if (null !== $organization->getNotificationEmail()) {
+            $addresses[] = mb_strtolower($organization->getNotificationEmail());
+        }
+
+        return array_values(array_unique($addresses));
     }
 
     /** @param array<string, mixed> $context */

@@ -101,7 +101,10 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
 - **Fenêtre de 24 h** : au-delà du dernier message client, Meta refuse le texte libre. Le
   formulaire de réponse disparaît. Les modèles validés ne sont pas encore gérés.
 - **Bot** : message fixe, au premier contact puis après 12 h de silence (`Inbox::QUIET_PERIOD`).
-  Le même seuil déclenche l'alerte par courriel. Il ne change jamais le statut du fil.
+  Il ne change jamais le statut du fil.
+- **Alertes** : chaque message client prévient tous les comptes de l'organisation et son adresse
+  d'alerte, sauf la phrase d'ouverture WhatsApp. L'envoi se fait après la réponse à la requête
+  (`Notifier::sendPending`), jamais pendant : un SMTP lent bloquerait le client et le relais.
 - **Lien privé** : `/<slug>/suivi/<jeton>`, un jeton par conversation, jamais par client. Détenir un lien ne donne
   accès qu'à ce fil, même si plusieurs demandes partagent la même adresse.
 - **Formulaire** : données déclaratives, elles complètent une fiche et ne l'écrasent jamais.

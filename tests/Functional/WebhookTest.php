@@ -72,6 +72,45 @@ class WebhookTest extends AppTestCase
         self::assertSame('Voir #itroomfan sur le site', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
     }
 
+    public function testEveryWhatsAppMessageAlertsTheTeam(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1', text: 'Premier message'));
+        self::assertEmailCount(1);
+
+        $this->postWebhook($this->textMessage('wamid.2', text: 'Deuxième message'));
+        self::assertEmailCount(1);
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Deuxième message');
+
+        $this->postWebhook($this->textMessage('wamid.3', text: 'Troisième message'));
+        self::assertEmailCount(1);
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Troisième message');
+    }
+
+    public function testRedeliveredMessageDoesNotAlertTwice(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1'));
+        $this->postWebhook($this->textMessage('wamid.1'));
+
+        self::assertEmailCount(0);
+    }
+
+    public function testAlertGoesToAllAccountsOfTheOrganizationOnce(): void
+    {
+        $itroom = $this->em->find(\App\Entity\Organization::class, $this->itroom->getId());
+        $other = $this->createOrganization('dufermont', 'Dufermont');
+        foreach ([['a@itroom.test', $itroom], ['alerte@itroom.test', $itroom], ['b@dufermont.test', $other]] as [$email, $organization]) {
+            $this->em->persist((new \App\Entity\User($email))->setPassword('x')->setOrganization($organization));
+        }
+        $this->em->flush();
+
+        $this->postWebhook($this->textMessage());
+
+        self::assertEmailCount(1);
+        $to = array_map(static fn ($address) => $address->getAddress(), self::getMailerMessage()->getTo());
+        sort($to);
+        self::assertSame(['a@itroom.test', 'alerte@itroom.test'], $to);
+    }
+
     public function testSamePhoneHasSeparateRecordPerOrganization(): void
     {
         $this->createOrganization('dufermont', 'Dufermont');

@@ -69,6 +69,9 @@ class ContactFormTest extends AppTestCase
 
         self::assertResponseRedirects();
         self::assertSame(2, $this->em->getRepository(Message::class)->count([]));
+        self::assertEmailCount(1);
+        self::assertEmailAddressContains(self::getMailerMessage(), 'To', 'alerte@itroom.test');
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Une précision.');
     }
 
     public function testPageIsSpecificToOrganizationAndCarriesWhatsAppCode(): void

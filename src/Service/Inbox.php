@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
  */
 class Inbox
 {
-    /** Au-delà de ce silence, un message est une nouvelle sollicitation : bot et alerte repartent. */
+    /** Au-delà de ce silence, un message est une nouvelle sollicitation : le bot répond de nouveau. */
     private const QUIET_PERIOD = '-12 hours';
 
     private const OPENED = 'Conversation ouverte depuis la page de contact.';
@@ -81,10 +81,16 @@ class Inbox
             $this->sendAutomatic($conversation, "🎤 Voici ce que nous avons compris de votre message vocal :\n\n« ".$transcription.' »');
         }
 
+        // La phrase d'ouverture ne contient aucune demande : l'équipe n'a rien à lire à ce stade.
         if (self::OPENED === $body) {
             $this->sendBotReply($conversation, self::OPENED_REPLY);
-        } elseif ($isNewSolicitation) {
-            $this->notifier->notifyOwner($conversation, $body);
+
+            return;
+        }
+
+        $this->notifier->notifyTeam($conversation, $body);
+
+        if ($isNewSolicitation) {
             $this->sendBotReply($conversation, $organization->getBotMessage());
         }
     }
@@ -139,7 +145,7 @@ class Inbox
         $this->entityManager->flush();
 
         $this->notifier->sendTrackingLink($conversation);
-        $this->notifier->notifyOwner($conversation, $body);
+        $this->notifier->notifyTeam($conversation, $body);
 
         return $conversation;
     }
@@ -149,7 +155,7 @@ class Inbox
         new Message($conversation, MessageSender::CLIENT, $body);
         $this->entityManager->flush();
 
-        $this->notifier->notifyOwner($conversation, $body);
+        $this->notifier->notifyTeam($conversation, $body);
     }
 
     /** Le message est enregistré avant l'envoi : un échec reste visible et n'efface rien. */
