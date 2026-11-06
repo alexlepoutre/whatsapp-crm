@@ -14,9 +14,12 @@ use App\Repository\ClientRepository;
 use App\Repository\ConversationRepository;
 use App\Service\CurrentOrganization;
 use App\Service\Inbox;
+use App\Service\MessageCatalog;
+use App\Service\PhoneNormalizer;
 use App\WhatsApp\WhatsAppClient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -171,7 +174,12 @@ class AdminController extends AbstractController
     }
 
     #[Route('/reglages', name: 'admin_settings')]
-    public function settings(Request $request, WhatsAppClient $whatsApp): Response
+    public function settings(
+        Request $request,
+        WhatsAppClient $whatsApp,
+        MessageCatalog $catalog,
+        #[Autowire('%env(WHATSAPP_PUBLIC_NUMBER)%')] string $publicNumber,
+    ): Response
     {
         $form = $this->createForm(SettingsType::class, $this->current->get());
         $form->handleRequest($request);
@@ -186,6 +194,40 @@ class AdminController extends AbstractController
         return $this->render('admin/settings.html.twig', [
             'form' => $form,
             'whatsappConfigured' => $whatsApp->isConfigured(),
+            'messages' => $catalog->all($this->current->get()),
+            'whatsappNumber' => PhoneNormalizer::normalize($publicNumber),
         ]);
+    }
+
+    #[Route('/reglages/messages/{key}', name: 'admin_message_template', requirements: ['key' => '[a-z_]+'], methods: ['POST'])]
+    public function saveMessageTemplate(string $key, Request $request, MessageCatalog $catalog): Response
+    {
+        if (!$catalog->exists($key)) {
+            throw $this->createNotFoundException();
+        }
+
+        if (!$this->isCsrfTokenValid('message-template', $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $organization = $this->current->get();
+        $text = str_replace("\r\n", "\n", trim($request->request->getString('text')));
+
+        if ($request->request->has('reset')) {
+            $organization->setMessageTemplate($key, null);
+            $this->addFlash('success', 'Texte d\'origine rétabli.');
+        } elseif (null !== $error = $catalog->validate($key, $text)) {
+            $this->addFlash('error', 'Message non enregistré. '.$error);
+
+            return $this->redirect($this->generateUrl('admin_settings').'#'.$key);
+        } else {
+            // Identique à l'origine : rien à garder, le message suivra les futures corrections.
+            $organization->setMessageTemplate($key, $text === $catalog->defaultText($key) ? null : $text);
+            $this->addFlash('success', 'Message enregistré.');
+        }
+
+        $this->entityManager->flush();
+
+        return $this->redirect($this->generateUrl('admin_settings').'#'.$key);
     }
 }

@@ -27,9 +27,6 @@ class Inbox
 
     private const OPENED = 'Conversation ouverte depuis la page de contact.';
 
-    public const VOICE_ECHO = "🎤 Voici ce que nous avons compris de votre message vocal :\n\n« %s »";
-    public const CLOSED_REPLY = 'Votre demande est clôturée. Écrivez-nous à tout moment si vous avez besoin de la rouvrir.';
-    public const CONTINUE_REPLY = 'Très bien, écrivez votre message ici.';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -39,6 +36,7 @@ class Inbox
         private readonly WhatsAppClient $whatsApp,
         private readonly Notifier $notifier,
         private readonly LoggerInterface $logger,
+        private readonly MessageCatalog $catalog,
     ) {
     }
 
@@ -63,7 +61,7 @@ class Inbox
 
         // Le client doit pouvoir vérifier ce qui a été compris, même bot désactivé.
         if (null !== $transcription) {
-            $this->sendAutomatic($conversation, \sprintf(self::VOICE_ECHO, $transcription));
+            $this->sendAutomatic($conversation, $this->catalog->render($organization, MessageCatalog::VOICE_ECHO, ['transcription' => $transcription]));
         }
 
         // La phrase d'ouverture ne contient aucune demande : le client reçoit le message automatique
@@ -96,7 +94,7 @@ class Inbox
 
         if ($closing) {
             $this->closeFromClient($conversation);
-            $this->sendAutomatic($conversation, self::CLOSED_REPLY);
+            $this->sendAutomatic($conversation, $this->catalog->render($organization, MessageCatalog::CLOSED));
 
             return;
         }
@@ -104,7 +102,7 @@ class Inbox
         // Un clic ne contient aucune demande : ni « À traiter », ni alerte, tant qu'il n'a rien écrit.
         $conversation->markAnswered();
         $this->entityManager->flush();
-        $this->sendAutomatic($conversation, self::CONTINUE_REPLY);
+        $this->sendAutomatic($conversation, $this->catalog->render($organization, MessageCatalog::CONTINUE));
     }
 
     private function whatsAppConversation(Organization $organization, string $phone, ?string $profileName): Conversation
@@ -315,7 +313,7 @@ class Inbox
         try {
             $phone = (string) $message->getConversation()->getClient()->getPhone();
             $id = $withChoice
-                ? $this->whatsApp->sendTextWithChoice($phone, $message->getBody())
+                ? $this->whatsApp->sendTextWithChoice($phone, $message->getBody(), $this->catalog->render($message->getConversation()->getOrganization(), MessageCatalog::CHOICE_PROMPT))
                 : $this->whatsApp->sendText($phone, $message->getBody());
             $message->setWaMessageId($id);
             $message->markDelivery(DeliveryStatus::SENT);

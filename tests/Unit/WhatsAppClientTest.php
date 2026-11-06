@@ -42,7 +42,7 @@ class WhatsAppClientTest extends TestCase
         $response = new JsonMockResponse(['messages' => [['id' => 'wamid.1']]]);
         $client = new WhatsAppClient(new MockHttpClient($response), 'jeton', '123', 'v24.0');
 
-        self::assertSame('wamid.1', $client->sendTextWithChoice('33612345678', 'Votre commande est partie.'));
+        self::assertSame('wamid.1', $client->sendTextWithChoice('33612345678', 'Votre commande est partie.', 'Question ?'));
 
         $sent = json_decode($response->getRequestOptions()['body'], true);
         self::assertSame('interactive', $sent['type']);
@@ -62,7 +62,7 @@ class WhatsAppClientTest extends TestCase
         $second = new JsonMockResponse(['messages' => [['id' => 'wamid.choix']]]);
         $client = new WhatsAppClient(new MockHttpClient([$first, $second]), 'jeton', '123', 'v24.0');
 
-        self::assertSame('wamid.texte', $client->sendTextWithChoice('33612345678', str_repeat('a', 1025)));
+        self::assertSame('wamid.texte', $client->sendTextWithChoice('33612345678', str_repeat('a', 1025), 'Question ?'));
 
         self::assertSame('text', json_decode($first->getRequestOptions()['body'], true)['type']);
         self::assertSame('interactive', json_decode($second->getRequestOptions()['body'], true)['type']);
@@ -74,7 +74,7 @@ class WhatsAppClientTest extends TestCase
         $second = new JsonMockResponse(['error' => ['message' => 'Refusé']], ['http_code' => 400]);
         $client = new WhatsAppClient(new MockHttpClient([$first, $second]), 'jeton', '123', 'v24.0');
 
-        self::assertSame('wamid.texte', $client->sendTextWithChoice('33612345678', str_repeat('a', 1025)));
+        self::assertSame('wamid.texte', $client->sendTextWithChoice('33612345678', str_repeat('a', 1025), 'Question ?'));
     }
 
     public function testSurfacesMetaErrorMessage(): void

@@ -12,6 +12,7 @@ use App\Repository\ClientRepository;
 use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
 use App\Service\Inbox;
+use App\Service\MessageCatalog;
 use App\Service\Notifier;
 use App\WhatsApp\WhatsAppClient;
 use App\WhatsApp\WhatsAppException;
@@ -31,6 +32,7 @@ class InboxReadReceiptTest extends TestCase
             $whatsApp,
             $this->createStub(Notifier::class),
             $this->createStub(LoggerInterface::class),
+            new MessageCatalog(),
         );
     }
 

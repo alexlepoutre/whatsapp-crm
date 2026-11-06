@@ -11,12 +11,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -34,7 +32,7 @@ class Notifier implements EventSubscriberInterface
         private readonly UrlGeneratorInterface $urls,
         private readonly LoggerInterface $logger,
         private readonly OrganizationTransport $transports,
-        private readonly BodyRendererInterface $bodyRenderer,
+        private readonly MessageCatalog $messages,
         private readonly UserRepository $users,
         private readonly MailSettingsRepository $mailSettings,
         #[Autowire('%env(MAIL_FROM)%')] private readonly string $from,
@@ -43,12 +41,12 @@ class Notifier implements EventSubscriberInterface
 
     public function sendTrackingLink(Conversation $conversation): bool
     {
-        return $this->toClient($conversation, 'Votre demande : '.$conversation->getTitle(), 'email/tracking_link.txt.twig', []);
+        return $this->toClient($conversation, 'Votre demande : '.$conversation->getTitle(), MessageCatalog::TRACKING_LINK);
     }
 
     public function sendReply(Conversation $conversation, string $body, bool $final = false): bool
     {
-        return $this->toClient($conversation, 'Nouvelle réponse : '.$conversation->getTitle(), 'email/reply.txt.twig', ['body' => $body, 'final' => $final]);
+        return $this->toClient($conversation, 'Nouvelle réponse : '.$conversation->getTitle(), $final ? MessageCatalog::FINAL_REPLY : MessageCatalog::REPLY, ['message' => $body]);
     }
 
     /**
@@ -89,15 +87,15 @@ class Notifier implements EventSubscriberInterface
 
         $this->send(
             $organization,
-            (new TemplatedEmail())
+            (new Email())
                 ->to(...$recipients)
                 ->subject(\sprintf('[%s] %s', $conversation->getChannel()->label(), $conversation->getClient()->getDisplayName()))
-                ->textTemplate('email/owner_notification.txt.twig')
-                ->context([
-                    'conversation' => $conversation,
-                    'body' => $body,
-                    'url' => $this->urls->generate('admin_conversation', ['id' => $conversation->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
-                ]),
+                ->text($this->messages->render($organization, MessageCatalog::TEAM, [
+                    'client' => $conversation->getClient()->getDisplayName(),
+                    'canal' => $conversation->getChannel()->label(),
+                    'message' => $body,
+                    'lien' => $this->urls->generate('admin_conversation', ['id' => $conversation->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                ])),
         );
     }
 
@@ -113,8 +111,8 @@ class Notifier implements EventSubscriberInterface
         return array_values(array_unique($addresses));
     }
 
-    /** @param array<string, mixed> $context */
-    private function toClient(Conversation $conversation, string $subject, string $template, array $context): bool
+    /** @param array<string, string> $variables */
+    private function toClient(Conversation $conversation, string $subject, string $messageKey, array $variables = []): bool
     {
         $email = $conversation->getClient()->getEmail();
 
@@ -124,14 +122,14 @@ class Notifier implements EventSubscriberInterface
 
         return $this->send(
             $conversation->getOrganization(),
-            (new TemplatedEmail())
+            (new Email())
                 ->to($email)
                 ->subject($subject)
-                ->textTemplate($template)
-                ->context($context + [
-                    'conversation' => $conversation,
-                    'url' => $this->urls->generate('tracking_show', ['slug' => $conversation->getOrganization()->getSlug(), 'token' => $conversation->getAccessToken()], UrlGeneratorInterface::ABSOLUTE_URL),
-                ]),
+                ->text($this->messages->render($conversation->getOrganization(), $messageKey, $variables + [
+                    'client' => $conversation->getClient()->getDisplayName(),
+                    'objet' => $conversation->getTitle(),
+                    'lien' => $this->urls->generate('tracking_show', ['slug' => $conversation->getOrganization()->getSlug(), 'token' => $conversation->getAccessToken()], UrlGeneratorInterface::ABSOLUTE_URL),
+                ])),
         );
     }
 
@@ -181,7 +179,7 @@ class Notifier implements EventSubscriberInterface
         return $this->mailSettings->current()?->toAddress() ?? Address::create($this->from);
     }
 
-    private function send(Organization $organization, TemplatedEmail $email): bool
+    private function send(Organization $organization, Email $email): bool
     {
         try {
             $transport = $this->transports->for($organization);
@@ -192,9 +190,7 @@ class Notifier implements EventSubscriberInterface
                 return true;
             }
 
-            // Ce transport est hors du Mailer : le gabarit doit être rendu ici.
             $email->from(new Address((string) $organization->getSmtpUsername(), $organization->getName()));
-            $this->bodyRenderer->render($email);
             $transport->send($email);
 
             return true;

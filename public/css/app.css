@@ -457,3 +457,17 @@ input:not([type="checkbox"]):focus, textarea:focus { border-color: var(--action)
     .contact-grid { grid-template-columns: minmax(0, 1fr); }
     .composer, .split > section, .narrow, .defaults { padding: 1rem; }
 }
+
+/* Messages types */
+.templates { margin-top: 2rem; }
+.templates h2 { margin-top: 0; }
+.templates h3 { margin: 1.5rem 0 .6rem; font-size: 1.05rem; }
+.template { margin-bottom: .9rem; padding: 1.1rem 1.25rem; border-radius: 18px; background: var(--surface); box-shadow: 0 8px 20px -16px rgb(15 53 66 / .5); scroll-margin-top: 1rem; }
+.template label { margin-bottom: 0; font-size: 1.05rem; }
+.template > .muted { margin-bottom: .5rem; }
+.template textarea + .muted { margin-top: .35rem; }
+
+.snippet { margin-top: 2rem; }
+.snippet h2 { margin-top: 0; }
+.snippet textarea { font: .85rem/1.4 ui-monospace, monospace; color: var(--muted); }
+.snippet .composer__actions { margin-top: .5rem; }

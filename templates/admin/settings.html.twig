@@ -21,4 +21,58 @@
             <button type="submit" class="btn">Enregistrer les réglages</button>
         {{ form_end(form) }}
     </div>
+
+    {% if whatsappNumber %}
+        {% set glyph %}{{ include('_whatsapp_logo.html.twig')|trim }}{% endset %}
+        {% set snippet %}<a href="https://wa.me/{{ whatsappNumber }}?text={{ organization.whatsAppOpening|url_encode }}" target="_blank" rel="noopener" aria-label="Écrire sur WhatsApp" style="position:fixed;right:20px;bottom:20px;z-index:9999;display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:#25d366;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.25)">{{ glyph|replace({'class="wa-logo"': 'width="36" height="36"'})|raw }}</a>{% endset %}
+
+        <section class="template snippet">
+            <h2 id="bouton-whatsapp">Bouton WhatsApp pour votre site</h2>
+            <p class="muted">Collez ce code juste avant la balise de fin <code>&lt;/body&gt;</code> de votre site. Le bouton flotte en bas à droite et ouvre une conversation avec {{ organization.name }}. Il n'ajoute ni script ni cookie.</p>
+            <textarea id="snippet" rows="5" readonly>{{ snippet }}</textarea>
+            <div class="composer__actions">
+                <button type="button" class="btn" data-copy="#snippet">Copier le code</button>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="templates">
+        <h2 id="messages">Messages types</h2>
+        <p class="muted">Les textes envoyés automatiquement pour {{ organization.name }}. Les mots entre accolades, comme {lien}, sont remplacés à l'envoi.</p>
+
+        {% for group, items in messages %}
+            <h3>{{ group }}</h3>
+            {% for message in items %}
+                <form method="post" action="{{ path('admin_message_template', {key: message.key}) }}" class="template" id="{{ message.key }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('message-template') }}">
+                    <label for="text-{{ message.key }}">{{ message.title }}{% if message.custom %} <span class="tag">Personnalisé</span>{% endif %}</label>
+                    <p class="muted">{{ message.when }}</p>
+                    <textarea id="text-{{ message.key }}" name="text" rows="{{ message.key starts with 'email' ? 8 : 3 }}">{{ message.text }}</textarea>
+                    <p class="muted">Variables : {{ message.variables|join(', ') }}</p>
+                    <div class="composer__actions">
+                        <button type="submit" class="btn">Enregistrer</button>
+                        {% if message.custom %}
+                            <button type="submit" name="reset" value="1" class="btn btn--quiet" formnovalidate>Rétablir le texte d'origine</button>
+                        {% endif %}
+                    </div>
+                </form>
+            {% endfor %}
+        {% endfor %}
+    </section>
+
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                const field = document.querySelector(button.dataset.copy);
+                field.select();
+
+                try {
+                    await navigator.clipboard.writeText(field.value);
+                    button.textContent = 'Code copié';
+                } catch {
+                    button.textContent = 'Code sélectionné';
+                }
+            });
+        });
+    </script>
 {% endblock %}

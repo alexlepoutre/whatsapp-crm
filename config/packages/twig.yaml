@@ -1,7 +1,7 @@
 twig:
     # À incrémenter à chaque modification du CSS : sans cela, les navigateurs gardent l'ancien.
     globals:
-        assets_version: 3
+        assets_version: 5
     date:
         timezone: Europe/Paris
     file_name_pattern: '*.twig'

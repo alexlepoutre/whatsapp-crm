@@ -16,7 +16,6 @@ class WhatsAppClient
 
     /** Limite de Meta pour le texte d'un message à boutons. */
     private const CHOICE_BODY_LIMIT = 1024;
-    public const CHOICE_PROMPT = 'Votre demande est-elle traitée ?';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -71,7 +70,7 @@ class WhatsAppClient
      *
      * @throws WhatsAppException
      */
-    public function sendTextWithChoice(string $to, string $body): string
+    public function sendTextWithChoice(string $to, string $body, string $prompt): string
     {
         if (mb_strlen($body) <= self::CHOICE_BODY_LIMIT) {
             return $this->sendChoice($to, $body);
@@ -81,7 +80,7 @@ class WhatsAppClient
 
         // La réponse est partie : l'absence des boutons ne doit pas la faire passer pour un échec.
         try {
-            $this->sendChoice($to, self::CHOICE_PROMPT);
+            $this->sendChoice($to, $prompt);
         } catch (WhatsAppException) {
         }
 

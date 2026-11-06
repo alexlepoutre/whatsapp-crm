@@ -73,17 +73,23 @@
     </div>
 
     <section class="defaults">
-        <h2 id="messages-par-defaut">Messages par défaut</h2>
-        <p class="muted">Les textes envoyés automatiquement pour {{ edited.name }}. Le message automatique se modifie dans les <a href="{{ path('admin_settings') }}">réglages</a>.</p>
+        <h2 id="messages-par-defaut">Messages types</h2>
+        <p class="muted">Les textes envoyés automatiquement pour {{ edited.name }}, avec un exemple. Ils se modifient dans les <a href="{{ path('admin_settings') }}#messages">réglages</a>.</p>
+
+        <h3>Message automatique</h3>
+        <article class="default-message">
+            <p class="muted">{{ edited.botEnabled ? 'Première réponse sur WhatsApp, puis après 12 heures de silence.' : 'Désactivé dans les réglages : il ne part pas.' }}</p>
+            <p class="default-message__text">{{ edited.botMessage|nl2br }}</p>
+        </article>
 
         {% for group, messages in defaultMessages %}
             <h3>{{ group }}</h3>
             <div class="defaults__list">
                 {% for message in messages %}
                     <article class="default-message">
-                        <h4>{{ message.title }}</h4>
+                        <h4>{{ message.title }}{% if message.custom %} <span class="tag">Personnalisé</span>{% endif %}</h4>
                         <p class="muted">{{ message.when }}</p>
-                        <p class="default-message__text">{{ message.text|nl2br }}</p>
+                        <p class="default-message__text">{{ message.preview|nl2br }}</p>
                     </article>
                 {% endfor %}
             </div>

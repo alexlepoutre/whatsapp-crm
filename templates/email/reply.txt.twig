@@ -1,9 +1,0 @@
-Bonjour {{ conversation.client.displayName }},
-
-{{ conversation.organization.name }} a répondu à votre demande « {{ conversation.title }} » :
-
-{{ body }}
-
-{% if final %}Votre demande est-elle traitée ? Depuis votre lien privé, vous pouvez la clôturer ou continuer la conversation (ne répondez pas à ce courriel) :
-{% else %}Pour répondre, utilisez votre lien privé (ne répondez pas à ce courriel) :
-{% endif %}{{ url }}

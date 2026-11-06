@@ -122,9 +122,9 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
   caractères par Meta) ou bloc sur le lien de suivi (`Conversation::awaitingClosure`). Le lien de
   suivi garde en plus un bouton de clôture permanent. L'équipe est prévenue d'une clôture ;
   « Continuer » ne change rien tant que le client n'a pas écrit.
-- **Messages par défaut** : la fiche d'une organisation les affiche depuis les constantes de
-  `Inbox` et les vrais modèles de courriel. Un nouveau texte automatique s'y ajoute
-  (`OrganizationController::defaultMessages`).
+- **Messages types** : tous les textes automatiques passent par `MessageCatalog`, modifiables par
+  organisation dans Réglages. Un nouveau texte s'y déclare, jamais en dur. Les variables vitales,
+  comme `{lien}`, sont obligatoires. Seul ce qui diffère de l'origine est enregistré.
 - **Alertes** : chaque message client prévient tous les comptes de l'organisation et son adresse
   d'alerte, sauf la phrase d'ouverture WhatsApp. L'envoi se fait après la réponse à la requête
   (`Notifier::sendPending`), jamais pendant : un SMTP lent bloquerait le client et le relais.

@@ -57,6 +57,15 @@ class Organization
     #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Choisissez une couleur.')]
     private string $secondaryColor = '#0f3542';
 
+    /**
+     * Textes automatiques personnalisés, par clé de MessageCatalog. Seuls ceux qui diffèrent de
+     * l'origine y figurent.
+     *
+     * @var array<string, string>|null
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $messageTemplates = null;
+
     /** Change à chaque nouveau logo, pour que le cache des navigateurs ne garde pas l'ancien. Nul sans logo. */
     #[ORM\Column(nullable: true)]
     private ?int $logoVersion = null;
@@ -143,6 +152,27 @@ class Organization
     public function setBotMessage(?string $botMessage): static
     {
         $this->botMessage = (string) $botMessage;
+
+        return $this;
+    }
+
+    public function getMessageTemplate(string $key): ?string
+    {
+        return $this->messageTemplates[$key] ?? null;
+    }
+
+    public function setMessageTemplate(string $key, ?string $text): static
+    {
+        $templates = $this->messageTemplates ?? [];
+
+        if (null === $text) {
+            unset($templates[$key]);
+        } else {
+            $templates[$key] = $text;
+        }
+
+        // Nouveau tableau : Doctrine ne repère pas une modification faite sur place.
+        $this->messageTemplates = [] === $templates ? null : $templates;
 
         return $this;
     }
