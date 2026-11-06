@@ -42,6 +42,7 @@
         <nav class="rail__nav">
             <a href="{{ path('admin_inbox') }}" {% if app.current_route == 'admin_inbox' %}aria-current="page"{% endif %}>Messages</a>
             <a href="{{ path('admin_clients') }}" {% if app.current_route == 'admin_clients' %}aria-current="page"{% endif %}>Clients</a>
+            <a href="{{ path('admin_statistics') }}" {% if app.current_route starts with 'admin_statistics' %}aria-current="page"{% endif %}>Statistiques</a>
             <a href="{{ path('admin_settings') }}" {% if app.current_route == 'admin_settings' %}aria-current="page"{% endif %}>Réglages</a>
             {% if is_granted('ROLE_SUPER_ADMIN') %}
                 <a href="{{ path('admin_organizations') }}" {% if app.current_route starts with 'admin_organization' %}aria-current="page"{% endif %}>Organisations</a>

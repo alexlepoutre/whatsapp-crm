@@ -1,0 +1,139 @@
+{# Couleurs vérifiées pour le daltonisme, fixes : celles d'une organisation pourraient se confondre. #}
+{% set total = 0 %}
+{% set top = 0 %}
+{% for point in series %}
+    {% set total = total + point.received + point.sent %}
+    {% set top = max(top, point.received, point.sent) %}
+{% endfor %}
+
+{% if total == 0 %}
+    <p class="empty">Aucun message sur cette période.</p>
+{% else %}
+    {% set width = 800 %}
+    {% set height = 260 %}
+    {% set left = 36 %}
+    {% set right = 14 %}
+    {% set upper = 12 %}
+    {% set bottom = 232 %}
+    {% set step = top <= 4 ? 1 : (top <= 8 ? 2 : (top <= 20 ? 5 : (top <= 40 ? 10 : (top <= 100 ? 25 : (top / 4 / 50)|round(0, 'ceil') * 50)))) %}
+    {% set ceiling = (top / step)|round(0, 'ceil') * step %}
+    {% set count = series|length %}
+    {% set gap = count > 1 ? (width - left - right) / (count - 1) : 0 %}
+    {% set every = (count / 7)|round(0, 'ceil') %}
+    {% set linePoints = {received: '', sent: ''} %}
+    {% set xs = [] %}
+    {% for point in series %}
+        {% set x = count > 1 ? left + loop.index0 * gap : (left + width - right) / 2 %}
+        {% set xs = xs|merge([x]) %}
+        {% set linePoints = {
+            received: linePoints.received ~ x|round(1) ~ ',' ~ (bottom - point.received / ceiling * (bottom - upper))|round(1) ~ ' ',
+            sent: linePoints.sent ~ x|round(1) ~ ',' ~ (bottom - point.sent / ceiling * (bottom - upper))|round(1) ~ ' ',
+        } %}
+    {% endfor %}
+
+    <figure class="chart" data-chart data-points="{{ series|json_encode }}" data-xs="{{ xs|json_encode }}" data-width="{{ width }}">
+        <ul class="chart__legend">
+            <li><span class="chart__key chart__key--received"></span>Messages reçus</li>
+            <li><span class="chart__key chart__key--sent"></span>Réponses envoyées</li>
+        </ul>
+        <div class="chart__plot">
+            <svg viewBox="0 0 {{ width }} {{ height }}" role="img" tabindex="0" aria-label="Messages reçus et réponses envoyées sur la période. Les chiffres sont dans le tableau ci-dessous.">
+                {% for tick in range(0, ceiling, step) %}
+                    {% set y = bottom - tick / ceiling * (bottom - upper) %}
+                    <line class="chart__grid" x1="{{ left }}" x2="{{ width - right }}" y1="{{ y }}" y2="{{ y }}"></line>
+                    <text class="chart__tick" x="{{ left - 8 }}" y="{{ y + 4 }}" text-anchor="end">{{ tick }}</text>
+                {% endfor %}
+                {% for point in series %}
+                    {% if loop.index0 % every == 0 %}
+                        <text class="chart__tick" x="{{ xs[loop.index0] }}" y="{{ height - 8 }}" text-anchor="{{ loop.first and count > 1 ? 'start' : 'middle' }}">{{ point.label }}</text>
+                    {% endif %}
+                {% endfor %}
+                <polyline class="chart__line chart__line--received" points="{{ linePoints.received }}"></polyline>
+                <polyline class="chart__line chart__line--sent" points="{{ linePoints.sent }}"></polyline>
+                {% if count <= 14 %}
+                    {% for point in series %}
+                        <circle class="chart__dot chart__dot--received" cx="{{ xs[loop.index0] }}" cy="{{ bottom - point.received / ceiling * (bottom - upper) }}" r="4"></circle>
+                        <circle class="chart__dot chart__dot--sent" cx="{{ xs[loop.index0] }}" cy="{{ bottom - point.sent / ceiling * (bottom - upper) }}" r="4"></circle>
+                    {% endfor %}
+                {% endif %}
+                <line class="chart__cross" y1="{{ upper }}" y2="{{ bottom }}" hidden></line>
+            </svg>
+            <div class="chart__tip" hidden></div>
+        </div>
+        <details class="chart__table">
+            <summary>Voir les chiffres</summary>
+            <div class="stats-table">
+                <table>
+                    <thead><tr><th scope="col">Période</th><th scope="col">Reçus</th><th scope="col">Envoyés</th></tr></thead>
+                    <tbody>
+                        {% for point in series %}
+                            <tr><th scope="row">{{ point.label }}</th><td>{{ point.received }}</td><td>{{ point.sent }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+    </figure>
+
+    <script>
+        (() => {
+            const chart = document.querySelector('[data-chart]');
+            const points = JSON.parse(chart.dataset.points);
+            const xs = JSON.parse(chart.dataset.xs);
+            const width = Number(chart.dataset.width);
+            const svg = chart.querySelector('svg');
+            const cross = chart.querySelector('.chart__cross');
+            const tip = chart.querySelector('.chart__tip');
+            let current = points.length - 1;
+
+            const row = (value, label, kind) => {
+                const line = document.createElement('p');
+                const key = document.createElement('span');
+                const strong = document.createElement('strong');
+                key.className = `chart__key chart__key--${kind}`;
+                strong.textContent = value;
+                line.append(key, strong, ` ${label}`);
+
+                return line;
+            };
+
+            const show = (index) => {
+                current = index;
+                const point = points[index];
+                const title = document.createElement('p');
+                title.textContent = point.label;
+                tip.replaceChildren(title, row(point.received, 'reçus', 'received'), row(point.sent, 'envoyés', 'sent'));
+                tip.hidden = false;
+                cross.hidden = false;
+                cross.setAttribute('x1', xs[index]);
+                cross.setAttribute('x2', xs[index]);
+                const share = xs[index] / width;
+                tip.style.left = `${share * 100}%`;
+                tip.style.transform = share > .7 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)';
+            };
+
+            const hide = () => {
+                tip.hidden = true;
+                cross.hidden = true;
+            };
+
+            svg.addEventListener('pointermove', (event) => {
+                const box = svg.getBoundingClientRect();
+                const x = (event.clientX - box.left) / box.width * width;
+                const nearest = xs.reduce((best, value, index) => (Math.abs(value - x) < Math.abs(xs[best] - x) ? index : best), 0);
+                show(nearest);
+            });
+            svg.addEventListener('pointerleave', hide);
+            svg.addEventListener('focus', () => show(current));
+            svg.addEventListener('blur', hide);
+            svg.addEventListener('keydown', (event) => {
+                const move = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
+
+                if (move) {
+                    event.preventDefault();
+                    show(Math.min(points.length - 1, Math.max(0, current + move)));
+                }
+            });
+        })();
+    </script>
+{% endif %}

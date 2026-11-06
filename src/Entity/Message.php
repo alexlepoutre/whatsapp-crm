@@ -8,6 +8,7 @@ use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Index(columns: ['created_at'])]
 class Message
 {
     #[ORM\Id]

@@ -443,3 +443,45 @@ input:not([type="checkbox"]):focus, textarea:focus { border-color: var(--action)
 .snippet h2 { margin-top: 0; }
 .snippet textarea { font: .85rem/1.4 ui-monospace, monospace; color: var(--muted); }
 .snippet .composer__actions { margin-top: .5rem; }
+
+/* Statistiques. Les couleurs du graphique sont fixes : voir _statistics_chart.html.twig. */
+.stats-period { margin-top: .75rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem; margin-bottom: 1.5rem; }
+.stats-period .filters { margin: 0; }
+.stats-period__form { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; }
+.stats-period__form label { display: flex; align-items: center; gap: .4rem; margin: 0; font-weight: 400; }
+.stats-period__form input { width: auto; margin: 0; }
+.stats-group { margin-bottom: 2rem; }
+.stats-group h2 { margin-bottom: .75rem; font-size: 1.15rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); gap: .75rem; }
+.stat { padding: 1rem 1.1rem; border-radius: 10px; background: var(--surface); }
+.stat p { margin: 0; }
+.stat__label { color: var(--muted); font-size: .92rem; }
+.stat__value { margin-block: .15rem !important; color: var(--ink); font-size: 2rem; font-weight: 700; line-height: 1.15; }
+.stat__note { color: var(--muted); font-size: .82rem; }
+.chart { --received: #2563c9; --sent: #d9730d; margin: 0; padding: 1rem 1.1rem; border-radius: 10px; background: var(--surface); }
+.chart__legend { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; margin: 0 0 .5rem; padding: 0; list-style: none; font-size: .92rem; }
+.chart__key { display: inline-block; width: 14px; height: 2px; margin-right: .4rem; vertical-align: middle; }
+.chart__key--received { background: var(--received); }
+.chart__key--sent { background: var(--sent); }
+.chart__plot { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.chart__grid { stroke: #e3ebe9; stroke-width: 1; }
+.chart__tick { fill: var(--muted); font-size: 12px; }
+.chart__line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart__line--received { stroke: var(--received); }
+.chart__line--sent { stroke: var(--sent); }
+.chart__dot { stroke: var(--surface); stroke-width: 2; }
+.chart__dot--received { fill: var(--received); }
+.chart__dot--sent { fill: var(--sent); }
+.chart__cross { stroke: var(--muted); stroke-width: 1; }
+.chart__cross[hidden] { display: none; }
+.chart__tip { position: absolute; top: .25rem; padding: .5rem .7rem; border-radius: 8px; background: var(--surface); box-shadow: 0 0 0 1px var(--line), 0 8px 20px -12px rgb(15 53 66 / .5); font-size: .88rem; pointer-events: none; white-space: nowrap; }
+.chart__tip p { margin: 0; }
+.chart__tip p:first-child { color: var(--muted); }
+.chart__table { margin-top: .5rem; font-size: .92rem; }
+.chart__table summary { cursor: pointer; color: var(--muted); }
+.stats-table { overflow-x: auto; }
+.stats-table table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: .92rem; }
+.stats-table th, .stats-table td { padding: .55rem .75rem; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.stats-table th:first-child { text-align: left; }
+.stats-table thead th { color: var(--muted); font-weight: 600; }

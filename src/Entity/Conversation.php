@@ -56,6 +56,10 @@ class Conversation
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastMessageAt = null;
 
+    /** Nul pour les conversations clôturées avant que cette date soit enregistrée. */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $closedAt = null;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -121,11 +125,18 @@ class Conversation
     {
         $this->status = ConversationStatus::CLOSED;
         $this->awaitingClosure = false;
+        $this->closedAt ??= new \DateTimeImmutable();
     }
 
     public function reopen(): void
     {
         $this->status = ConversationStatus::OPEN;
+        $this->closedAt = null;
+    }
+
+    public function getClosedAt(): ?\DateTimeImmutable
+    {
+        return $this->closedAt;
     }
 
     public function isAwaitingClosure(): bool

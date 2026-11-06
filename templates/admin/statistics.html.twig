@@ -1,0 +1,104 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Statistiques{% endblock %}
+
+{% block body %}
+    {% set dates = {du: period.fromParameter, au: period.toParameter} %}
+    <h1>Statistiques{% if rows is not null %} de toutes les organisations{% endif %}</h1>
+
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+        <nav class="filters" aria-label="Choisir le périmètre">
+            <a href="{{ path('admin_statistics', dates) }}" {% if rows is null %}aria-current="true"{% endif %}>{{ current_organization().name }}</a>
+            <a href="{{ path('admin_statistics_all', dates) }}" {% if rows is not null %}aria-current="true"{% endif %}>Toutes les organisations</a>
+        </nav>
+    {% endif %}
+
+    <div class="stats-period">
+        <nav class="filters" aria-label="Plages de dates courantes">
+            {% for label, preset in presets %}
+                <a href="{{ path(app.current_route, {du: preset.from, au: preset.to}) }}" {% if preset.from == dates.du and preset.to == dates.au %}aria-current="true"{% endif %}>{{ label }}</a>
+            {% endfor %}
+        </nav>
+        <form method="get" class="stats-period__form">
+            <label>Du <input type="date" name="du" value="{{ dates.du }}"></label>
+            <label>au <input type="date" name="au" value="{{ dates.au }}"></label>
+            <button type="submit" class="btn btn--quiet">Afficher</button>
+        </form>
+    </div>
+
+    <section class="stats-group" aria-label="En ce moment">
+        <h2>En ce moment</h2>
+        <div class="stats">
+            {{ _self.tile('En attente de réponse', report.waiting, report.waiting ? 'la plus ancienne attend depuis ' ~ report.oldestWaiting|duration : 'Rien à traiter') }}
+        </div>
+    </section>
+
+    <section class="stats-group">
+        <h2>Activité sur la période</h2>
+        <div class="stats">
+            {{ _self.tile('Nouvelles demandes', report.newConversations, report.whatsapp ~ ' WhatsApp, ' ~ report.form ~ ' formulaire') }}
+            {{ _self.tile('Nouveaux clients', report.newClients) }}
+            {{ _self.tile('Messages reçus', report.received) }}
+            {{ _self.tile('Réponses envoyées', report.sent, 'par votre équipe') }}
+            {{ _self.tile('Réponses automatiques', report.automatic) }}
+            {{ _self.tile('Messages non partis', report.unsent, 'en échec ou simulés') }}
+        </div>
+    </section>
+
+    <section class="stats-group">
+        <h2>Délais sur la période</h2>
+        <div class="stats">
+            {{ _self.tile('Délai moyen de réponse', report.replyAverage|duration, report.replies ~ ' réponse(s) mesurée(s)') }}
+            {{ _self.tile('Délai médian de réponse', report.replyMedian|duration, 'la moitié des réponses partent plus vite') }}
+            {{ _self.tile('Délai moyen de clôture', report.closureAverage|duration, 'de la demande à sa clôture') }}
+            {{ _self.tile('Conversations clôturées', report.closed, 'enregistrées depuis le 6 novembre 2026') }}
+        </div>
+    </section>
+
+    <section class="stats-group">
+        <h2>Messages {{ report.monthly ? 'par mois' : 'par jour' }}</h2>
+        {{ include('admin/_statistics_chart.html.twig', {series: report.series}) }}
+    </section>
+
+    {% if rows is not null %}
+        <section class="stats-group">
+            <h2>Par organisation</h2>
+            <div class="stats-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Organisation</th>
+                            <th scope="col">Nouvelles demandes</th>
+                            <th scope="col">Reçus</th>
+                            <th scope="col">Envoyés</th>
+                            <th scope="col">En attente</th>
+                            <th scope="col">Délai de réponse</th>
+                            <th scope="col">Délai de clôture</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <th scope="row">{{ row.organization.name }}</th>
+                                <td>{{ row.report.newConversations }}</td>
+                                <td>{{ row.report.received }}</td>
+                                <td>{{ row.report.sent }}</td>
+                                <td>{{ row.report.waiting }}</td>
+                                <td>{{ row.report.replyAverage|duration }}</td>
+                                <td>{{ row.report.closureAverage|duration }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}
+
+{% macro tile(label, value, note) %}
+    <div class="stat">
+        <p class="stat__label">{{ label }}</p>
+        <p class="stat__value">{{ value }}</p>
+        {% if note %}<p class="stat__note">{{ note }}</p>{% endif %}
+    </div>
+{% endmacro %}

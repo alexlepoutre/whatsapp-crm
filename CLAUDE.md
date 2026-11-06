@@ -134,5 +134,8 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
 - **Lien privé** : `/<slug>/suivi/<jeton>`, un jeton par conversation, jamais par client. Détenir un lien ne donne
   accès qu'à ce fil, même si plusieurs demandes partagent la même adresse.
 - **Formulaire** : données déclaratives, elles complètent une fiche et ne l'écrasent jamais.
+- **Statistiques** : `/admin/statistiques` pour l'organisation courante, `/admin/statistiques/organisations` pour le
+  super-admin seul. Jours à l'heure de Paris. « Envoyé » ne compte que ce qui est vraiment parti. Le délai de clôture
+  repose sur `Conversation.closedAt`, nul pour ce qui a été clôturé avant le 6 novembre 2026 : ne pas l'inventer.
 - **Référencement** : une page avec un bloc `description` reçoit canonique et aperçu de partage (`_seo.html.twig`) ; sans description, elle n'en a pas. Noter toute nouvelle page publique dans `public/sitemap.xml`. Les organisations clientes n'y figurent pas, pour ne pas publier la liste des clients. L'image `public/og-image.png` se régénère depuis `/linkedin/partage` en local.
 - **Referrer-Policy** : `same-origin`, pas `no-referrer` qui enverrait `Origin: null` sur les POST.
