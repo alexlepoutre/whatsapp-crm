@@ -55,6 +55,11 @@ Un seul numéro et un seul webhook Meta pour tous les projets IT-Room : le hook
   secret `WHATSAPP_RELAY_SECRET`), vers `POST /webhook/relay/<slug>`.
 - Sortant : le CRM appelle directement l'API Graph avec le token du numéro.
 - Le code `#itroom` est retiré du message. Un 404 signale au hook un code inconnu.
+- Côté hook : `CrmRouter` (table Postgres `crm_route`), `CrmRelayMessageHandler`, file
+  `crm_relay` avec relances pendant environ 4 heures. Un client y reste sans limite de durée,
+  et revient aux bots s'il tape le code d'un projet (`sergic`). Toute panne de routage retombe
+  sur les bots.
+- Numéro partagé : +33 7 66 67 35 58. Si le token du hook change, le recopier dans `.env.prod`.
 
 ## Production
 
