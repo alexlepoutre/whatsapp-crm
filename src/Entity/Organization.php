@@ -70,6 +70,13 @@ class Organization
         return $this->name;
     }
 
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     public function getNotificationEmail(): ?string
     {
         return $this->notificationEmail;

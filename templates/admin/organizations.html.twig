@@ -1,0 +1,31 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Organisations{% endblock %}
+
+{% block body %}
+    <h1>Organisations</h1>
+
+    <div class="split">
+        <section>
+            <h2>Toutes les organisations</h2>
+            <div class="rows">
+                {% for item in organizations %}
+                    <a class="row" href="{{ path('admin_organization', {id: item.id}) }}">
+                        <span class="row__who">{{ item.name }}</span>
+                        <span class="row__when">/{{ item.slug }}</span>
+                    </a>
+                {% else %}
+                    <p class="empty">Créez la première organisation avec le formulaire.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <h2>Nouvelle organisation</h2>
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn">Créer l'organisation</button>
+            {{ form_end(form) }}
+        </section>
+    </div>
+{% endblock %}

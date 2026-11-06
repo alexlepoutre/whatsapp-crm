@@ -1,0 +1,42 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ edited.name }}{% endblock %}
+
+{% block body %}
+    {# « edited » et non « organization », qui désigne dans le layout l'organisation affichée. #}
+    <h1>{{ edited.name }}</h1>
+    <p class="muted">Page de contact : <a href="{{ path('contact', {slug: edited.slug}) }}">{{ url('contact', {slug: edited.slug}) }}</a></p>
+
+    <div class="split">
+        <section>
+            <h2>Comptes</h2>
+            <div class="rows">
+                {% for user in accounts %}
+                    <div class="row">
+                        <span class="row__who">{{ user.email }}</span>
+                        <form method="post" action="{{ path('admin_account_delete', {id: user.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
+                            <button type="submit" class="btn btn--quiet">Supprimer {{ user.email }}</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <p class="empty">Aucun compte. Ajoutez-en un pour que cette organisation traite ses messages.</p>
+                {% endfor %}
+            </div>
+
+            <h2>Ajouter un compte</h2>
+            {{ form_start(account) }}
+                {{ form_widget(account) }}
+                <button type="submit" class="btn">Créer le compte</button>
+            {{ form_end(account) }}
+        </section>
+
+        <section>
+            <h2>Informations</h2>
+            {{ form_start(edit) }}
+                {{ form_widget(edit) }}
+                <button type="submit" class="btn">Enregistrer l'organisation</button>
+            {{ form_end(edit) }}
+        </section>
+    </div>
+{% endblock %}

@@ -72,6 +72,8 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
 
 ## Règles métier à ne pas casser
 
+- **Super-admin** : lui seul gère organisations et comptes (`/admin/organisations`). L'adresse
+  d'une organisation ne change plus après création : c'est aussi son code WhatsApp.
 - **Étanchéité** : toute lecture passe par l'organisation courante (`CurrentOrganization`). Une
   route avec un identifiant appelle `assertOwns()` : 404 si la fiche est à une autre organisation.
 - **Relais** : la signature est obligatoire. Sans secret configuré, tout est refusé.
