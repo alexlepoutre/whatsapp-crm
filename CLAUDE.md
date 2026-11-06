@@ -71,7 +71,9 @@ Un seul numéro et un seul webhook Meta pour tous les projets IT-Room : le hook
 
 ## Production
 
-`ubuntu@51.38.187.88:/home/ubuntu/whatsapp-crm`, https://crm.v1.re7itroom.fr derrière Traefik.
+`ubuntu@51.38.187.88:/home/ubuntu/whatsapp-crm`, https://ma-relation-clients.fr derrière Traefik.
+`www` et l'ancienne adresse crm.v1.re7itroom.fr redirigent, sauf `/webhook/` sur cette dernière : le
+hook y relaie encore (`CRM_RELAY_URL` dans son `.env`). Ne pas retirer cette exception sans changer le hook.
 Déployer : récupérer le code puis `./deploy.sh`. Les secrets sont dans `.env.prod` sur le
 serveur (modèle : `.env.prod.example`). Après une modification de ce fichier :
 `docker compose -f compose.prod.yaml --env-file .env.prod up -d`.

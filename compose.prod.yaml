@@ -30,10 +30,27 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-network
-      - traefik.http.routers.whatsapp-crm.rule=Host(`crm.v1.re7itroom.fr`)
+      - traefik.http.routers.whatsapp-crm.rule=Host(`ma-relation-clients.fr`)
       - traefik.http.routers.whatsapp-crm.entrypoints=websecure
       - traefik.http.routers.whatsapp-crm.tls.certresolver=letsencrypt
+      - traefik.http.routers.whatsapp-crm.service=whatsapp-crm
       - traefik.http.services.whatsapp-crm.loadbalancer.server.port=80
+      # L'ancienne adresse et www redirigent en gardant le chemin : les liens privés déjà envoyés
+      # aux clients restent valides.
+      - traefik.http.routers.whatsapp-crm-redirect.rule=Host(`crm.v1.re7itroom.fr`) || Host(`www.ma-relation-clients.fr`)
+      - traefik.http.routers.whatsapp-crm-redirect.entrypoints=websecure
+      - traefik.http.routers.whatsapp-crm-redirect.tls.certresolver=letsencrypt
+      - traefik.http.routers.whatsapp-crm-redirect.service=whatsapp-crm
+      - traefik.http.routers.whatsapp-crm-redirect.middlewares=whatsapp-crm-domain
+      - traefik.http.middlewares.whatsapp-crm-domain.redirectregex.regex=^https://[^/]+/(.*)
+      - traefik.http.middlewares.whatsapp-crm-domain.redirectregex.replacement=https://ma-relation-clients.fr/$${1}
+      - traefik.http.middlewares.whatsapp-crm-domain.redirectregex.permanent=true
+      # Sauf le relais WhatsApp : le hook y envoie des POST et ne suit pas les redirections.
+      - traefik.http.routers.whatsapp-crm-relay.rule=Host(`crm.v1.re7itroom.fr`) && PathPrefix(`/webhook/`)
+      - traefik.http.routers.whatsapp-crm-relay.entrypoints=websecure
+      - traefik.http.routers.whatsapp-crm-relay.tls.certresolver=letsencrypt
+      - traefik.http.routers.whatsapp-crm-relay.service=whatsapp-crm
+      - traefik.http.routers.whatsapp-crm-relay.priority=1000
 
   database:
     image: mariadb:11.4
