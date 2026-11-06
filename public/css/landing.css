@@ -72,6 +72,8 @@
 .v1-promises { width: min(100%, 74rem); margin-inline: auto; padding: clamp(3rem, 7vw, 5rem) 1rem; }
 .v1-promises ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 3rem; margin: 1.5rem 0 0; padding: 0; list-style: none; font-size: 1.15rem; }
 .v1-promises strong { display: block; font-size: 1.25rem; }
+.lv1 .l-faq { padding-top: 0; padding-bottom: clamp(3rem, 7vw, 5rem); }
+.lv1 .l-faq h2 { margin: 0 0 1.25rem; font-size: clamp(1.8rem, 4vw, 2.75rem); line-height: 1.1; }
 .v1-end { padding: clamp(3rem, 7vw, 5rem) 1rem; background: var(--sun); color: #0a3540; text-align: center; }
 .lv1 .v1-end h2 { color: inherit; }
 .v1-end p { margin-bottom: 1.5rem; font-size: 1.2rem; }
@@ -139,7 +141,7 @@
 .v3-row time { color: var(--muted); font-size: .85rem; }
 .v3-row span { color: var(--muted); overflow-wrap: anywhere; }
 .v3-row em { font-style: normal; align-self: end; justify-self: end; }
-.v3-pains, .v3-benefits, .v3-trust, .v3-faq { width: min(100%, 74rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4.5rem) 1rem 0; }
+.v3-pains, .v3-benefits, .v3-trust, .l-faq { width: min(100%, 74rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4.5rem) 1rem 0; }
 .lv3 h2 { margin: 0 0 1.25rem; font-size: clamp(1.8rem, 4vw, 2.75rem); line-height: 1.1; letter-spacing: -.025em; }
 .v3-pains ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 3rem; margin: 0; padding: 0; list-style: none; }
 .v3-pains li { padding-block: .8rem; border-top: 1px solid var(--line); font-size: 1.15rem; }
@@ -149,9 +151,9 @@
 .v3-grid p { color: var(--muted); }
 .v3-trust ul { margin: 0 0 1rem; padding: 0; list-style: none; }
 .v3-trust li { padding-block: .6rem; border-top: 1px solid var(--line); font-size: 1.1rem; }
-.v3-faq details { border-top: 1px solid var(--line); }
-.v3-faq summary { padding-block: .9rem; font-weight: 600; font-size: 1.1rem; cursor: pointer; }
-.v3-faq details p { padding-bottom: 1rem; color: var(--muted); }
+.l-faq details { border-top: 1px solid var(--line); }
+.l-faq summary { padding-block: .9rem; font-weight: 600; font-size: 1.1rem; cursor: pointer; }
+.l-faq details p { padding-bottom: 1rem; color: var(--muted); }
 .v3-end { margin-top: clamp(3rem, 6vw, 4.5rem); padding: clamp(3rem, 7vw, 5rem) 1rem; background: var(--panel); color: #fff; text-align: center; }
 .v3-end h2 { max-width: 44rem; margin-inline: auto; margin-bottom: 1.5rem; }
 

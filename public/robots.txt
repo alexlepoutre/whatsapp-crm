@@ -1,0 +1,8 @@
+# Les moteurs de recherche et les robots des assistants IA sont les bienvenus sur les pages publiques.
+User-agent: *
+Disallow: /admin$
+Disallow: /admin/
+Disallow: /webhook/
+Disallow: /*/suivi/
+
+Sitemap: https://ma-relation-clients.fr/sitemap.xml

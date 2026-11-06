@@ -8,3 +8,4 @@ tests
 .phpunit.cache
 
 templates/marketing/slide.html.twig
+templates/marketing/og.html.twig

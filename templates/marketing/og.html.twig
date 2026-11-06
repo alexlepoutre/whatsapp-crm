@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+{% import 'public/landing/_advisor.html.twig' as people %}
+
+{% block title %}Aperçu de partage{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block theme %}
+<style>
+    html, body { margin: 0; padding: 0; background: #e6f5f1; }
+    .og { position: relative; box-sizing: border-box; display: grid; grid-template-columns: 1fr 400px; gap: 40px; width: 1200px; height: 630px; padding: 56px 60px; overflow: hidden; background: #e6f5f1; color: #0a3540; }
+    .og__brand { display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 700; }
+    .og__brand img { width: 52px; height: 52px; }
+    .og__text { display: flex; flex-direction: column; }
+    .og h1 { margin: auto 0 0; color: inherit; font-size: 76px; line-height: 1.03; letter-spacing: -.03em; }
+    .og p { margin: 22px 0 auto; color: #2f5a66; font-size: 31px; line-height: 1.28; }
+    .og__for { margin: 0 !important; font-size: 25px !important; font-weight: 600; }
+    .og__side { display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+    .og__count { display: flex; align-items: baseline; gap: 14px; width: fit-content; padding: 12px 30px; border-radius: 22px; background: #ffc845; color: #0a3540; }
+    .og__count .display__digits { font-size: 84px; }
+    .og__count .display__label { font-size: 30px; }
+    .og__bubble { margin: 0; padding: 18px 22px; border-radius: 20px 20px 20px 4px; background: #fff; box-shadow: 0 14px 30px -18px rgb(15 53 66 / .45); color: #0a3540; font-size: 26px; line-height: 1.25; }
+    .og__bubble--out { align-self: flex-end; border-radius: 20px 20px 4px 20px; background: #d6f6c8; }
+    .og__team { display: flex; }
+    .og__team span { width: 92px; height: 92px; margin-right: -16px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 6px #e6f5f1; }
+</style>
+{% endblock %}
+
+{% block page %}
+    <section class="og">
+        <div class="og__text">
+            <div class="og__brand"><img src="/logo.svg" alt="">Ma Relation Clients</div>
+            <h1>Remplacez votre répondeur.</h1>
+            <p>Vos clients écrivent sur WhatsApp ou par formulaire. Vous répondez quand vous êtes disponible.</p>
+            <p class="og__for">Pour les artisans, les auto-entrepreneurs et les PME</p>
+        </div>
+        <div class="og__side">
+            <div class="og__count"><span class="display__digits">4</span><span class="display__label">à traiter</span></div>
+            <p class="og__bubble">Bonjour, pouvez-vous passer pour un devis ?</p>
+            <p class="og__bubble og__bubble--out">Bien sûr, je vous rappelle ce soir.</p>
+            <div class="og__team">
+                <span>{{ people.advisor('#f2c9a8', '#3b2a20', '#0f6e6e', '#bfe8df', true) }}</span>
+                <span>{{ people.advisor('#8d5a3c', '#1d1612', '#f5b82e', '#fdeab5') }}</span>
+                <span>{{ people.advisor('#e8b48f', '#a9592d', '#2b4c9b', '#d6dcfb', true) }}</span>
+            </div>
+        </div>
+    </section>
+{% endblock %}

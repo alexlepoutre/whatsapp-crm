@@ -32,10 +32,11 @@ class AdminTest extends AppTestCase
 
         $this->client->request('GET', '/admin/conversations/'.$conversation->getId());
         self::assertSelectorExists('#consent');
-        self::assertPageTitleSame('Conversation');
+        self::assertPageTitleContains('Conversation | ');
+        self::assertPageTitleContains($conversation->getOrganization()->getName());
 
         $this->client->request('GET', '/admin/clients/'.$conversation->getClient()->getId());
-        self::assertPageTitleSame('Fiche client');
+        self::assertPageTitleContains('Fiche client | ');
     }
 
     public function testClientSearchIsNotMeasured(): void

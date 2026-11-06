@@ -1,0 +1,21 @@
+# Ma Relation Clients
+
+> Outil en ligne français qui remplace le répondeur téléphonique des artisans, auto-entrepreneurs et PME. Les clients écrivent sur WhatsApp ou par un formulaire, et l'équipe répond depuis un seul dashboard, classé par client.
+
+Ma Relation Clients est conçu par Alexis Lepoutre et édité par IT-Room (Information Technology Room, Hem, France). Le service est hébergé chez OVH à Roubaix. Le tarif fait l'objet d'un devis.
+
+## Fonctionnement
+
+- Chaque organisation dispose d'une page de contact à son nom, avec un bouton WhatsApp et un formulaire.
+- Une réponse automatique confirme au client que sa demande est arrivée.
+- Les messages vocaux WhatsApp sont transcrits en texte.
+- Le client sans WhatsApp reçoit par courriel un lien privé pour suivre l'échange, sans créer de compte.
+- Toute l'équipe est prévenue à chaque message, et une demande reste visible tant qu'elle n'est pas traitée.
+
+## Pages
+
+- [Présentation et questions fréquentes](https://ma-relation-clients.fr/)
+- [Contacter IT-Room](https://ma-relation-clients.fr/itroom)
+- [Confidentialité et RGPD](https://ma-relation-clients.fr/confidentialite)
+- [Mentions légales](https://ma-relation-clients.fr/mentions-legales)
+- [Conditions générales de vente](https://ma-relation-clients.fr/cgv)

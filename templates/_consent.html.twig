@@ -60,6 +60,11 @@
                 history.replaceState(history.state, '', url);
             }
 
+            // Pour une dimension personnalisée GA4 : variable de couche de données « organisation » dans GTM.
+            if (ORGANIZATION) {
+                dataLayer.push({ organisation: ORGANIZATION });
+            }
+
             gtag('consent', 'update', { analytics_storage: 'granted' });
             gtag('js', new Date());
 

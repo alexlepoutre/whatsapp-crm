@@ -1,0 +1,55 @@
+{# Une seule source pour la page et pour les données structurées : les deux doivent rester identiques. #}
+{% set questions = [
+    {q: "Qu'est-ce que Ma Relation Clients ?", a: "Ma Relation Clients est un outil en ligne qui remplace le répondeur téléphonique. Vos clients vous écrivent sur WhatsApp ou par un formulaire, et vous traitez toutes les demandes dans un seul dashboard, classées par client. Il est conçu par IT-Room et hébergé en France."},
+    {q: "Comment remplacer son répondeur par WhatsApp ?", a: "Vous disposez d'une page de contact à votre nom, avec un bouton WhatsApp et un formulaire. Vous diffusez son lien sur votre site, vos devis ou vos cartes de visite. Une réponse automatique rassure le client, et vous répondez quand vous êtes disponible."},
+    {q: "À qui s'adresse cet outil ?", a: "Aux artisans, aux auto-entrepreneurs et aux PME : ceux qui sont sur le terrain toute la journée et ne peuvent pas décrocher."},
+    {q: "Que deviennent les messages vocaux ?", a: "Ils sont transcrits automatiquement : vous les lisez au lieu de les écouter, et le client voit ce qui a été compris."},
+    {q: "Mes clients doivent-ils installer quelque chose ?", a: "Non. Ils utilisent WhatsApp, qu'ils ont déjà, ou un simple formulaire avec un lien privé pour suivre l'échange."},
+    {q: "Et ceux qui n'ont pas WhatsApp ?", a: "Ils remplissent le formulaire de votre page de contact et reçoivent un lien privé par courriel pour poursuivre la conversation."},
+    {q: "Plusieurs personnes peuvent-elles répondre ?", a: "Oui. Chaque personne a son compte, et toute l'équipe est prévenue à chaque message."},
+    {q: "Faut-il un ordinateur pour répondre ?", a: "Non. L'outil fonctionne dans un navigateur, sur ordinateur comme sur smartphone."},
+    {q: "Où sont hébergées les données ?", a: "Le service est hébergé en France, chez OVH à Roubaix, et chaque organisation n'accède qu'à ses propres échanges. Les messages WhatsApp passent par Meta, et les vocaux par le service de transcription d'OpenAI."},
+    {q: "Combien ça coûte ?", a: "Le tarif dépend de vos besoins et fait l'objet d'un devis."},
+] %}
+
+<section class="l-faq">
+    <h2>Vos questions sur le remplacement du répondeur</h2>
+    {% for item in questions %}
+        <details{% if loop.first %} open{% endif %}><summary>{{ item.q }}</summary><p>{{ item.a }}</p></details>
+    {% endfor %}
+</section>
+
+{% set entries = [] %}
+{% for item in questions %}
+    {% set entries = entries|merge([{'@type': 'Question', name: item.q, acceptedAnswer: {'@type': 'Answer', text: item.a}}]) %}
+{% endfor %}
+{% set publisher = {
+    '@type': 'Organization',
+    '@id': 'https://www.itroom.fr/#organization',
+    name: 'IT-Room',
+    legalName: 'Information Technology Room',
+    url: 'https://www.itroom.fr',
+    email: 'contact@itroom.fr',
+    address: {'@type': 'PostalAddress', streetAddress: '5 allée Gabert', postalCode: '59510', addressLocality: 'Hem', addressCountry: 'FR'},
+} %}
+<script type="application/ld+json">{{ {
+    '@context': 'https://schema.org',
+    '@graph': [
+        publisher,
+        {'@type': 'WebSite', '@id': url('home') ~ '#website', url: url('home'), name: 'Ma Relation Clients', inLanguage: 'fr-FR', publisher: {'@id': publisher['@id']}},
+        {
+            '@type': 'WebApplication',
+            name: 'Ma Relation Clients',
+            url: url('home'),
+            image: absolute_url(asset('og-image.png')),
+            description: "Outil en ligne qui remplace le répondeur téléphonique : les clients écrivent sur WhatsApp ou par formulaire, et l'équipe répond depuis un seul dashboard.",
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Navigateur web',
+            inLanguage: 'fr-FR',
+            audience: {'@type': 'BusinessAudience', audienceType: 'Artisans, auto-entrepreneurs et PME'},
+            featureList: ['Page de contact avec bouton WhatsApp et formulaire', 'Réponse automatique au premier message', 'Dashboard classé par client', 'Transcription des messages vocaux', 'Alerte de toute l\'équipe à chaque message', 'Lien privé de suivi sans création de compte'],
+            provider: {'@id': publisher['@id']},
+        },
+        {'@type': 'FAQPage', mainEntity: entries},
+    ],
+}|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>

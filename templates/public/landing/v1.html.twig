@@ -1,7 +1,8 @@
 {% extends 'public/landing/layout.html.twig' %}
 {% import 'public/landing/_advisor.html.twig' as people %}
 
-{% block title %}Ma Relation Clients : derrière chaque message, quelqu'un vous répond{% endblock %}
+{% block title %}Remplacez votre répondeur par WhatsApp | Ma Relation Clients{% endblock %}
+{% block description %}Vos clients écrivent sur WhatsApp ou par formulaire, vous répondez depuis un seul dashboard. L'alternative au répondeur pour les artisans, auto-entrepreneurs et PME.{% endblock %}
 {% block body_class %}lv1{% endblock %}
 
 {% block landing %}
@@ -58,6 +59,8 @@
                 <li><strong>Les vocaux se lisent.</strong> Le message est transcrit, et le client voit ce que vous avez compris.</li>
             </ul>
         </section>
+
+        {{ include('public/landing/_faq.html.twig') }}
 
         <section class="v1-end">
             <h2>Et si on en parlait ?</h2>

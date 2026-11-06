@@ -22,6 +22,13 @@ class SlideController extends AbstractController
         return $this->render('marketing/slide.html.twig', ['numbers' => [$number]]);
     }
 
+    /** Source de public/og-image.png, l'aperçu des liens partagés. */
+    #[Route('/linkedin/partage', name: 'marketing_share')]
+    public function share(): Response
+    {
+        return $this->render('marketing/og.html.twig');
+    }
+
     #[Route('/linkedin/carrousel', name: 'marketing_carousel')]
     public function carousel(): Response
     {

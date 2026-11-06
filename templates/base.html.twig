@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Ma Relation Clients{% endblock %}</title>
-    {% block description %}{% endblock %}
+    <title>{% block title %}Ma Relation Clients{% endblock %}{% block title_suffix %}{% endblock %}</title>
+    {# Une description fait d'une page une page publique : balises de référencement et de partage. #}
+    {% set description %}{% block description %}{% endblock %}{% endset %}
+    {% if description|trim %}{{ include('_seo.html.twig', {title: block('title'), description: description|trim}) }}{% endif %}
     {% block robots %}{% endblock %}
     {% block favicon %}
         {# Le numéro de version force les navigateurs, qui gardent longtemps une favicon, à la renouveler. #}

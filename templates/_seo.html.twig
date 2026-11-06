@@ -1,0 +1,26 @@
+{#
+    title et description sont déjà échappés : ils viennent du rendu des blocs, d'où |raw.
+    L'adresse canonique ne garde aucun paramètre, dont ?organisation= ajouté pour GA4.
+#}
+{% set canonical = url(app.current_route, app.current_route_parameters) %}
+{% set logo = organization.logoVersion ?? null %}
+<meta name="description" content="{{ description|raw }}">
+<link rel="canonical" href="{{ canonical }}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Ma Relation Clients">
+<meta property="og:title" content="{{ title|raw }}">
+<meta property="og:description" content="{{ description|raw }}">
+<meta property="og:url" content="{{ canonical }}">
+{% if logo %}
+    <meta property="og:image" content="{{ url('organization_logo', {slug: organization.slug, v: logo}) }}">
+    <meta property="og:image:alt" content="Logo de {{ organization.name }}">
+    <meta name="twitter:card" content="summary">
+{% else %}
+    <meta property="og:image" content="{{ absolute_url(asset('og-image.png')) }}?v=1">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Ma Relation Clients : vos clients écrivent, vous répondez quand vous êtes disponible.">
+    <meta name="twitter:card" content="summary_large_image">
+{% endif %}
