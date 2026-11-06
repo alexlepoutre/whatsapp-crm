@@ -59,6 +59,8 @@ Un seul numéro et un seul webhook Meta pour tous les projets IT-Room : le hook
   `crm_relay` avec relances pendant environ 4 heures. Un client y reste sans limite de durée,
   et revient aux bots s'il tape le code d'un projet (`sergic`). Toute panne de routage retombe
   sur les bots.
+- Vocaux : le hook les transcrit (Whisper, clé OpenAI dans son `app_config`) et ajoute le champ
+  `transcription` au message relayé. Si cela échoue, le message arrive sans. L'audio n'est pas gardé.
 - Numéro partagé : +33 7 66 67 35 58. Si le token du hook change, le recopier dans `.env.prod`.
 
 ## Production

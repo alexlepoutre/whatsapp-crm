@@ -99,6 +99,29 @@ class WebhookTest extends AppTestCase
         self::assertStringContainsString('Ma facture', $message->getBody());
     }
 
+    public function testVoiceMessageShowsTranscription(): void
+    {
+        $this->postWebhook(['messages' => [[
+            'from' => '33612345678', 'id' => 'wamid.v1', 'type' => 'audio',
+            'audio' => ['id' => '123', 'voice' => true],
+            'transcription' => 'Où en est ma commande ?',
+        ]]]);
+
+        $body = $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.v1'])->getBody();
+        self::assertStringContainsString('transcription automatique', $body);
+        self::assertStringContainsString('Où en est ma commande ?', $body);
+    }
+
+    public function testVoiceMessageIsKeptWhenTranscriptionFailed(): void
+    {
+        $this->postWebhook(['messages' => [[
+            'from' => '33612345678', 'id' => 'wamid.v2', 'type' => 'audio', 'audio' => ['id' => '123'],
+        ]]]);
+
+        $body = $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.v2'])->getBody();
+        self::assertStringContainsString('transcription indisponible', $body);
+    }
+
     public function testDeliveryStatusNeverGoesBackwards(): void
     {
         $this->postWebhook($this->textMessage());

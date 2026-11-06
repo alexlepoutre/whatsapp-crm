@@ -16,8 +16,6 @@ class WebhookProcessor
     private const MEDIA_LABELS = [
         'image' => 'Photo',
         'video' => 'Vidéo',
-        'audio' => 'Message vocal',
-        'voice' => 'Message vocal',
         'document' => 'Document',
         'sticker' => 'Sticker',
         'location' => 'Position',
@@ -106,6 +104,14 @@ class WebhookProcessor
             $reply = $message['interactive']['button_reply'] ?? $message['interactive']['list_reply'] ?? [];
 
             return (string) ($reply['title'] ?? '');
+        }
+
+        if ('audio' === $type || 'voice' === $type) {
+            $transcription = trim((string) ($message['transcription'] ?? ''));
+
+            return '' === $transcription
+                ? '[Message vocal reçu, transcription indisponible]'
+                : "[Message vocal, transcription automatique]\n".$transcription;
         }
 
         $label = self::MEDIA_LABELS[$type] ?? 'Message d\'un type non géré';
