@@ -6,9 +6,12 @@
     <title>{% block title %}Posez votre question{% endblock %}</title>
     {% block description %}{% endblock %}
     {% block robots %}{% endblock %}
-    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="32x32">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    {% block favicon %}
+        {# Le numéro de version force les navigateurs, qui gardent longtemps une favicon, à la renouveler. #}
+        <link rel="icon" href="{{ asset('favicon.ico') }}?v=2" sizes="32x32">
+        <link rel="icon" href="{{ asset('favicon.svg') }}?v=2" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}?v=2">
+    {% endblock %}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     {% block theme %}{% endblock %}
 </head>

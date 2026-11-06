@@ -102,6 +102,26 @@ class BrandingTest extends AppTestCase
         self::assertNull($this->reloadedOrganization()->getLogoVersion());
     }
 
+    public function testOrganizationLogoBecomesTheFavicon(): void
+    {
+        $this->loginAsSuperAdmin();
+        $this->saveOrganization([], $this->uploadedFile(base64_decode(self::PNG), 'logo.png'));
+
+        $this->client->request('GET', '/itroom');
+        self::assertSelectorExists('link[rel="icon"][href^="/itroom/logo"]');
+        self::assertSelectorNotExists('link[rel="icon"][href^="/favicon"]');
+
+        $this->client->request('GET', '/admin');
+        self::assertSelectorExists('link[rel="icon"][href^="/itroom/logo"]');
+    }
+
+    public function testOrganizationWithoutLogoKeepsTheApplicationFavicon(): void
+    {
+        $this->client->request('GET', '/itroom');
+
+        self::assertSelectorExists('link[rel="icon"][href^="/favicon.svg"]');
+    }
+
     public function testSvgAndNonImageFilesAreRefused(): void
     {
         $this->loginAsSuperAdmin();

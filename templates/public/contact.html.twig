@@ -2,6 +2,7 @@
 
 {% block title %}Contacter {{ organization.name }}{% endblock %}
 {% block body_class %}public{% endblock %}
+{% block favicon %}{% if organization.logoVersion %}{{ include('_favicon_organization.html.twig', {theme: organization}) }}{% else %}{{ parent() }}{% endif %}{% endblock %}
 {% block theme %}{{ include('_theme.html.twig', {theme: organization}) }}{% endblock %}
 
 {% block page %}

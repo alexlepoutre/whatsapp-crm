@@ -94,7 +94,8 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorExists('a[href="/itroom"]');
         self::assertSelectorExists('a.btn--whatsapp[href^="https://wa.me/33600000000?text="] svg.wa-logo');
         self::assertSelectorExists('a[href="/connexion"]');
-        self::assertSelectorExists('link[rel="icon"][href="/favicon.svg"]');
+        self::assertSelectorExists('link[rel="icon"][href^="/favicon.svg"]');
+        self::assertSelectorExists('img[src="/logo.svg"]');
     }
 
     #[\PHPUnit\Framework\Attributes\TestWith(['/mentions-legales', '430 032 854'])]
