@@ -6,6 +6,7 @@
 
 {% block page %}
     <main class="public__main">
+        <p class="public__org">{{ conversation.organization.name }}</p>
         <h1>{{ conversation.title }}</h1>
         <p class="muted">Demande envoyée le {{ conversation.createdAt|date('d/m/Y') }}. Ce lien est privé : ne le partagez pas.</p>
         {{ include('_flashes.html.twig') }}
@@ -13,7 +14,7 @@
         <div class="thread">
             {% for message in conversation.messages %}
                 <article class="bubble {{ message.isFromClient ? 'bubble--out' : 'bubble--in' }}">
-                    <p class="bubble__meta">{{ message.isFromClient ? 'Vous' : 'Réponse' }}, le {{ message.createdAt|date('d/m/Y à H\\hi') }}</p>
+                    <p class="bubble__meta">{{ message.isFromClient ? 'Vous' : conversation.organization.name }}, le {{ message.createdAt|date('d/m/Y à H\\hi') }}</p>
                     <p>{{ message.body|nl2br }}</p>
                 </article>
             {% endfor %}

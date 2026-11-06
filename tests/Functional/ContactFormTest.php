@@ -5,13 +5,14 @@ namespace App\Tests\Functional;
 use App\Entity\Client;
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\Organization;
 
 class ContactFormTest extends AppTestCase
 {
     /** @param array<string, string> $overrides */
     private function submitContact(array $overrides = []): void
     {
-        $this->client->request('GET', '/');
+        $this->client->request('GET', '/itroom');
         $this->client->submitForm('Envoyer ma demande', $overrides + [
             'contact[name]' => 'Dominique',
             'contact[email]' => 'dominique@example.test',
@@ -32,7 +33,7 @@ class ContactFormTest extends AppTestCase
         self::assertEmailAddressContains($link, 'To', 'dominique@example.test');
 
         $conversation = $this->em->getRepository(Conversation::class)->findOneBy([]);
-        self::assertEmailTextBodyContains($link, '/suivi/'.$conversation->getAccessToken());
+        self::assertEmailTextBodyContains($link, '/itroom/suivi/'.$conversation->getAccessToken());
 
         $this->client->followRedirect();
         self::assertSelectorTextContains('h1', 'Demande de devis');
@@ -70,9 +71,68 @@ class ContactFormTest extends AppTestCase
         self::assertSame(2, $this->em->getRepository(Message::class)->count([]));
     }
 
+    public function testPageIsSpecificToOrganizationAndCarriesWhatsAppCode(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+
+        $this->client->request('GET', '/dufermont');
+
+        self::assertSelectorTextContains('.public__org', 'Dufermont');
+        self::assertSelectorExists('a[href="https://wa.me/33600000000?text=%23dufermont%20"]');
+    }
+
+    public function testUnknownOrganizationPageIsNotFound(): void
+    {
+        $this->client->request('GET', '/inconnue');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testApplicationRoutesWinOverOrganizationPages(): void
+    {
+        $this->client->request('GET', '/connexion');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Connexion');
+    }
+
+    public function testReservedAddressCannotBecomeAnOrganization(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Organization('admin', 'Pirate');
+    }
+
+    public function testFormRequestGoesToTheOrganizationOfThePage(): void
+    {
+        $other = $this->createOrganization('dufermont', 'Dufermont');
+        $this->client->request('GET', '/dufermont');
+        $this->client->submitForm('Envoyer ma demande', [
+            'contact[name]' => 'Dominique',
+            'contact[email]' => 'dominique@example.test',
+            'contact[subject]' => 'Devis',
+            'contact[body]' => 'Bonjour',
+        ]);
+
+        $client = $this->em->getRepository(Client::class)->findOneBy(['email' => 'dominique@example.test']);
+        self::assertSame($other->getId(), $client->getOrganization()->getId());
+        self::assertEmailAddressContains(self::getMailerMessage(1), 'To', 'alerte@dufermont.test');
+    }
+
+    public function testPrivateLinkFailsUnderAnotherOrganizationAddress(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+        $this->submitContact();
+        $token = $this->em->getRepository(Conversation::class)->findOneBy([])->getAccessToken();
+
+        $this->client->request('GET', '/dufermont/suivi/'.$token);
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
     public function testUnknownTokenIsNotFound(): void
     {
-        $this->client->request('GET', '/suivi/'.str_repeat('a', 64));
+        $this->client->request('GET', '/itroom/suivi/'.str_repeat('a', 64));
 
         self::assertResponseStatusCodeSame(404);
     }

@@ -25,6 +25,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private string $password = '';
 
+    /** Nul pour un super-admin, qui n'appartient à aucune organisation en particulier. */
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    private ?Organization $organization = null;
+
+    #[ORM\Column]
+    private bool $superAdmin = false;
+
     public function __construct(string $email)
     {
         $this->email = mb_strtolower($email);
@@ -47,7 +55,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return ['ROLE_ADMIN'];
+        return $this->superAdmin ? ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] : ['ROLE_ADMIN'];
+    }
+
+    public function getOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    public function setOrganization(?Organization $organization): static
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->superAdmin;
+    }
+
+    public function setSuperAdmin(bool $superAdmin): static
+    {
+        $this->superAdmin = $superAdmin;
+
+        return $this;
     }
 
     public function getPassword(): string

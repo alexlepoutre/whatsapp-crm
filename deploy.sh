@@ -14,9 +14,13 @@ if [ ! -f .env.prod ]; then
         -e "s|^DB_PASSWORD=.*|DB_PASSWORD=${db_password}|" \
         -e "s|^DB_ROOT_PASSWORD=.*|DB_ROOT_PASSWORD=$(openssl rand -hex 24)|" \
         -e "s|<DB_PASSWORD>|${db_password}|" \
-        -e "s|^WHATSAPP_VERIFY_TOKEN=.*|WHATSAPP_VERIFY_TOKEN=$(openssl rand -hex 24)|" \
+        -e "s|^WHATSAPP_RELAY_SECRET=.*|WHATSAPP_RELAY_SECRET=$(openssl rand -hex 32)|" \
         .env.prod.example > .env.prod
     echo ".env.prod créé avec des secrets générés."
+fi
+
+if ! grep -q '^WHATSAPP_RELAY_SECRET=' .env.prod; then
+    echo "WHATSAPP_RELAY_SECRET=$(openssl rand -hex 32)" >> .env.prod
 fi
 
 compose up -d --build --wait

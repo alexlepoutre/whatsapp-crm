@@ -11,27 +11,52 @@ use App\Enum\MessageSender;
 
 class WebhookTest extends AppTestCase
 {
-    public function testMetaVerificationEchoesChallenge(): void
-    {
-        $this->client->request('GET', '/webhook/whatsapp?hub.mode=subscribe&hub.verify_token=jeton-de-test&hub.challenge=1234');
-
-        self::assertResponseIsSuccessful();
-        self::assertSame('1234', $this->client->getResponse()->getContent());
-    }
-
-    public function testWrongVerifyTokenIsRefused(): void
-    {
-        $this->client->request('GET', '/webhook/whatsapp?hub.mode=subscribe&hub.verify_token=faux&hub.challenge=1234');
-
-        self::assertResponseStatusCodeSame(403);
-    }
-
     public function testForgedSignatureIsRefusedAndStoresNothing(): void
     {
         $this->postWebhook($this->textMessage(), 'sha256=fausse');
 
         self::assertResponseStatusCodeSame(403);
         self::assertSame(0, $this->em->getRepository(Message::class)->count([]));
+    }
+
+    public function testUnknownOrganizationAnswersNotFound(): void
+    {
+        $this->postWebhook($this->textMessage(), slug: 'inconnue');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testRoutingCodeIsRemovedFromMessage(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1', text: '#itroom Bonjour, un devis ?'));
+        $this->postWebhook($this->textMessage('wamid.2', '33699999999', '#itroom '));
+
+        self::assertSame('Bonjour, un devis ?', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
+        self::assertSame('Conversation ouverte depuis la page de contact.', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.2'])->getBody());
+    }
+
+    public function testSamePhoneHasSeparateRecordPerOrganization(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+
+        $this->postWebhook($this->textMessage('wamid.1'));
+        $this->postWebhook($this->textMessage('wamid.2'), slug: 'dufermont');
+
+        self::assertSame(2, $this->em->getRepository(Client::class)->count(['phone' => '33612345678']));
+    }
+
+    public function testStatusFromAnotherOrganizationIsIgnored(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+        $this->postWebhook($this->textMessage());
+        $bot = $this->em->getRepository(Message::class)->findOneBy(['sender' => MessageSender::BOT]);
+        $bot->setWaMessageId('wamid.out');
+        $this->em->flush();
+
+        $this->postWebhook(['statuses' => [['id' => 'wamid.out', 'status' => 'read']]], slug: 'dufermont');
+
+        $this->em->clear();
+        self::assertNotSame(DeliveryStatus::READ, $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.out'])->getDeliveryStatus());
     }
 
     public function testIncomingMessageCreatesClientAndBotAnswersOnce(): void

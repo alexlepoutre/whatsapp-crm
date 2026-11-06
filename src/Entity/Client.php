@@ -11,11 +11,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Une personne, quel que soit le canal par lequel elle écrit.
+ * Une personne pour une organisation, quel que soit le canal par lequel elle écrit. Si elle
+ * contacte deux organisations, elle a deux fiches : rien n'est partagé entre elles.
  */
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
-#[UniqueEntity('email', message: 'Un autre client utilise déjà cette adresse.')]
-#[UniqueEntity('phone', message: 'Un autre client utilise déjà ce numéro.')]
+#[ORM\UniqueConstraint(name: 'uniq_client_organization_email', columns: ['organization_id', 'email'])]
+#[ORM\UniqueConstraint(name: 'uniq_client_organization_phone', columns: ['organization_id', 'phone'])]
+#[UniqueEntity(['organization', 'email'], message: 'Un autre client utilise déjà cette adresse.', errorPath: 'email')]
+#[UniqueEntity(['organization', 'phone'], message: 'Un autre client utilise déjà ce numéro.', errorPath: 'phone')]
 class Client
 {
     #[ORM\Id]
@@ -23,17 +26,21 @@ class Client
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private Organization $organization;
+
     #[ORM\Column(length: 120, nullable: true)]
     #[Assert\Length(max: 120)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 180, unique: true, nullable: true)]
+    #[ORM\Column(length: 180, nullable: true)]
     #[Assert\Email]
     #[Assert\Length(max: 180)]
     private ?string $email = null;
 
     /** Format Meta : chiffres seuls, indicatif compris (33612345678). */
-    #[ORM\Column(length: 20, unique: true, nullable: true)]
+    #[ORM\Column(length: 20, nullable: true)]
     #[Assert\Length(min: 8, max: 20)]
     private ?string $phone = null;
 
@@ -48,8 +55,9 @@ class Client
     #[ORM\OrderBy(['lastMessageAt' => 'DESC'])]
     private Collection $conversations;
 
-    public function __construct()
+    public function __construct(Organization $organization)
     {
+        $this->organization = $organization;
         $this->createdAt = new \DateTimeImmutable();
         $this->conversations = new ArrayCollection();
     }
@@ -57,6 +65,11 @@ class Client
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getOrganization(): Organization
+    {
+        return $this->organization;
     }
 
     public function getName(): ?string

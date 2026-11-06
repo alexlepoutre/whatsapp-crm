@@ -5,6 +5,8 @@ namespace App\Tests\Functional;
 use App\Entity\Client;
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\Organization;
+use App\Entity\User;
 use App\Enum\ConversationStatus;
 use App\Enum\DeliveryStatus;
 use App\Enum\MessageSender;
@@ -63,7 +65,7 @@ class AdminTest extends AppTestCase
 
     public function testReplyOnFormConversationEmailsPrivateLink(): void
     {
-        $this->client->request('GET', '/');
+        $this->client->request('GET', '/itroom');
         $this->client->submitForm('Envoyer ma demande', [
             'contact[name]' => 'Dominique',
             'contact[email]' => 'dominique@example.test',
@@ -81,7 +83,81 @@ class AdminTest extends AppTestCase
         $email = self::getMailerMessage();
         self::assertEmailAddressContains($email, 'To', 'dominique@example.test');
         self::assertEmailTextBodyContains($email, 'Voici le devis.');
-        self::assertEmailTextBodyContains($email, '/suivi/'.$conversation->getAccessToken());
+        self::assertEmailTextBodyContains($email, '/itroom/suivi/'.$conversation->getAccessToken());
+    }
+
+    public function testAccountOnlySeesItsOwnOrganization(): void
+    {
+        $this->postWebhook($this->textMessage());
+        $conversation = $this->em->getRepository(Conversation::class)->findOneBy([]);
+        $clientId = $conversation->getClient()->getId();
+        $conversationId = $conversation->getId();
+        $this->loginAsOwner($this->createOrganization('dufermont', 'Dufermont'));
+
+        $this->client->request('GET', '/admin');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('a.row');
+        self::assertSelectorTextContains('.display__digits', '00');
+
+        $this->client->request('GET', '/admin/clients');
+        self::assertSelectorNotExists('a.row');
+
+        $this->client->request('GET', '/admin/conversations/'.$conversationId);
+        self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('GET', '/admin/clients/'.$clientId);
+        self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('POST', '/admin/clients/'.$clientId.'/supprimer');
+        self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('POST', '/admin/conversations/'.$conversationId.'/cloturer');
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testNormalAccountCannotSwitchOrganization(): void
+    {
+        $other = $this->createOrganization('dufermont', 'Dufermont');
+        $this->loginAsOwner();
+
+        $this->client->request('POST', '/admin/organisation/'.$other->getId());
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    public function testSuperAdminSwitchesBetweenOrganizations(): void
+    {
+        $other = $this->createOrganization('dufermont', 'Dufermont');
+        $this->postWebhook($this->textMessage(), slug: 'dufermont');
+        $user = (new User('super@example.test'))->setPassword('inutilisé')->setSuperAdmin(true);
+        $this->em->persist($user);
+        $this->em->flush();
+        $this->client->loginUser($user);
+
+        // Dufermont vient avant IT-Room par ordre alphabétique.
+        $this->client->request('GET', '/admin');
+        self::assertSelectorTextContains('.rail__org', 'Dufermont');
+        self::assertSelectorExists('a.row');
+
+        $this->client->submitForm('Voir IT-Room');
+        $this->client->followRedirect();
+        self::assertSelectorTextContains('.rail__org', 'IT-Room');
+        self::assertSelectorNotExists('a.row');
+        self::assertSame('Dufermont', $other->getName());
+    }
+
+    public function testSettingsAreSavedForCurrentOrganizationOnly(): void
+    {
+        $other = $this->createOrganization('dufermont', 'Dufermont');
+        $this->loginAsOwner();
+
+        $this->client->request('GET', '/admin/reglages');
+        self::assertSelectorExists('a[href="/itroom"]');
+        $this->client->submitForm('Enregistrer les réglages', ['settings[botMessage]' => 'Message IT-Room']);
+
+        $this->em->clear();
+        self::assertSame('Message IT-Room', $this->em->getRepository(Organization::class)->findOneBy(['slug' => 'itroom'])->getBotMessage());
+        self::assertNotSame('Message IT-Room', $this->em->getRepository(Organization::class)->find($other->getId())->getBotMessage());
     }
 
     public function testDeletingClientRemovesConversations(): void

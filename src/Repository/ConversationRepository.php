@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Client;
 use App\Entity\Conversation;
+use App\Entity\Organization;
 use App\Enum\Channel;
 use App\Enum\ConversationStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -26,13 +27,15 @@ class ConversationRepository extends ServiceEntityRepository
     }
 
     /** @return Conversation[] */
-    public function findForInbox(?ConversationStatus $status): array
+    public function findForInbox(Organization $organization, ?ConversationStatus $status): array
     {
         $query = $this->createQueryBuilder('v')
             ->join('v.client', 'c')
             ->addSelect('c')
             ->leftJoin('v.messages', 'm')
             ->addSelect('m')
+            ->andWhere('c.organization = :organization')
+            ->setParameter('organization', $organization)
             ->orderBy('v.lastMessageAt', 'DESC');
 
         if ($status) {
@@ -42,8 +45,16 @@ class ConversationRepository extends ServiceEntityRepository
         return $query->getQuery()->getResult();
     }
 
-    public function countOpen(): int
+    public function countOpen(Organization $organization): int
     {
-        return $this->count(['status' => ConversationStatus::OPEN]);
+        return (int) $this->createQueryBuilder('v')
+            ->select('COUNT(v.id)')
+            ->join('v.client', 'c')
+            ->andWhere('c.organization = :organization')
+            ->andWhere('v.status = :status')
+            ->setParameter('organization', $organization)
+            ->setParameter('status', ConversationStatus::OPEN)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

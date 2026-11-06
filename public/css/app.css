@@ -92,6 +92,9 @@ a { color: var(--action); }
 
 .display__label { display: block; margin-top: .5rem; text-align: right; font-size: .9rem; }
 
+.rail__org { padding-inline: .6rem; font-weight: 600; color: #fff; }
+.rail__switch button { padding: .3rem .6rem; border: 0; background: none; color: inherit; font: inherit; font-size: .9rem; text-align: left; text-decoration: underline; cursor: pointer; }
+.public__org { margin-bottom: .75rem; color: var(--muted); font-weight: 600; font-size: 1.1rem; }
 .rail__nav { display: grid; gap: .25rem; }
 
 .rail a:not(.display) {
@@ -209,7 +212,7 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .btn:hover { filter: brightness(.9); }
 .btn--quiet { background: transparent; border-color: #8a9aaa; color: var(--ink); }
 .btn--danger { background: var(--danger); }
-.btn--whatsapp { background: var(--whatsapp); margin-top: .75rem; padding: .85rem 1.5rem; font-size: 1.15rem; }
+.btn--whatsapp { display: inline-flex; align-items: center; gap: .6rem; background: var(--whatsapp); padding: .85rem 1.5rem; font-size: 1.15rem; }
 
 .composer { margin-bottom: 1rem; }
 .search { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-block: 1rem 1.5rem; }

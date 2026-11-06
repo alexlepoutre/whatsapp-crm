@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\Organization;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -12,6 +13,7 @@ abstract class AppTestCase extends WebTestCase
 {
     protected KernelBrowser $client;
     protected EntityManagerInterface $em;
+    protected Organization $itroom;
 
     protected function setUp(): void
     {
@@ -22,15 +24,17 @@ abstract class AppTestCase extends WebTestCase
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($metadata);
         $tool->createSchema($metadata);
+
+        $this->itroom = $this->createOrganization('itroom', 'IT-Room');
     }
 
     /** @param array<string, mixed> $value */
-    protected function postWebhook(array $value, ?string $signature = null): void
+    protected function postWebhook(array $value, ?string $signature = null, string $slug = 'itroom'): void
     {
         $body = json_encode(['entry' => [['changes' => [['value' => $value]]]]], \JSON_THROW_ON_ERROR);
         $signature ??= 'sha256='.hash_hmac('sha256', $body, 'secret-de-test');
 
-        $this->client->request('POST', '/webhook/whatsapp', server: ['HTTP_X_HUB_SIGNATURE_256' => $signature], content: $body);
+        $this->client->request('POST', '/webhook/relay/'.$slug, server: ['HTTP_X_HUB_SIGNATURE_256' => $signature], content: $body);
     }
 
     /** @return array<string, mixed> */
@@ -42,9 +46,21 @@ abstract class AppTestCase extends WebTestCase
         ];
     }
 
-    protected function loginAsOwner(): void
+    protected function createOrganization(string $slug, string $name): Organization
     {
-        $user = (new User('moi@example.test'))->setPassword('inutilisé');
+        $organization = (new Organization($slug, $name))->setNotificationEmail('alerte@'.$slug.'.test');
+        $this->em->persist($organization);
+        $this->em->flush();
+
+        return $organization;
+    }
+
+    protected function loginAsOwner(?Organization $organization = null): void
+    {
+        // Le noyau redémarre entre deux requêtes : l'organisation doit être relue dans le gestionnaire courant.
+        $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        $organization = $this->em->find(Organization::class, ($organization ?? $this->itroom)->getId());
+        $user = (new User('moi@'.$organization->getSlug().'.test'))->setPassword('inutilisé')->setOrganization($organization);
         $this->em->persist($user);
         $this->em->flush();
         $this->client->loginUser($user);

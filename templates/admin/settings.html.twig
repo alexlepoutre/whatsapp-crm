@@ -13,6 +13,8 @@
         {% endif %}
     </p>
 
+    <p>Page de contact : <a href="{{ path('contact', {slug: organization.slug}) }}">{{ url('contact', {slug: organization.slug}) }}</a></p>
+
     <div class="narrow">
         {{ form_start(form) }}
             {{ form_widget(form) }}

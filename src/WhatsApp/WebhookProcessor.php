@@ -2,6 +2,7 @@
 
 namespace App\WhatsApp;
 
+use App\Entity\Organization;
 use App\Enum\DeliveryStatus;
 use App\Repository\MessageRepository;
 use App\Service\Inbox;
@@ -31,7 +32,7 @@ class WebhookProcessor
     }
 
     /** @param array<string, mixed> $payload */
-    public function process(array $payload): void
+    public function process(Organization $organization, array $payload): void
     {
         foreach ($payload['entry'] ?? [] as $entry) {
             foreach ($entry['changes'] ?? [] as $change) {
@@ -39,11 +40,11 @@ class WebhookProcessor
                 $names = $this->profileNames($value['contacts'] ?? []);
 
                 foreach ($value['messages'] ?? [] as $message) {
-                    $this->handleMessage($message, $names);
+                    $this->handleMessage($organization, $message, $names);
                 }
 
                 foreach ($value['statuses'] ?? [] as $status) {
-                    $this->handleStatus($status);
+                    $this->handleStatus($organization, $status);
                 }
             }
         }
@@ -71,7 +72,7 @@ class WebhookProcessor
      * @param array<string, mixed>  $message
      * @param array<string, string> $names
      */
-    private function handleMessage(array $message, array $names): void
+    private function handleMessage(Organization $organization, array $message, array $names): void
     {
         $from = $message['from'] ?? null;
         $id = $message['id'] ?? null;
@@ -80,7 +81,7 @@ class WebhookProcessor
             return;
         }
 
-        $this->inbox->receiveWhatsApp($from, $names[$from] ?? null, $id, $this->bodyOf($message));
+        $this->inbox->receiveWhatsApp($organization, $from, $names[$from] ?? null, $id, $this->bodyOf($message));
     }
 
     /**
@@ -114,12 +115,12 @@ class WebhookProcessor
     }
 
     /** @param array<string, mixed> $status */
-    private function handleStatus(array $status): void
+    private function handleStatus(Organization $organization, array $status): void
     {
         $delivery = DeliveryStatus::tryFrom((string) ($status['status'] ?? ''));
         $message = isset($status['id']) ? $this->messages->findByWaMessageId((string) $status['id']) : null;
 
-        if (null === $delivery || null === $message) {
+        if (null === $delivery || null === $message || $message->getConversation()->getOrganization() !== $organization) {
             return;
         }
 

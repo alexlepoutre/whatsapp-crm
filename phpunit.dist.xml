@@ -15,9 +15,8 @@
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
-        <server name="WHATSAPP_APP_SECRET" value="secret-de-test" force="true" />
-        <server name="WHATSAPP_VERIFY_TOKEN" value="jeton-de-test" force="true" />
-        <server name="OWNER_EMAIL" value="moi@example.test" force="true" />
+        <server name="WHATSAPP_RELAY_SECRET" value="secret-de-test" force="true" />
+        <server name="WHATSAPP_PUBLIC_NUMBER" value="33600000000" force="true" />
     </php>
 
     <testsuites>

@@ -22,7 +22,6 @@ class Notifier
         private readonly UrlGeneratorInterface $urls,
         private readonly LoggerInterface $logger,
         #[Autowire('%env(MAIL_FROM)%')] private readonly string $from,
-        #[Autowire('%env(OWNER_EMAIL)%')] private readonly string $ownerEmail,
     ) {
     }
 
@@ -38,13 +37,15 @@ class Notifier
 
     public function notifyOwner(Conversation $conversation, string $body): bool
     {
-        if ('' === $this->ownerEmail) {
+        $recipient = $conversation->getOrganization()->getNotificationEmail();
+
+        if (null === $recipient) {
             return false;
         }
 
         return $this->send(
             (new TemplatedEmail())
-                ->to($this->ownerEmail)
+                ->to($recipient)
                 ->subject(\sprintf('[%s] %s', $conversation->getChannel()->label(), $conversation->getClient()->getDisplayName()))
                 ->textTemplate('email/owner_notification.txt.twig')
                 ->context([
@@ -71,7 +72,7 @@ class Notifier
                 ->textTemplate($template)
                 ->context($context + [
                     'conversation' => $conversation,
-                    'url' => $this->urls->generate('tracking_show', ['token' => $conversation->getAccessToken()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'url' => $this->urls->generate('tracking_show', ['slug' => $conversation->getOrganization()->getSlug(), 'token' => $conversation->getAccessToken()], UrlGeneratorInterface::ABSOLUTE_URL),
                 ]),
         );
     }

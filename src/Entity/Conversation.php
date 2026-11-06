@@ -83,6 +83,11 @@ class Conversation
         return $this->client;
     }
 
+    public function getOrganization(): Organization
+    {
+        return $this->client->getOrganization();
+    }
+
     public function getChannel(): Channel
     {
         return $this->channel;

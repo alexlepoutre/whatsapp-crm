@@ -5,13 +5,13 @@ namespace App\Service;
 use App\Entity\Client;
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\Organization;
 use App\Enum\Channel;
 use App\Enum\DeliveryStatus;
 use App\Enum\MessageSender;
 use App\Repository\ClientRepository;
 use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
-use App\Repository\SettingsRepository;
 use App\WhatsApp\WhatsAppClient;
 use App\WhatsApp\WhatsAppException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +29,6 @@ class Inbox
         private readonly ClientRepository $clients,
         private readonly ConversationRepository $conversations,
         private readonly MessageRepository $messages,
-        private readonly SettingsRepository $settings,
         private readonly WhatsAppClient $whatsApp,
         private readonly Notifier $notifier,
     ) {
@@ -40,16 +39,16 @@ class Inbox
      * la contrainte d'unicité fait échouer le second : Meta réessaie et tombe sur le test
      * ci-dessous. L'exception n'est donc volontairement pas interceptée.
      */
-    public function receiveWhatsApp(string $phone, ?string $profileName, string $waMessageId, string $body): void
+    public function receiveWhatsApp(Organization $organization, string $phone, ?string $profileName, string $waMessageId, string $body): void
     {
         if (null !== $this->messages->findByWaMessageId($waMessageId)) {
             return;
         }
 
-        $client = $this->clients->findByPhone($phone);
+        $client = $this->clients->findByPhone($organization, $phone);
 
         if (null === $client) {
-            $client = (new Client())->setPhone($phone);
+            $client = (new Client($organization))->setPhone($phone);
             $this->entityManager->persist($client);
         }
 
@@ -66,6 +65,7 @@ class Inbox
 
         $isNewSolicitation = $conversation->isQuietSince(new \DateTimeImmutable(self::QUIET_PERIOD));
 
+        $body = $this->withoutWhatsAppCode($organization, $body);
         (new Message($conversation, MessageSender::CLIENT, $body))->setWaMessageId($waMessageId);
         $this->entityManager->flush();
 
@@ -75,12 +75,26 @@ class Inbox
         }
     }
 
-    public function createFromForm(string $name, string $email, ?string $phone, string $subject, string $body): Conversation
+    /** Le lien de la page publique préremplit « #itroom » : c'est un code de routage, pas un message. */
+    private function withoutWhatsAppCode(Organization $organization, string $body): string
     {
-        $client = $this->clients->findByEmail($email) ?? $this->clients->findByPhone($phone);
+        $code = $organization->getWhatsAppCode();
+
+        if (0 !== stripos($body, $code)) {
+            return $body;
+        }
+
+        $rest = ltrim(substr($body, \strlen($code)), " \t\n\r:,-");
+
+        return '' === $rest ? 'Conversation ouverte depuis la page de contact.' : $rest;
+    }
+
+    public function createFromForm(Organization $organization, string $name, string $email, ?string $phone, string $subject, string $body): Conversation
+    {
+        $client = $this->clients->findByEmail($organization, $email) ?? $this->clients->findByPhone($organization, $phone);
 
         if (null === $client) {
-            $client = new Client();
+            $client = new Client($organization);
             $this->entityManager->persist($client);
         }
 
@@ -88,11 +102,11 @@ class Inbox
         // vérifiées, et elles ne doivent pas pouvoir réécrire la fiche d'un client existant.
         $client->setName($client->getName() ?? $name);
 
-        if (null === $client->getEmail() && null === $this->clients->findByEmail($email)) {
+        if (null === $client->getEmail() && null === $this->clients->findByEmail($organization, $email)) {
             $client->setEmail($email);
         }
 
-        if (null === $client->getPhone() && null === $this->clients->findByPhone($phone)) {
+        if (null === $client->getPhone() && null === $this->clients->findByPhone($organization, $phone)) {
             $client->setPhone($phone);
         }
 
@@ -136,13 +150,13 @@ class Inbox
 
     private function sendBotReply(Conversation $conversation): void
     {
-        $settings = $this->settings->current();
+        $organization = $conversation->getOrganization();
 
-        if (!$settings->isBotEnabled()) {
+        if (!$organization->isBotEnabled()) {
             return;
         }
 
-        $message = new Message($conversation, MessageSender::BOT, $settings->getBotMessage());
+        $message = new Message($conversation, MessageSender::BOT, $organization->getBotMessage());
         $this->entityManager->flush();
 
         $this->deliverOnWhatsApp($message);

@@ -17,8 +17,9 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class TrackingController extends AbstractController
 {
-    #[Route('/suivi/{token}', name: 'tracking_show', requirements: ['token' => '[a-f0-9]{64}'])]
+    #[Route('/{slug}/suivi/{token}', name: 'tracking_show', requirements: ['slug' => '[a-z0-9][a-z0-9-]*', 'token' => '[a-f0-9]{64}'])]
     public function show(
+        string $slug,
         string $token,
         Request $request,
         ConversationRepository $conversations,
@@ -27,7 +28,7 @@ class TrackingController extends AbstractController
     ): Response {
         $conversation = $conversations->findOneBy(['accessToken' => $token]);
 
-        if (null === $conversation) {
+        if (null === $conversation || $conversation->getOrganization()->getSlug() !== $slug) {
             throw $this->createNotFoundException();
         }
 
@@ -42,7 +43,7 @@ class TrackingController extends AbstractController
                 $this->addFlash('error', 'Trop de messages envoyés sur cette demande. Réessayez dans une heure.');
             }
 
-            return $this->redirectToRoute('tracking_show', ['token' => $token]);
+            return $this->redirectToRoute('tracking_show', ['slug' => $slug, 'token' => $token]);
         }
 
         return $this->render('public/tracking.html.twig', [

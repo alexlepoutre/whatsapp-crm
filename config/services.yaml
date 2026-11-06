@@ -11,11 +11,9 @@ parameters:
     # Sans jeton, l'application tourne et les envois WhatsApp sont marqués « simulés ».
     env(WHATSAPP_ACCESS_TOKEN): ''
     env(WHATSAPP_PHONE_NUMBER_ID): ''
-    env(WHATSAPP_APP_SECRET): ''
-    env(WHATSAPP_VERIFY_TOKEN): ''
+    env(WHATSAPP_RELAY_SECRET): ''
     env(WHATSAPP_PUBLIC_NUMBER): ''
     env(WHATSAPP_API_VERSION): 'v24.0'
-    env(OWNER_EMAIL): ''
     env(MAIL_FROM): 'noreply@localhost.test'
 
 services:
