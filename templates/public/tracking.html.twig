@@ -41,13 +41,17 @@
         {% endif %}
 
         {% if conversation.isClosed %}
-            <p class="notice">Cette demande est clôturée. Si vous écrivez un nouveau message, elle sera rouverte.</p>
+            <p class="notice">Cette demande est clôturée.</p>
+            <form method="post" action="{{ path('tracking_reopen', routeArguments) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('tracking-choice') }}">
+                <button type="submit" class="btn">Rouvrir ma demande</button>
+            </form>
+        {% else %}
+            {{ form_start(form, {attr: {class: 'composer'}}) }}
+                {{ form_row(form.body) }}
+                <button type="submit" class="btn">Envoyer mon message</button>
+            {{ form_end(form) }}
         {% endif %}
-
-        {{ form_start(form, {attr: {class: 'composer'}}) }}
-            {{ form_row(form.body) }}
-            <button type="submit" class="btn">Envoyer mon message</button>
-        {{ form_end(form) }}
 
         {% if not conversation.isClosed and not conversation.awaitingClosure %}
             <form method="post" action="{{ path('tracking_close', routeArguments) }}">

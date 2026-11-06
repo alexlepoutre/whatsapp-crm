@@ -226,15 +226,35 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorNotExists('form[action$="/cloturer"]');
     }
 
-    public function testClientMessageReopensClosedRequest(): void
+    public function testClosedRequestHasNoInputAndCanBeReopened(): void
     {
         $this->openTrackingPage();
         $this->client->submitForm('Clôturer ma demande');
         $this->client->followRedirect();
 
-        $this->client->submitForm('Envoyer mon message', ['message[body]' => 'Finalement, encore une question.']);
+        self::assertSelectorNotExists('textarea');
+
+        $this->client->submitForm('Rouvrir ma demande');
 
         self::assertSame(\App\Enum\ConversationStatus::OPEN, $this->conversationStatus());
+        self::assertEmailCount(1);
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Le client a rouvert sa demande.');
+
+        $this->client->followRedirect();
+        self::assertSelectorExists('textarea');
+    }
+
+    public function testMessageIsRefusedOnClosedRequest(): void
+    {
+        $this->openTrackingPage();
+        $crawler = $this->client->getCrawler();
+        $form = $crawler->selectButton('Envoyer mon message')->form(['message[body]' => 'Trop tard']);
+        $this->client->submitForm('Clôturer ma demande');
+
+        $this->client->submit($form);
+
+        self::assertSame(\App\Enum\ConversationStatus::CLOSED, $this->conversationStatus());
+        self::assertSame(1, $this->em->getRepository(Message::class)->count([]));
     }
 
     public function testClosingNeedsValidToken(): void

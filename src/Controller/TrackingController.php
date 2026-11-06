@@ -34,7 +34,9 @@ class TrackingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($limiter->create($token)->consume()->isAccepted()) {
+            if ($conversation->isClosed()) {
+                $this->addFlash('error', 'Message non envoyé : rouvrez d\'abord votre demande.');
+            } elseif ($limiter->create($token)->consume()->isAccepted()) {
                 $inbox->replyFromClient($conversation, $form->get('body')->getData());
                 $this->addFlash('success', 'Votre message est envoyé.');
             } else {
@@ -58,7 +60,7 @@ class TrackingController extends AbstractController
         $this->assertValidToken($request);
 
         $inbox->closeFromClient($conversation);
-        $this->addFlash('success', 'Votre demande est clôturée. Écrivez un nouveau message si vous avez besoin de la rouvrir.');
+        $this->addFlash('success', 'Votre demande est clôturée. Vous pouvez la rouvrir depuis cette page.');
 
         return $this->redirectToRoute('tracking_show', ['slug' => $slug, 'token' => $token]);
     }
@@ -72,6 +74,19 @@ class TrackingController extends AbstractController
 
         $inbox->continueFromClient($conversation);
         $this->addFlash('success', 'Très bien, écrivez votre message ci-dessous.');
+
+        return $this->redirectToRoute('tracking_show', ['slug' => $slug, 'token' => $token]);
+    }
+
+    #[Route('/{slug}/suivi/{token}/rouvrir', name: 'tracking_reopen', requirements: ['slug' => '[a-z0-9][a-z0-9-]*', 'token' => '[a-f0-9]{64}'], methods: ['POST'])]
+    public function reopen(string $slug, string $token, Request $request, ConversationRepository $conversations, Inbox $inbox): Response
+    {
+        $conversation = $this->find($conversations, $slug, $token);
+
+        $this->assertValidToken($request);
+
+        $inbox->reopenFromClient($conversation);
+        $this->addFlash('success', 'Votre demande est rouverte. Écrivez votre message ci-dessous.');
 
         return $this->redirectToRoute('tracking_show', ['slug' => $slug, 'token' => $token]);
     }

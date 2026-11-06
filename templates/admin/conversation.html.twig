@@ -48,7 +48,13 @@
         <p class="notice">Dernière réponse envoyée : le client peut clôturer ou continuer.</p>
     {% endif %}
 
-    {% if conversation.isWhatsApp and not conversation.isWhatsAppWindowOpen %}
+    {% if conversation.isClosed %}
+        <p class="notice">Cette conversation est clôturée.</p>
+        <form method="post" action="{{ path('admin_conversation_reopen', {id: conversation.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('reopen-conversation') }}">
+            <button type="submit" class="btn">Rouvrir la conversation</button>
+        </form>
+    {% elseif conversation.isWhatsApp and not conversation.isWhatsAppWindowOpen %}
         <p class="notice">Le dernier message de ce client date de plus de 24 heures : WhatsApp n'autorise plus de réponse libre. Il faut attendre qu'il réécrive.</p>
     {% else %}
         {% if conversation.isWhatsApp and not whatsappConfigured %}

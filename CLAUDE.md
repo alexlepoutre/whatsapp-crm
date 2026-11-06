@@ -103,11 +103,16 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
   formulaire de réponse disparaît. Les modèles validés ne sont pas encore gérés.
 - **Bot** : message fixe, au premier contact puis après 12 h de silence (`Inbox::QUIET_PERIOD`).
   Il ne change jamais le statut du fil.
+- **Conversation clôturée** : plus de zone de saisie dans l'admin ni sur le lien de suivi, et le
+  serveur refuse aussi l'écriture. Un bouton rouvre. Sur WhatsApp, le client ne peut pas être
+  empêché d'écrire : son message rouvre la conversation.
+- **Déploiement** : `Dockerfile.prod` installe les dépendances avant de copier le code, pour ne pas
+  retélécharger depuis GitHub à chaque fois. Garder cet ordre.
 - **Dernière réponse** : deuxième bouton de l'admin. Le client se voit alors proposer de clôturer
   ou de continuer : boutons WhatsApp (`WhatsAppClient::sendTextWithChoice`, texte limité à 1024
   caractères par Meta) ou bloc sur le lien de suivi (`Conversation::awaitingClosure`). Le lien de
   suivi garde en plus un bouton de clôture permanent. L'équipe est prévenue d'une clôture ;
-  « Continuer » ne change rien tant que le client n'a pas écrit. Un nouveau message rouvre.
+  « Continuer » ne change rien tant que le client n'a pas écrit.
 - **Messages par défaut** : la fiche d'une organisation les affiche depuis les constantes de
   `Inbox` et les vrais modèles de courriel. Un nouveau texte automatique s'y ajoute
   (`OrganizationController::defaultMessages`).

@@ -123,6 +123,11 @@ class Conversation
         $this->awaitingClosure = false;
     }
 
+    public function reopen(): void
+    {
+        $this->status = ConversationStatus::OPEN;
+    }
+
     public function isAwaitingClosure(): bool
     {
         return $this->awaitingClosure;

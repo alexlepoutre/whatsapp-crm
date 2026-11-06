@@ -11,14 +11,21 @@ COPY docker/php/php-prod.ini "$PHP_INI_DIR/conf.d/zz-app.ini"
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/app
-COPY . .
 
 ENV APP_ENV=prod APP_DEBUG=0
+
+# Les dépendances d'abord : cette couche reste en cache tant que le fichier lock ne change pas.
+# Sinon, chaque déploiement retélécharge tout depuis GitHub, qui finit par refuser.
+COPY composer.json composer.lock symfony.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction --no-progress
+
+COPY . .
 
 # ARG et non ENV : ce secret de construction ne doit pas subsister dans l'image.
 ARG APP_SECRET=build-time-placeholder
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress \
+RUN composer dump-autoload --no-dev --optimize --no-interaction \
+    && composer run-script --no-dev post-install-cmd --no-interaction \
     && rm /usr/bin/composer \
     && chown -R www-data:www-data var
 

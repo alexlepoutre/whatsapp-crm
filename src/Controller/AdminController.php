@@ -57,7 +57,9 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($conversation->isWhatsApp() && !$conversation->isWhatsAppWindowOpen()) {
+            if ($conversation->isClosed()) {
+                $this->addFlash('error', 'Réponse non envoyée : la conversation est clôturée. Rouvrez-la pour répondre.');
+            } elseif ($conversation->isWhatsApp() && !$conversation->isWhatsAppWindowOpen()) {
                 $this->addFlash('error', 'Réponse non envoyée : le dernier message du client date de plus de 24 heures.');
             } else {
                 $message = $inbox->replyFromOwner($conversation, $form->get('body')->getData(), $request->request->has('final'));
@@ -91,6 +93,22 @@ class AdminController extends AbstractController
         $this->addFlash('success', 'Conversation clôturée. Elle se rouvrira si le client réécrit.');
 
         return $this->redirectToRoute('admin_inbox');
+    }
+
+    #[Route('/conversations/{id}/rouvrir', name: 'admin_conversation_reopen', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function reopen(Conversation $conversation, Request $request): Response
+    {
+        $this->current->assertOwns($conversation->getClient());
+
+        if (!$this->isCsrfTokenValid('reopen-conversation', $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $conversation->reopen();
+        $this->entityManager->flush();
+        $this->addFlash('success', 'Conversation rouverte.');
+
+        return $this->redirectToRoute('admin_conversation', ['id' => $conversation->getId()]);
     }
 
     #[Route('/clients', name: 'admin_clients')]

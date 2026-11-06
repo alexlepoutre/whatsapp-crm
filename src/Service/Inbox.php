@@ -200,6 +200,18 @@ class Inbox
         $this->entityManager->flush();
     }
 
+    public function reopenFromClient(Conversation $conversation): void
+    {
+        if (!$conversation->isClosed()) {
+            return;
+        }
+
+        $conversation->reopen();
+        $this->entityManager->flush();
+
+        $this->notifier->notifyTeam($conversation, 'Le client a rouvert sa demande.');
+    }
+
     /** Sans alerte, la demande quitterait « À traiter » sans que l'équipe sache pourquoi. */
     public function closeFromClient(Conversation $conversation): void
     {

@@ -205,6 +205,53 @@ class AdminTest extends AppTestCase
         self::assertNotSame('Message IT-Room', $this->em->getRepository(Organization::class)->find($other->getId())->getBotMessage());
     }
 
+    public function testClosedConversationHasNoInputAndCanBeReopened(): void
+    {
+        $this->postWebhook($this->textMessage());
+        $this->loginAsOwner();
+        $conversation = $this->em->getRepository(Conversation::class)->findOneBy([]);
+        $conversation->close();
+        $this->em->flush();
+        $id = $conversation->getId();
+
+        $this->client->request('GET', '/admin/conversations/'.$id);
+        self::assertSelectorNotExists('textarea');
+        self::assertSelectorNotExists('form[action$="/cloturer"]');
+
+        $this->client->submitForm('Rouvrir la conversation');
+        $this->client->followRedirect();
+
+        self::assertSelectorExists('textarea');
+        $this->em->clear();
+        self::assertSame(ConversationStatus::OPEN, $this->em->getRepository(Conversation::class)->find($id)->getStatus());
+    }
+
+    public function testReplyIsRefusedOnClosedConversation(): void
+    {
+        $this->postWebhook($this->textMessage());
+        $this->loginAsOwner();
+        $id = $this->em->getRepository(Conversation::class)->findOneBy([])->getId();
+
+        $crawler = $this->client->request('GET', '/admin/conversations/'.$id);
+        $form = $crawler->selectButton('Envoyer la réponse')->form(['message[body]' => 'Trop tard']);
+        $this->client->submitForm('Clôturer la conversation');
+
+        $this->client->submit($form);
+
+        self::assertSame(0, $this->em->getRepository(Message::class)->count(['sender' => MessageSender::OWNER]));
+    }
+
+    public function testAccountCannotReopenConversationOfAnotherOrganization(): void
+    {
+        $this->postWebhook($this->textMessage());
+        $id = $this->em->getRepository(Conversation::class)->findOneBy([])->getId();
+        $this->loginAsOwner($this->createOrganization('dufermont', 'Dufermont'));
+
+        $this->client->request('POST', '/admin/conversations/'.$id.'/rouvrir');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
     public function testFormConversationShowsThePrivateLink(): void
     {
         $this->client->request('GET', '/itroom');
