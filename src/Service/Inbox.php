@@ -15,6 +15,7 @@ use App\Repository\MessageRepository;
 use App\WhatsApp\WhatsAppClient;
 use App\WhatsApp\WhatsAppException;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Point de passage de tous les messages, entrants comme sortants, quel que soit le canal.
@@ -34,6 +35,7 @@ class Inbox
         private readonly MessageRepository $messages,
         private readonly WhatsAppClient $whatsApp,
         private readonly Notifier $notifier,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -42,7 +44,7 @@ class Inbox
      * la contrainte d'unicité fait échouer le second : Meta réessaie et tombe sur le test
      * ci-dessous. L'exception n'est donc volontairement pas interceptée.
      */
-    public function receiveWhatsApp(Organization $organization, string $phone, ?string $profileName, string $waMessageId, string $body): void
+    public function receiveWhatsApp(Organization $organization, string $phone, ?string $profileName, string $waMessageId, string $body, ?string $transcription = null): void
     {
         if (null !== $this->messages->findByWaMessageId($waMessageId)) {
             return;
@@ -73,6 +75,11 @@ class Inbox
         $body = $this->withoutWhatsAppOpening($organization, $body);
         (new Message($conversation, MessageSender::CLIENT, $body))->setWaMessageId($waMessageId);
         $this->entityManager->flush();
+
+        // Le client doit pouvoir vérifier ce qui a été compris, même bot désactivé.
+        if (null !== $transcription) {
+            $this->sendAutomatic($conversation, "🎤 Voici ce que nous avons compris de votre message vocal :\n\n« ".$transcription.' »');
+        }
 
         if (self::OPENED === $body) {
             $this->sendBotReply($conversation, self::OPENED_REPLY);
@@ -164,12 +171,51 @@ class Inbox
         return $message;
     }
 
+    /**
+     * Quelqu'un vient d'ouvrir la conversation. Une panne laisse les messages non lus : le prochain
+     * affichage réessaiera, et ne pas passer au bleu ne doit jamais empêcher de lire la page.
+     */
+    public function markAsRead(Conversation $conversation): void
+    {
+        if (!$conversation->isWhatsApp() || !$this->whatsApp->isConfigured()) {
+            return;
+        }
+
+        $unread = $conversation->getMessages()->filter(
+            static fn (Message $m) => $m->isFromClient() && null !== $m->getWaMessageId() && null === $m->getReadAt(),
+        );
+        $last = $unread->last();
+
+        if (false === $last) {
+            return;
+        }
+
+        try {
+            $this->whatsApp->markAsRead((string) $last->getWaMessageId());
+        } catch (WhatsAppException $e) {
+            $this->logger->error('Accusé de lecture refusé : '.$e->getMessage(), ['conversation' => $conversation->getId()]);
+
+            return;
+        }
+
+        foreach ($unread as $message) {
+            $message->markRead();
+        }
+
+        $this->entityManager->flush();
+    }
+
     private function sendBotReply(Conversation $conversation, string $text): void
     {
         if (!$conversation->getOrganization()->isBotEnabled()) {
             return;
         }
 
+        $this->sendAutomatic($conversation, $text);
+    }
+
+    private function sendAutomatic(Conversation $conversation, string $text): void
+    {
         $message = new Message($conversation, MessageSender::BOT, $text);
         $this->entityManager->flush();
 

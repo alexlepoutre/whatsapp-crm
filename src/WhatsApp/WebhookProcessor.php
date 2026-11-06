@@ -79,7 +79,9 @@ class WebhookProcessor
             return;
         }
 
-        $this->inbox->receiveWhatsApp($organization, $from, $names[$from] ?? null, $id, $this->bodyOf($message));
+        $transcription = trim((string) ($message['transcription'] ?? ''));
+
+        $this->inbox->receiveWhatsApp($organization, $from, $names[$from] ?? null, $id, $this->bodyOf($message), '' === $transcription ? null : $transcription);
     }
 
     /**

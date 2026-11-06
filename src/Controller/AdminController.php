@@ -49,6 +49,10 @@ class AdminController extends AbstractController
     {
         $this->current->assertOwns($conversation->getClient());
 
+        if ($request->isMethod('GET')) {
+            $inbox->markAsRead($conversation);
+        }
+
         $form = $this->createForm(MessageType::class, null, ['label_body' => 'Votre réponse']);
         $form->handleRequest($request);
 

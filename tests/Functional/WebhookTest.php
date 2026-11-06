@@ -147,6 +147,34 @@ class WebhookTest extends AppTestCase
         $body = $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.v1'])->getBody();
         self::assertStringContainsString('transcription automatique', $body);
         self::assertStringContainsString('Où en est ma commande ?', $body);
+
+        $replies = $this->em->getRepository(Message::class)->findBy(['sender' => MessageSender::BOT], ['id' => 'ASC']);
+        self::assertStringContainsString('Où en est ma commande ?', $replies[0]->getBody());
+        self::assertStringContainsString('compris de votre message vocal', $replies[0]->getBody());
+    }
+
+    public function testTranscriptionIsSentBackEvenWithBotDisabled(): void
+    {
+        $this->em->find(\App\Entity\Organization::class, $this->itroom->getId())->setBotEnabled(false);
+        $this->em->flush();
+
+        $this->postWebhook(['messages' => [[
+            'from' => '33612345678', 'id' => 'wamid.v3', 'type' => 'audio', 'audio' => ['id' => '1'], 'transcription' => 'Bonjour',
+        ]]]);
+
+        self::assertSame(1, $this->em->getRepository(Message::class)->count(['sender' => MessageSender::BOT]));
+    }
+
+    public function testNothingIsSentBackWithoutTranscription(): void
+    {
+        $this->em->find(\App\Entity\Organization::class, $this->itroom->getId())->setBotEnabled(false);
+        $this->em->flush();
+
+        $this->postWebhook(['messages' => [[
+            'from' => '33612345678', 'id' => 'wamid.v4', 'type' => 'audio', 'audio' => ['id' => '1'],
+        ]]]);
+
+        self::assertSame(0, $this->em->getRepository(Message::class)->count(['sender' => MessageSender::BOT]));
     }
 
     public function testVoiceMessageIsKeptWhenTranscriptionFailed(): void

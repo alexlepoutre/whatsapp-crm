@@ -63,6 +63,9 @@ Un seul numéro et un seul webhook Meta pour tous les projets IT-Room : le hook
   sur les bots.
 - Vocaux : le hook les transcrit (Whisper, clé OpenAI dans son `app_config`) et ajoute le champ
   `transcription` au message relayé. Si cela échoue, le message arrive sans. L'audio n'est pas gardé.
+  Le CRM renvoie le texte compris au client, même bot désactivé.
+- Coches bleues : à l'ouverture de la conversation dans l'admin (`Inbox::markAsRead`), pas à la
+  réception. Le hook ne le fait pas pour les clients relayés.
 - Numéro partagé : +33 7 66 67 35 58. Si le token du hook change, le recopier dans `.env.prod`.
 
 ## Production

@@ -24,6 +24,19 @@ class WhatsAppClientTest extends TestCase
         );
     }
 
+    public function testMarksMessageAsRead(): void
+    {
+        $response = new JsonMockResponse(['success' => true]);
+        $client = new WhatsAppClient(new MockHttpClient($response), 'jeton', '123', 'v24.0');
+
+        $client->markAsRead('wamid.42');
+
+        self::assertSame(
+            ['messaging_product' => 'whatsapp', 'status' => 'read', 'message_id' => 'wamid.42'],
+            json_decode($response->getRequestOptions()['body'], true),
+        );
+    }
+
     public function testSurfacesMetaErrorMessage(): void
     {
         $response = new JsonMockResponse(['error' => ['message' => 'Hors fenêtre']], ['http_code' => 400]);

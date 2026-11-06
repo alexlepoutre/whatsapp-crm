@@ -36,6 +36,10 @@ class Message
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $failureReason = null;
 
+    /** Moment où quelqu'un a ouvert la conversation : les coches du client sont alors passées au bleu. */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $readAt = null;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -117,6 +121,16 @@ class Message
     public function getFailureReason(): ?string
     {
         return $this->failureReason;
+    }
+
+    public function getReadAt(): ?\DateTimeImmutable
+    {
+        return $this->readAt;
+    }
+
+    public function markRead(): void
+    {
+        $this->readAt = new \DateTimeImmutable();
     }
 
     public function getCreatedAt(): \DateTimeImmutable

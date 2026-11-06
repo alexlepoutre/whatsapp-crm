@@ -31,20 +31,50 @@ class WhatsAppClient
      */
     public function sendText(string $to, string $body): string
     {
+        $data = $this->post([
+            'messaging_product' => 'whatsapp',
+            'to' => $to,
+            'type' => 'text',
+            'text' => ['body' => $body],
+        ]);
+
+        $id = $data['messages'][0]['id'] ?? null;
+
+        if (!\is_string($id)) {
+            throw new WhatsAppException('Réponse Meta sans identifiant de message.');
+        }
+
+        return $id;
+    }
+
+    /**
+     * Passe au bleu les coches du client, pour ce message et tous les précédents.
+     *
+     * @throws WhatsAppException
+     */
+    public function markAsRead(string $messageId): void
+    {
+        $this->post([
+            'messaging_product' => 'whatsapp',
+            'status' => 'read',
+            'message_id' => $messageId,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $json
+     *
+     * @return array<string, mixed>
+     *
+     * @throws WhatsAppException
+     */
+    private function post(array $json): array
+    {
         try {
             $response = $this->httpClient->request(
                 'POST',
                 \sprintf('https://graph.facebook.com/%s/%s/messages', $this->apiVersion, $this->phoneNumberId),
-                [
-                    'auth_bearer' => $this->accessToken,
-                    'timeout' => 10,
-                    'json' => [
-                        'messaging_product' => 'whatsapp',
-                        'to' => $to,
-                        'type' => 'text',
-                        'text' => ['body' => $body],
-                    ],
-                ],
+                ['auth_bearer' => $this->accessToken, 'timeout' => 10, 'json' => $json],
             );
 
             $data = $response->toArray(false);
@@ -53,12 +83,10 @@ class WhatsAppClient
             throw new WhatsAppException('Meta injoignable : '.$e->getMessage(), 0, $e);
         }
 
-        $id = $data['messages'][0]['id'] ?? null;
-
-        if ($status >= 400 || !\is_string($id)) {
+        if ($status >= 400) {
             throw new WhatsAppException($data['error']['message'] ?? \sprintf('Réponse Meta inattendue (HTTP %d).', $status));
         }
 
-        return $id;
+        return $data;
     }
 }
