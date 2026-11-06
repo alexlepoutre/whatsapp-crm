@@ -44,7 +44,7 @@
                 <button type="submit" class="btn">Enregistrer l'organisation</button>
             {{ form_end(edit) }}
 
-            <h2>Messagerie OVH</h2>
+            <h2 id="messagerie">Messagerie OVH</h2>
             <p class="notice">
                 {% if edited.hasSmtp %}
                     Les courriels de {{ edited.name }} partent de {{ edited.smtpUsername }}.
@@ -58,11 +58,28 @@
             {{ form_end(mail) }}
 
             {% if edited.hasSmtp %}
-                <form method="post" action="{{ path('admin_organization_test_mail', {id: edited.id}) }}">
+                <form method="post" action="{{ path('admin_organization_test_mail', {id: edited.id}) }}" data-pending="Envoi en cours, jusqu'à 20 secondes…">
                     <input type="hidden" name="_token" value="{{ csrf_token('test-mail') }}">
                     <button type="submit" class="btn btn--quiet">Envoyer un courriel de test</button>
                 </form>
             {% endif %}
+            {% for message in app.flashes('mail_success') %}
+                <p class="flash flash--success" role="status">{{ message }}</p>
+            {% endfor %}
+            {% for message in app.flashes('mail_error') %}
+                <p class="flash flash--error" role="alert">{{ message }}</p>
+            {% endfor %}
         </section>
     </div>
+
+    <script>
+        // L'envoi peut durer plusieurs secondes : sans retour visuel, on reclique et on l'interrompt.
+        document.querySelectorAll('form[data-pending]').forEach((form) => {
+            form.addEventListener('submit', () => {
+                const button = form.querySelector('button');
+                button.disabled = true;
+                button.textContent = form.dataset.pending;
+            });
+        });
+    </script>
 {% endblock %}

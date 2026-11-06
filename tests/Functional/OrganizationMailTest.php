@@ -8,6 +8,7 @@ use App\Entity\Organization;
 use App\Entity\User;
 use App\Enum\DeliveryStatus;
 use App\Enum\MessageSender;
+use App\Service\Notifier;
 use App\Service\SecretBox;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -143,11 +144,20 @@ class OrganizationMailTest extends AppTestCase
         ]);
 
         $this->client->request('GET', '/admin/organisations/'.$this->itroom->getId());
+        self::assertSelectorExists('form[data-pending]');
         $this->client->submitForm('Envoyer un courriel de test');
+        self::assertStringEndsWith('#messagerie', (string) $this->client->getResponse()->headers->get('Location'));
         $this->client->followRedirect();
 
-        self::assertSelectorTextContains('.flash--error', 'Échec');
+        self::assertSelectorTextContains('form[data-pending] + .flash--error', 'Échec');
         self::assertStringNotContainsString(self::PASSWORD, (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testTechnicalErrorsAreExplained(): void
+    {
+        self::assertStringContainsString('mot de passe', Notifier::explain('Expected response code "235" but got code "535"'));
+        self::assertStringContainsString('injoignable', Notifier::explain('Connection could not be established with host'));
+        self::assertSame('Autre erreur', Notifier::explain('Autre erreur'));
     }
 
     public function testNormalAccountCannotSeeOrChangeMailSettings(): void

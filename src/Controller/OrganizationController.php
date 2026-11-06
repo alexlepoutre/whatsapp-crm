@@ -167,12 +167,13 @@ class OrganizationController extends AbstractController
         $error = $notifier->sendTest($organization, $user->getEmail());
 
         if (null === $error) {
-            $this->addFlash('success', \sprintf('Courriel de test envoyé à %s.', $user->getEmail()));
+            $this->addFlash('mail_success', \sprintf('Courriel de test envoyé à %s. Vérifiez qu\'il arrive bien, spams compris.', $user->getEmail()));
         } else {
-            $this->addFlash('error', 'Échec de l\'envoi : '.$error);
+            $this->addFlash('mail_error', 'Échec de l\'envoi : '.$error);
         }
 
-        return $this->redirectToRoute('admin_organization', ['id' => $organization->getId()]);
+        // Le bouton est bas dans la page : on y revient pour que le résultat soit sous les yeux.
+        return $this->redirect($this->generateUrl('admin_organization', ['id' => $organization->getId()]).'#messagerie');
     }
 
     private function applyLogo(Organization $organization, FormInterface $form): void

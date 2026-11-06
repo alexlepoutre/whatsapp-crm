@@ -104,8 +104,24 @@ class Notifier
 
             return null;
         } catch (TransportExceptionInterface $e) {
-            return $e->getMessage();
+            $this->logger->error('Courriel de test non envoyé : '.$e->getMessage(), ['organization' => $organization->getSlug()]);
+
+            return self::explain($e->getMessage());
         }
+    }
+
+    /** Le message du serveur est en anglais et technique : on dit quoi corriger. */
+    public static function explain(string $error): string
+    {
+        if (str_contains($error, '535') || str_contains($error, 'Failed to authenticate')) {
+            return 'le serveur refuse l\'adresse ou le mot de passe. Vérifiez-les en vous connectant au webmail, puis ressaisissez le mot de passe.';
+        }
+
+        if (str_contains($error, 'Connection could not be established') || str_contains($error, 'timed out')) {
+            return 'le serveur SMTP est injoignable. Vérifiez son nom et le port.';
+        }
+
+        return $error;
     }
 
     private function send(Organization $organization, TemplatedEmail $email): bool

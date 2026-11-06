@@ -230,11 +230,14 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 }
 
 .btn:hover { filter: brightness(.9); }
+.btn:disabled { opacity: .7; cursor: progress; }
 .btn--quiet { background: transparent; border-color: #8a9aaa; color: var(--ink); }
 .btn--danger { background: var(--danger); color: #fff; }
 .btn--whatsapp { display: inline-flex; align-items: center; gap: .6rem; background: var(--whatsapp); color: #fff; padding: .85rem 1.5rem; font-size: 1.15rem; }
 
 .composer { margin-bottom: 1rem; }
+#messagerie { scroll-margin-top: 1rem; }
+[data-pending] + .flash { margin-top: 1rem; }
 .search { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-block: 1rem 1.5rem; }
 .search label { width: 100%; margin: 0; }
 .search input { flex: 1 1 16rem; width: auto; }
