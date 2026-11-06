@@ -33,10 +33,33 @@
 
         <section>
             <h2>Informations</h2>
+            {% if edited.logoVersion %}
+                <img class="logo-preview" src="{{ path('organization_logo', {slug: edited.slug, v: edited.logoVersion}) }}" alt="Logo actuel de {{ edited.name }}">
+            {% endif %}
             {{ form_start(edit) }}
                 {{ form_widget(edit) }}
                 <button type="submit" class="btn">Enregistrer l'organisation</button>
             {{ form_end(edit) }}
+
+            <h2>Messagerie OVH</h2>
+            <p class="notice">
+                {% if edited.hasSmtp %}
+                    Les courriels de {{ edited.name }} partent de {{ edited.smtpUsername }}.
+                {% else %}
+                    Aucune boîte configurée : les courriels de {{ edited.name }} ne partiront pas.
+                {% endif %}
+            </p>
+            {{ form_start(mail) }}
+                {{ form_widget(mail) }}
+                <button type="submit" class="btn">Enregistrer la messagerie</button>
+            {{ form_end(mail) }}
+
+            {% if edited.hasSmtp %}
+                <form method="post" action="{{ path('admin_organization_test_mail', {id: edited.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('test-mail') }}">
+                    <button type="submit" class="btn btn--quiet">Envoyer un courriel de test</button>
+                </form>
+            {% endif %}
         </section>
     </div>
 {% endblock %}

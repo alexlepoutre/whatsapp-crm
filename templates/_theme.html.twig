@@ -1,0 +1,11 @@
+{# Les couleurs sont validées au format #rrggbb par l'entité : rien d'autre n'atteint ce bloc. #}
+<style>
+    :root {
+        --action: {{ theme.primaryColor }};
+        --on-action: {{ theme.primaryTextColor }};
+        --link: {{ theme.linkColor }};
+        --action-soft: color-mix(in srgb, {{ theme.primaryColor }} 14%, white);
+        --panel: {{ theme.secondaryColor }};
+        --on-panel: {{ theme.secondaryTextColor }};
+    }
+</style>

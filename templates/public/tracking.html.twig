@@ -3,10 +3,11 @@
 {% block title %}Suivi de votre demande{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block body_class %}public{% endblock %}
+{% block theme %}{{ include('_theme.html.twig', {theme: conversation.organization}) }}{% endblock %}
 
 {% block page %}
     <main class="public__main">
-        <p class="public__org">{{ conversation.organization.name }}</p>
+        {{ include('public/_header.html.twig', {organization: conversation.organization}) }}
         <h1>{{ conversation.title }}</h1>
         <p class="muted">Demande envoyée le {{ conversation.createdAt|date('d/m/Y') }}. Ce lien est privé : ne le partagez pas.</p>
         {{ include('_flashes.html.twig') }}

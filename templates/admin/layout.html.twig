@@ -2,6 +2,7 @@
 
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block body_class %}admin{% endblock %}
+{% block theme %}{{ include('_theme.html.twig', {theme: current_organization()}) }}{% endblock %}
 
 {% block page %}
     {% set open = open_conversations() %}
@@ -46,6 +47,12 @@
         <a class="rail__logout" href="{{ path('logout') }}">Se déconnecter</a>
     </aside>
     <main class="main">
+        <header class="banner">
+            {% if organization.logoVersion %}
+                <img class="banner__logo" src="{{ path('organization_logo', {slug: organization.slug, v: organization.logoVersion}) }}" alt="">
+            {% endif %}
+            <p class="banner__name">{{ organization.name }}</p>
+        </header>
         {{ include('_flashes.html.twig') }}
         {% block body %}{% endblock %}
     </main>

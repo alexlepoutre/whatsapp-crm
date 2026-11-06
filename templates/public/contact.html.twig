@@ -2,10 +2,11 @@
 
 {% block title %}Contacter {{ organization.name }}{% endblock %}
 {% block body_class %}public{% endblock %}
+{% block theme %}{{ include('_theme.html.twig', {theme: organization}) }}{% endblock %}
 
 {% block page %}
     <main class="public__main">
-        <p class="public__org">{{ organization.name }}</p>
+        {{ include('public/_header.html.twig') }}
         <h1 class="public__title">Laissez-nous un message, nous vous répondons.</h1>
         {{ include('_flashes.html.twig') }}
 

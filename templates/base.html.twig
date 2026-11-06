@@ -6,6 +6,7 @@
     <title>{% block title %}Répondeur{% endblock %}</title>
     {% block robots %}{% endblock %}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    {% block theme %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
     {% block page %}{% endblock %}

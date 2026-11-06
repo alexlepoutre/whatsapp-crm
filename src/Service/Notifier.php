@@ -3,12 +3,15 @@
 namespace App\Service;
 
 use App\Entity\Conversation;
+use App\Entity\Organization;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\BodyRendererInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -21,6 +24,8 @@ class Notifier
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $urls,
         private readonly LoggerInterface $logger,
+        private readonly OrganizationTransport $transports,
+        private readonly BodyRendererInterface $bodyRenderer,
         #[Autowire('%env(MAIL_FROM)%')] private readonly string $from,
     ) {
     }
@@ -44,6 +49,7 @@ class Notifier
         }
 
         return $this->send(
+            $conversation->getOrganization(),
             (new TemplatedEmail())
                 ->to($recipient)
                 ->subject(\sprintf('[%s] %s', $conversation->getChannel()->label(), $conversation->getClient()->getDisplayName()))
@@ -66,6 +72,7 @@ class Notifier
         }
 
         return $this->send(
+            $conversation->getOrganization(),
             (new TemplatedEmail())
                 ->to($email)
                 ->subject($subject)
@@ -77,14 +84,49 @@ class Notifier
         );
     }
 
-    private function send(TemplatedEmail $email): bool
+    /** @return string|null le motif de l'échec, null si le courriel est parti */
+    public function sendTest(Organization $organization, string $recipient): ?string
+    {
+        $transport = $this->transports->for($organization);
+
+        if (null === $transport) {
+            return 'Le mot de passe est manquant ou illisible, ressaisissez-le.';
+        }
+
+        $email = (new Email())
+            ->from(new Address((string) $organization->getSmtpUsername(), $organization->getName()))
+            ->to($recipient)
+            ->subject('Courriel de test : '.$organization->getName())
+            ->text('La messagerie de '.$organization->getName().' fonctionne : ce courriel est parti de son serveur SMTP.');
+
+        try {
+            $transport->send($email);
+
+            return null;
+        } catch (TransportExceptionInterface $e) {
+            return $e->getMessage();
+        }
+    }
+
+    private function send(Organization $organization, TemplatedEmail $email): bool
     {
         try {
-            $this->mailer->send($email->from(Address::create($this->from)));
+            $transport = $this->transports->for($organization);
+
+            if (null === $transport) {
+                $this->mailer->send($email->from(Address::create($this->from)));
+
+                return true;
+            }
+
+            // Ce transport est hors du Mailer : le gabarit doit être rendu ici.
+            $email->from(new Address((string) $organization->getSmtpUsername(), $organization->getName()));
+            $this->bodyRenderer->render($email);
+            $transport->send($email);
 
             return true;
         } catch (TransportExceptionInterface $e) {
-            $this->logger->error('Courriel non envoyé : '.$e->getMessage());
+            $this->logger->error('Courriel non envoyé : '.$e->getMessage(), ['organization' => $organization->getSlug()]);
 
             return false;
         }

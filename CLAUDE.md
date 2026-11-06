@@ -74,6 +74,13 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
 
 - **Super-admin** : lui seul gère organisations et comptes (`/admin/organisations`). L'adresse
   d'une organisation ne change plus après création : c'est aussi son code WhatsApp.
+- **Identité** : couleurs et logo par organisation, sur l'admin et les pages publiques. Le logo
+  est en base (`OrganizationLogo`) car l'image de production n'a pas de volume. Pas de SVG : il
+  peut embarquer du script. La couleur du texte se calcule pour rester lisible.
+- **Messagerie** : chaque organisation a sa boîte OVH (`OrganizationTransport`), qui est aussi
+  l'expéditeur, OVH refusant une autre adresse. Sans boîte, retour au `MAILER_DSN` global. Le mot
+  de passe est chiffré (`SecretBox`, clé dérivée d'APP_SECRET) : changer APP_SECRET impose de le
+  ressaisir.
 - **Étanchéité** : toute lecture passe par l'organisation courante (`CurrentOrganization`). Une
   route avec un identifiant appelle `assertOwns()` : 404 si la fiche est à une autre organisation.
 - **Relais** : la signature est obligatoire. Sans secret configuré, tout est refusé.
