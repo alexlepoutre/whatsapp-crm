@@ -3,6 +3,7 @@
 {% block title %}Relation clients : remplacez le répondeur que vous n'avez pas le temps d'écouter{% endblock %}
 {% block description %}<meta name="description" content="Vos clients vous écrivent sur WhatsApp ou par formulaire. Un dashboard centralise leurs demandes : vous n'en manquez plus aucune.">{% endblock %}
 {% block body_class %}home{% endblock %}
+{% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}">{% endblock %}
 
 {% block page %}
     <div class="stage">
@@ -22,6 +23,7 @@
             <div>
                 <h1>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</h1>
                 <p class="hero__lead">Vos clients vous écrivent sur WhatsApp ou par formulaire. Vous avez un dashboard qui centralise les demandes reçues : vous ne passez plus à côté d'une demande et vous les traitez au fil du temps.</p>
+                <p class="l-for">Idéal pour les artisans, les auto-entrepreneurs et les PME.</p>
                 <div class="hero__actions">
                     {% if editor and whatsappNumber %}
                         <a class="btn btn--whatsapp" href="https://wa.me/{{ whatsappNumber }}?text={{ editor.whatsAppOpening|url_encode }}">
@@ -50,6 +52,8 @@
     </div>
 
     <main>
+        {{ include('public/landing/_field.html.twig') }}
+
         <section class="compare">
             <div class="compare__before">
                 <h2>Avec un répondeur</h2>

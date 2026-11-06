@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Service momentanément indisponible</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="home">
+    <!-- Page statique : servie par nginx quand PHP ne répond plus, elle ne doit dépendre de rien. -->
+    <div class="stage stage--signin">
+        <header class="home__top">
+            <a class="home__brand" href="/">
+                <img src="/logo.svg" alt="" width="36" height="36">
+                Relation clients
+            </a>
+        </header>
+        <main class="error-page">
+            <div class="error-page__display" aria-hidden="true">
+                <span class="display__digits" data-ghost="888">503</span>
+            </div>
+            <h1>Le service est momentanément indisponible.</h1>
+            <p class="hero__lead">Nous faisons le nécessaire. Réessayez dans quelques minutes. Si vous avez écrit sur WhatsApp, votre message sera traité dès le retour du service.</p>
+            <div class="hero__actions">
+                <a class="btn btn--amber" href="">Réessayer</a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

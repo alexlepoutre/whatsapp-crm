@@ -108,6 +108,8 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
   empêché d'écrire : son message rouvre la conversation.
 - **Déploiement** : `Dockerfile.prod` installe les dépendances avant de copier le code, pour ne pas
   retélécharger depuis GitHub à chaque fois. Garder cet ordre.
+- **Pages d'erreur** : `templates/bundles/TwigBundle/Exception/error.html.twig` pour Symfony (à
+  voir en dev sur `/_error/404`), `public/erreur.html` servie par nginx quand PHP est tombé.
 - **Dernière réponse** : deuxième bouton de l'admin. Le client se voit alors proposer de clôturer
   ou de continuer : boutons WhatsApp (`WhatsAppClient::sendTextWithChoice`, texte limité à 1024
   caractères par Meta) ou bloc sur le lien de suivi (`Conversation::awaitingClosure`). Le lien de

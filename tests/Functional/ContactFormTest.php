@@ -158,6 +158,41 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorExists('.l-switch a[aria-current]');
     }
 
+    #[\PHPUnit\Framework\Attributes\TestWith(['/'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/v1'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/v2'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/v3'])]
+    public function testEveryVersionAddressesPeopleOnTheField(string $url): void
+    {
+        $this->client->request('GET', $url);
+
+        self::assertSelectorTextContains('.l-for', 'artisans');
+        self::assertSelectorTextContains('.l-field', 'Le soir');
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestWith([404, 'Cette page n\'existe pas'])]
+    #[\PHPUnit\Framework\Attributes\TestWith([403, 'pas accès'])]
+    #[\PHPUnit\Framework\Attributes\TestWith([429, 'Trop de demandes'])]
+    #[\PHPUnit\Framework\Attributes\TestWith([500, 'de notre côté'])]
+    #[\PHPUnit\Framework\Attributes\TestWith([418, 'pas disponible'])]
+    public function testErrorPageExplainsEachStatus(int $status, string $text): void
+    {
+        $html = static::getContainer()->get('twig')->render('@Twig/Exception/error.html.twig', ['status_code' => $status, 'status_text' => '']);
+
+        self::assertStringContainsString($text, html_entity_decode($html, \ENT_QUOTES));
+        self::assertStringContainsString('data-ghost="888">'.$status, $html);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestWith(['/v1'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/v2'])]
+    public function testFlowIsShownFromClientToAdvisor(string $url): void
+    {
+        $this->client->request('GET', $url);
+
+        self::assertSelectorTextContains('.v2-flow', 'Le client écrit');
+        self::assertSelectorTextContains('.v2-flow', 'Le conseiller répond');
+    }
+
     public function testUnknownOrganizationPageIsNotFound(): void
     {
         $this->client->request('GET', '/inconnue');

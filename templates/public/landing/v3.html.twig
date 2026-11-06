@@ -8,6 +8,7 @@
         <section class="v3-hero">
             <h1>Chaque demande perdue est un client qui part ailleurs.</h1>
             <p>Relation clients remplace votre répondeur par un dashboard : WhatsApp et formulaires y arrivent ensemble, et rien ne reste sans réponse.</p>
+            <p class="l-for">Idéal pour les artisans, les auto-entrepreneurs et les PME.</p>
             <div class="l-actions">
                 <a class="l-btn l-btn--action" href="{{ path('contact', {slug: 'itroom'}) }}">Demander une démonstration</a>
                 {% if waUrl %}
@@ -53,10 +54,7 @@
             </div>
         </section>
 
-        <section class="v3-sectors">
-            <h2>Pour toutes les entreprises qui reçoivent des demandes</h2>
-            <p>Artisans, agences immobilières, syndics, commerces, cabinets, services clients : dès que des clients vous écrivent, vous gagnez à tout centraliser.</p>
-        </section>
+        {{ include('public/landing/_field.html.twig') }}
 
         <section class="v3-trust">
             <h2>Sérieux sur vos données</h2>

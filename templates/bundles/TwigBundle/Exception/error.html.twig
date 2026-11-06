@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% if status_code == 404 %}
+    {% set heading = "Cette page n'existe pas." %}
+    {% set detail = "L'adresse est peut-être incomplète. S'il s'agit de votre lien de suivi, ouvrez-le depuis le courriel reçu." %}
+{% elseif status_code == 403 %}
+    {% set heading = "Vous n'avez pas accès à cette page." %}
+    {% set detail = "Si vous veniez d'envoyer un formulaire, rechargez la page et réessayez." %}
+{% elseif status_code == 429 %}
+    {% set heading = "Trop de demandes en peu de temps." %}
+    {% set detail = "Patientez quelques minutes, puis réessayez." %}
+{% elseif status_code >= 500 %}
+    {% set heading = "Un problème est survenu de notre côté." %}
+    {% set detail = "Votre dernière action n'a peut-être pas été enregistrée. Réessayez dans un instant." %}
+{% else %}
+    {% set heading = "Cette page n'est pas disponible." %}
+    {% set detail = "Revenez à l'accueil pour continuer." %}
+{% endif %}
+
+{% block title %}{{ heading }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}home{% endblock %}
+
+{% block page %}
+    <div class="stage stage--signin">
+        <header class="home__top">
+            <a class="home__brand" href="{{ path('home') }}">
+                <img src="{{ asset('logo.svg') }}" alt="" width="36" height="36">
+                Relation clients
+            </a>
+        </header>
+
+        <main class="error-page">
+            <div class="error-page__display" aria-hidden="true">
+                <span class="display__digits" data-ghost="888">{{ status_code }}</span>
+            </div>
+            <h1>{{ heading }}</h1>
+            <p class="hero__lead">{{ detail }}</p>
+            <div class="hero__actions">
+                <a class="btn btn--amber" href="{{ path('home') }}">Revenir à l'accueil</a>
+                <a class="btn btn--on-dark btn--big" href="{{ path('contact', {slug: 'itroom'}) }}">Nous contacter</a>
+            </div>
+        </main>
+    </div>
+
+    {{ include('_footer.html.twig') }}
+{% endblock %}

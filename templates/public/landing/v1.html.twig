@@ -10,6 +10,7 @@
             <div>
                 <h1>Derrière chaque message, quelqu'un qui répond vraiment.</h1>
                 <p class="v1-lead">Remplacez le répondeur que vous n'avez pas le temps d'écouter. Vos clients écrivent, votre équipe les lit, et personne ne reste sans réponse.</p>
+                <p class="l-for">Idéal pour les artisans, les auto-entrepreneurs et les PME.</p>
                 <div class="l-actions">
                     {% if waUrl %}
                         <a class="l-btn l-btn--wa" href="{{ waUrl }}">{{ include('_whatsapp_logo.html.twig') }} Discuter sur WhatsApp</a>
@@ -21,11 +22,19 @@
             {# Illustration : personnes et messages fictifs. #}
             <div class="v1-team" aria-hidden="true">
                 <figure class="v1-face v1-face--a">{{ people.advisor('#f2c9a8', '#3b2a20', '#0f6e6e', '#bfe8df', true) }}</figure>
-                <figure class="v1-face v1-face--b">{{ people.advisor('#8d5a3c', '#1d1612', '#ff6b5e', '#ffd9a8') }}</figure>
+                <figure class="v1-face v1-face--b">{{ people.advisor('#8d5a3c', '#1d1612', '#f5b82e', '#fdeab5') }}</figure>
                 <figure class="v1-face v1-face--c">{{ people.advisor('#e8b48f', '#a9592d', '#2b4c9b', '#d6dcfb', true) }}</figure>
                 <p class="v1-bubble v1-bubble--a">Bonjour Camille, je regarde votre dossier.</p>
                 <p class="v1-bubble v1-bubble--b">C'est bon, votre devis est prêt !</p>
             </div>
+        </section>
+
+        {{ include('public/landing/_field.html.twig') }}
+
+        <section class="v1-flow">
+            <h2>Du message du client à votre réponse</h2>
+            {{ include('public/landing/_flow.html.twig') }}
+            <p class="v2-return">La réponse repart toute seule par le canal du client : sur WhatsApp, ou par courriel avec son lien privé.</p>
         </section>
 
         <section class="v1-talk">
