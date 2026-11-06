@@ -51,6 +51,5 @@
         </div>
     </main>
     {{ include('_footer.html.twig') }}
-    {# Les visiteurs des autres organisations ne sont pas ceux d'IT-Room. #}
-    {% if organization.slug == 'itroom' %}{{ include('_consent.html.twig') }}{% endif %}
+    {{ include('_consent.html.twig') }}
 {% endblock %}

@@ -108,13 +108,21 @@ class ContactFormTest extends AppTestCase
         self::assertResponseRedirects('/', 301);
     }
 
-    public function testMarketingPagesDoNotExistOutsideDevelopment(): void
+    #[\PHPUnit\Framework\Attributes\TestWith(['/linkedin'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/article'])]
+    public function testMarketingPagesAreOnlineButNotIndexed(string $url): void
     {
-        foreach (['/linkedin', '/article', '/marketing/inbox.jpg'] as $url) {
-            $this->client->request('GET', $url);
+        $this->client->request('GET', $url);
 
-            self::assertResponseStatusCodeSame(404);
-        }
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('meta[name="robots"][content="noindex, nofollow"]');
+    }
+
+    public function testSlideSourcesStayLocal(): void
+    {
+        $this->client->request('GET', '/linkedin/carrousel');
+
+        self::assertResponseStatusCodeSame(404);
     }
 
     #[\PHPUnit\Framework\Attributes\TestWith(['/mentions-legales', '430 032 854'])]
@@ -223,14 +231,15 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorNotExists('script[src*="googletagmanager"]');
     }
 
-    public function testNoMeasureOnOtherOrganizationsOrLogin(): void
+    public function testMeasureOnEveryOrganizationPageButNotOnLogin(): void
     {
         $this->createOrganization('dufermont', 'Dufermont');
 
-        foreach (['/dufermont', '/connexion'] as $url) {
-            $this->client->request('GET', $url);
-            self::assertSelectorNotExists('#consent');
-        }
+        $this->client->request('GET', '/dufermont');
+        self::assertSelectorExists('#consent');
+
+        $this->client->request('GET', '/connexion');
+        self::assertSelectorNotExists('#consent');
     }
 
     public function testNoMeasureOnPrivateLink(): void
@@ -240,6 +249,8 @@ class ContactFormTest extends AppTestCase
 
         self::assertSelectorNotExists('#consent');
         self::assertStringNotContainsString('gtm', (string) $this->client->getResponse()->getContent());
+        // Un clic vers une page mesurée ne doit pas transmettre le jeton.
+        self::assertSelectorExists('meta[name="referrer"][content="origin"]');
     }
 
     public function testUnknownOrganizationPageIsNotFound(): void

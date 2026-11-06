@@ -1,7 +1,7 @@
 {#
-    À n'inclure que sur les pages où la mesure d'audience a sa place. Jamais sur l'admin ni sur un
-    lien de suivi : l'adresse de ce dernier contient le jeton privé du client.
-    Google n'est chargé qu'après l'accord du visiteur.
+    Google n'est chargé qu'après l'accord du visiteur, et reçoit le titre, l'adresse et la page
+    d'origine. Donc jamais sur un lien de suivi, dont l'adresse contient le jeton privé, ni sur une
+    page dont le titre ou l'adresse contiennent une donnée client.
 #}
 <section class="consent" id="consent" aria-label="Cookies" hidden>
     <p>Nous aimerions mesurer la fréquentation du site avec Google Analytics. C'est facultatif, et vous pouvez changer d'avis à tout moment. <a href="{{ path('legal_privacy') }}#cookies">En savoir plus</a></p>

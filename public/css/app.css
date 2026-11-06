@@ -90,7 +90,9 @@ button.orgs__item:hover { background: rgb(128 128 128 / .25); }
 
 .rail__nav a:hover { background: rgb(128 128 128 / .25); }
 .rail__nav a[aria-current] { background: rgb(128 128 128 / .3); font-weight: 600; }
-.rail__logout { margin-top: auto; font-size: .9rem; }
+.rail__cookies { margin-top: auto; padding: .45rem .6rem; border: 0; background: none; color: inherit; font: inherit; font-size: .9rem; text-align: left; cursor: pointer; }
+.rail__cookies[hidden] + .rail__logout { margin-top: auto; }
+.rail__logout { font-size: .9rem; }
 .rail :focus-visible { outline-color: var(--on-panel); }
 
 .main { padding: 2rem clamp(1rem, 4vw, 3.5rem); max-width: 62rem; }
@@ -356,7 +358,7 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
     .display__digits { font-size: 1.8rem; }
     .display__label { font-size: .85rem; }
     .rail__nav { display: flex; flex: 1 1 auto; }
-    .rail__logout { margin-top: 0; }
+    .rail__logout, .rail__cookies, .rail__cookies[hidden] + .rail__logout { margin-top: 0; }
     .split { grid-template-columns: minmax(0, 1fr); }
     h1 { font-size: 1.85rem; }
     .main h1 { font-size: 1.35rem; }

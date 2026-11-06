@@ -1,6 +1,7 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block title %}{{ conversation.client.displayName }}{% endblock %}
+{# Titre générique : il est transmis à Google Analytics, le nom du client ne doit pas y figurer. #}
+{% block title %}Conversation{% endblock %}
 
 {% block body %}
     <header class="head">

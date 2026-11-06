@@ -20,13 +20,31 @@ class AdminTest extends AppTestCase
         self::assertResponseRedirects('/connexion');
     }
 
-    public function testNoMeasureInAdmin(): void
+    public function testDashboardIsMeasuredWithoutClientNames(): void
+    {
+        $this->postWebhook($this->textMessage());
+        $this->loginAsOwner();
+        $conversation = $this->em->getRepository(Conversation::class)->findOneBy([]);
+
+        $this->client->request('GET', '/admin');
+        self::assertSelectorExists('#consent');
+
+        $this->client->request('GET', '/admin/conversations/'.$conversation->getId());
+        self::assertSelectorExists('#consent');
+        self::assertPageTitleSame('Conversation');
+
+        $this->client->request('GET', '/admin/clients/'.$conversation->getClient()->getId());
+        self::assertPageTitleSame('Fiche client');
+    }
+
+    public function testClientSearchIsNotMeasured(): void
     {
         $this->loginAsOwner();
 
-        $this->client->request('GET', '/admin');
+        $this->client->request('GET', '/admin/clients?q=Camille');
 
         self::assertSelectorNotExists('#consent');
+        self::assertSelectorExists('meta[name="referrer"][content="origin"]');
     }
 
     public function testInboxListsWaitingConversation(): void

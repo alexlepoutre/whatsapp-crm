@@ -1,7 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Suivi de votre demande{% endblock %}
-{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{# referrer : sans cela, un clic vers une page mesurée transmettrait le jeton privé à Google. #}
+{% block robots %}<meta name="robots" content="noindex, nofollow"><meta name="referrer" content="origin">{% endblock %}
 {% block body_class %}public{% endblock %}
 {% block favicon %}{% if conversation.organization.logoVersion %}{{ include('_favicon_organization.html.twig', {theme: conversation.organization}) }}{% else %}{{ parent() }}{% endif %}{% endblock %}
 {% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ assets_version }}">{{ include('_theme.html.twig', {theme: conversation.organization}) }}{% endblock %}

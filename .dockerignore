@@ -7,5 +7,4 @@ vendor
 tests
 .phpunit.cache
 
-marketing
-templates/marketing
+templates/marketing/slide.html.twig

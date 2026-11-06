@@ -45,6 +45,7 @@
                 <a href="{{ path('admin_organizations') }}" {% if app.current_route starts with 'admin_organization' %}aria-current="page"{% endif %}>Organisations</a>
             {% endif %}
         </nav>
+        <button type="button" class="rail__cookies" data-consent-open hidden>Gérer les cookies</button>
         <a class="rail__logout" href="{{ path('logout') }}">Se déconnecter</a>
     </aside>
     <main class="main">
@@ -57,4 +58,6 @@
         {{ include('_flashes.html.twig') }}
         {% block body %}{% endblock %}
     </main>
+    {# Une recherche met son texte dans l'adresse : ce peut être le nom d'un client. #}
+    {% if not app.request.query.has('q') %}{{ include('_consent.html.twig') }}{% endif %}
 {% endblock %}

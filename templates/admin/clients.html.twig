@@ -1,6 +1,8 @@
 {% extends 'admin/layout.html.twig' %}
 
 {% block title %}Clients{% endblock %}
+{# Sans cela, la page suivante transmettrait le texte recherché comme page d'origine. #}
+{% block robots %}{{ parent() }}{% if term %}<meta name="referrer" content="origin">{% endif %}{% endblock %}
 
 {% block body %}
     <h1>Clients</h1>

@@ -15,5 +15,3 @@
 /.phpunit.cache/
 ###< phpunit/phpunit ###
 
-# Supports de communication, locaux uniquement
-/marketing/
