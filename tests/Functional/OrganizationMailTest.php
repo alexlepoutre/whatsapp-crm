@@ -160,6 +160,56 @@ class OrganizationMailTest extends AppTestCase
         self::assertSame('Autre erreur', Notifier::explain('Autre erreur'));
     }
 
+    private function saveDefaultSender(string $name, string $address): void
+    {
+        $this->client->request('GET', '/admin/organisations');
+        $this->client->submitForm('Enregistrer l\'expéditeur', [
+            'mail_settings[fromName]' => $name,
+            'mail_settings[fromAddress]' => $address,
+        ]);
+    }
+
+    public function testDefaultSenderIsConfigurableAndUsed(): void
+    {
+        $this->loginAsSuperAdmin();
+        $this->saveDefaultSender('Relation clients', 'contact@re7itroom.test');
+        self::assertResponseRedirects('/admin/organisations');
+
+        $this->client->request('GET', '/admin/organisations');
+        self::assertInputValueSame('mail_settings[fromAddress]', 'contact@re7itroom.test');
+
+        $this->client->request('GET', '/itroom');
+        $this->client->submitForm('Envoyer ma demande', [
+            'contact[name]' => 'Dominique',
+            'contact[email]' => 'dominique@example.test',
+            'contact[subject]' => 'Devis',
+            'contact[body]' => 'Bonjour',
+        ]);
+
+        $from = self::getMailerMessage(0)->getFrom()[0];
+        self::assertSame('contact@re7itroom.test', $from->getAddress());
+        self::assertSame('Relation clients', $from->getName());
+    }
+
+    public function testSavingTwiceKeepsOneSetting(): void
+    {
+        $this->loginAsSuperAdmin();
+        $this->saveDefaultSender('Un', 'un@example.test');
+        $this->saveDefaultSender('Deux', 'deux@example.test');
+
+        self::assertSame(1, $this->em->getRepository(\App\Entity\MailSettings::class)->count([]));
+    }
+
+    public function testInvalidSenderIsRefused(): void
+    {
+        $this->loginAsSuperAdmin();
+
+        $this->saveDefaultSender('Nom', 'pas-une-adresse');
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertSame(0, $this->em->getRepository(\App\Entity\MailSettings::class)->count([]));
+    }
+
     public function testNormalAccountCannotSeeOrChangeMailSettings(): void
     {
         $this->loginAsOwner();

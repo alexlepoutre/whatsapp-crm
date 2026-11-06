@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Conversation;
 use App\Entity\Organization;
 use App\Entity\User;
+use App\Repository\MailSettingsRepository;
 use App\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
@@ -35,6 +36,7 @@ class Notifier implements EventSubscriberInterface
         private readonly OrganizationTransport $transports,
         private readonly BodyRendererInterface $bodyRenderer,
         private readonly UserRepository $users,
+        private readonly MailSettingsRepository $mailSettings,
         #[Autowire('%env(MAIL_FROM)%')] private readonly string $from,
     ) {
     }
@@ -173,13 +175,19 @@ class Notifier implements EventSubscriberInterface
         return $error;
     }
 
+    /** Ce que l'admin a enregistré, sinon la configuration du serveur. */
+    public function defaultSender(): Address
+    {
+        return $this->mailSettings->current()?->toAddress() ?? Address::create($this->from);
+    }
+
     private function send(Organization $organization, TemplatedEmail $email): bool
     {
         try {
             $transport = $this->transports->for($organization);
 
             if (null === $transport) {
-                $this->mailer->send($email->from(Address::create($this->from)));
+                $this->mailer->send($email->from($this->defaultSender()));
 
                 return true;
             }

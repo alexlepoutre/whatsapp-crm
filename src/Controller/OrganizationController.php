@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\MailSettings;
 use App\Entity\Organization;
 use App\Entity\OrganizationLogo;
 use App\Entity\User;
 use App\Form\AccountEditType;
 use App\Form\AccountType;
+use App\Form\MailSettingsType;
 use App\Form\OrganizationCreateType;
 use App\Form\OrganizationEditType;
 use App\Form\OrganizationMailType;
+use App\Repository\MailSettingsRepository;
 use App\Repository\OrganizationLogoRepository;
 use App\Repository\OrganizationRepository;
 use App\Repository\UserRepository;
@@ -43,8 +46,22 @@ class OrganizationController extends AbstractController
     }
 
     #[Route('', name: 'admin_organizations')]
-    public function index(Request $request, OrganizationRepository $organizations): Response
+    public function index(Request $request, OrganizationRepository $organizations, MailSettingsRepository $mailSettings, Notifier $notifier): Response
     {
+        $sender = $notifier->defaultSender();
+        $settings = $mailSettings->current() ?? new MailSettings($sender->getName(), $sender->getAddress());
+
+        $senderForm = $this->createForm(MailSettingsType::class, $settings);
+        $senderForm->handleRequest($request);
+
+        if ($senderForm->isSubmitted() && $senderForm->isValid()) {
+            $this->entityManager->persist($settings);
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Expéditeur enregistré.');
+
+            return $this->redirectToRoute('admin_organizations');
+        }
+
         $form = $this->createForm(OrganizationCreateType::class);
         $form->handleRequest($request);
 
@@ -68,6 +85,7 @@ class OrganizationController extends AbstractController
         return $this->render('admin/organizations.html.twig', [
             'organizations' => $organizations->findAllByName(),
             'form' => $form,
+            'senderForm' => $senderForm,
         ]);
     }
 

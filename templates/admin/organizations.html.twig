@@ -26,6 +26,13 @@
                 {{ form_widget(form) }}
                 <button type="submit" class="btn">Créer l'organisation</button>
             {{ form_end(form) }}
+
+            <h2>Expéditeur par défaut</h2>
+            <p class="muted">Pour les organisations sans boîte OVH. Une organisation avec sa boîte envoie depuis celle-ci, sous son propre nom.</p>
+            {{ form_start(senderForm) }}
+                {{ form_widget(senderForm) }}
+                <button type="submit" class="btn">Enregistrer l'expéditeur</button>
+            {{ form_end(senderForm) }}
         </section>
     </div>
 {% endblock %}

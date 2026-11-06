@@ -90,7 +90,8 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
 - **Messagerie** : chaque organisation a sa boîte OVH (`OrganizationTransport`), qui est aussi
   l'expéditeur, OVH refusant une autre adresse. Sans boîte, retour au `MAILER_DSN` global. Le mot
   de passe est chiffré (`SecretBox`, clé dérivée d'APP_SECRET) : changer APP_SECRET impose de le
-  ressaisir.
+  ressaisir. L'expéditeur par défaut se règle dans `/admin/organisations` (`MailSettings`) ;
+  `MAIL_FROM` n'est que la valeur de départ.
 - **Étanchéité** : toute lecture passe par l'organisation courante (`CurrentOrganization`). Une
   route avec un identifiant appelle `assertOwns()` : 404 si la fiche est à une autre organisation.
 - **Relais** : la signature est obligatoire. Sans secret configuré, tout est refusé.
