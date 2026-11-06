@@ -35,6 +35,43 @@ class WebhookTest extends AppTestCase
         self::assertSame('Conversation ouverte depuis la page de contact.', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.2'])->getBody());
     }
 
+    public function testOpeningSentenceAsksForTheQuestionThenQuestionTriggersAlert(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1', text: 'Bonjour IT-Room, je vous contacte depuis votre site (#itroom).'));
+
+        self::assertEmailCount(0);
+        $bot = $this->em->getRepository(Message::class)->findOneBy(['sender' => MessageSender::BOT]);
+        self::assertStringContainsString('Posez maintenant votre question', $bot->getBody());
+        self::assertSame('Conversation ouverte depuis la page de contact.', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
+
+        $this->postWebhook($this->textMessage('wamid.2', text: 'Où en est ma commande ?'));
+
+        self::assertEmailCount(1);
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Où en est ma commande ?');
+    }
+
+    public function testQuestionWrittenInTheSameMessageAsOpeningIsKept(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1', text: 'Bonjour IT-Room, je vous contacte depuis votre site (#itroom). Où est ma commande ?'));
+
+        self::assertSame('Où est ma commande ?', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
+        self::assertEmailCount(1);
+    }
+
+    public function testEditedOpeningStillLosesItsCode(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1', text: 'Salut (#itroom) ma commande ?'));
+
+        self::assertSame('Salut  ma commande ?', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
+    }
+
+    public function testHashtagOfTheClientIsNotTouched(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1', text: 'Voir #itroomfan sur le site'));
+
+        self::assertSame('Voir #itroomfan sur le site', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
+    }
+
     public function testSamePhoneHasSeparateRecordPerOrganization(): void
     {
         $this->createOrganization('dufermont', 'Dufermont');

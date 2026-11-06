@@ -280,6 +280,12 @@ class Organization
         return .2126 * $channels[0] + .7152 * $channels[1] + .0722 * $channels[2];
     }
 
+    /** Le texte préparé par le bouton WhatsApp de la page publique. Le hook y repère « (#code) ». */
+    public function getWhatsAppOpening(): string
+    {
+        return \sprintf('Bonjour %s, je vous contacte depuis votre site (%s).', $this->name, $this->getWhatsAppCode());
+    }
+
     /** Le hook WhatsApp reconnaît ce code en tête du premier message et route vers ce CRM. */
     public function getWhatsAppCode(): string
     {

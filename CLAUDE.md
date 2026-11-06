@@ -50,11 +50,13 @@ WHATSAPP_PUBLIC_NUMBER=     # numéro affiché : active le bouton des pages publ
 Un seul numéro et un seul webhook Meta pour tous les projets IT-Room : le hook
 `immo.alesski.fr` (`/home/ubuntu/immo-sergic/whatsapp-sergic`, Sergic, Partenord, BDN).
 
-- Entrant : `wa.me/<numéro>?text=#itroom ` préremplit le code. Le hook retient le lien entre
+- Entrant : `wa.me/<numéro>?text=…` préremplit une phrase contenant `(#itroom)`, à envoyer telle
+  quelle d'abord. Le bot demande alors la question, et l'alerte part sur celle-ci. Un client déjà
+  rattaché ne change d'organisation qu'avec la forme `(#code)`. Le hook retient le lien entre
   ce téléphone et le code, et relaie le contenu Meta brut, signé (`X-Hub-Signature-256`,
   secret `WHATSAPP_RELAY_SECRET`), vers `POST /webhook/relay/<slug>`.
 - Sortant : le CRM appelle directement l'API Graph avec le token du numéro.
-- Le code `#itroom` est retiré du message. Un 404 signale au hook un code inconnu.
+- La phrase et le code sont retirés du message. Un 404 signale au hook un code inconnu.
 - Côté hook : `CrmRouter` (table Postgres `crm_route`), `CrmRelayMessageHandler`, file
   `crm_relay` avec relances pendant environ 4 heures. Un client y reste sans limite de durée,
   et revient aux bots s'il tape le code d'un projet (`sergic`). Toute panne de routage retombe

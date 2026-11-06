@@ -24,6 +24,9 @@ class Inbox
     /** Au-delà de ce silence, un message est une nouvelle sollicitation : bot et alerte repartent. */
     private const QUIET_PERIOD = '-12 hours';
 
+    private const OPENED = 'Conversation ouverte depuis la page de contact.';
+    private const OPENED_REPLY = 'Bonjour, nous sommes bien en contact. Posez maintenant votre question ici, nous vous répondons dès que possible.';
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ClientRepository $clients,
@@ -63,30 +66,43 @@ class Inbox
             $this->entityManager->persist($conversation);
         }
 
-        $isNewSolicitation = $conversation->isQuietSince(new \DateTimeImmutable(self::QUIET_PERIOD));
+        // La vraie demande suit la phrase d'ouverture : c'est elle qui doit déclencher l'alerte.
+        $isNewSolicitation = $conversation->isQuietSince(new \DateTimeImmutable(self::QUIET_PERIOD))
+            || self::OPENED === $conversation->getLastClientMessage()?->getBody();
 
-        $body = $this->withoutWhatsAppCode($organization, $body);
+        $body = $this->withoutWhatsAppOpening($organization, $body);
         (new Message($conversation, MessageSender::CLIENT, $body))->setWaMessageId($waMessageId);
         $this->entityManager->flush();
 
-        if ($isNewSolicitation) {
+        if (self::OPENED === $body) {
+            $this->sendBotReply($conversation, self::OPENED_REPLY);
+        } elseif ($isNewSolicitation) {
             $this->notifier->notifyOwner($conversation, $body);
-            $this->sendBotReply($conversation);
+            $this->sendBotReply($conversation, $organization->getBotMessage());
         }
     }
 
-    /** Le lien de la page publique préremplit « #itroom » : c'est un code de routage, pas un message. */
-    private function withoutWhatsAppCode(Organization $organization, string $body): string
+    /**
+     * La phrase préparée par le bouton WhatsApp sert au routage, ce n'est pas la demande du
+     * client : on la retire et on ne garde que ce qu'il a écrit lui-même.
+     */
+    private function withoutWhatsAppOpening(Organization $organization, string $body): string
     {
-        $code = $organization->getWhatsAppCode();
+        $code = preg_quote($organization->getWhatsAppCode(), '/');
 
-        if (0 !== stripos($body, $code)) {
+        $rest = str_ireplace($organization->getWhatsAppOpening(), '', $body, $count);
+
+        if (0 === $count) {
+            $rest = preg_replace('/\(\s*'.$code.'\s*\)|^\s*'.$code.'(?![\w-])/iu', '', $body, 1, $count);
+        }
+
+        if (0 === $count) {
             return $body;
         }
 
-        $rest = ltrim(substr($body, \strlen($code)), " \t\n\r:,-");
+        $rest = trim((string) $rest, " \t\n\r:,.-");
 
-        return '' === $rest ? 'Conversation ouverte depuis la page de contact.' : $rest;
+        return '' === $rest ? self::OPENED : $rest;
     }
 
     public function createFromForm(Organization $organization, string $name, string $email, ?string $phone, string $subject, string $body): Conversation
@@ -148,15 +164,13 @@ class Inbox
         return $message;
     }
 
-    private function sendBotReply(Conversation $conversation): void
+    private function sendBotReply(Conversation $conversation, string $text): void
     {
-        $organization = $conversation->getOrganization();
-
-        if (!$organization->isBotEnabled()) {
+        if (!$conversation->getOrganization()->isBotEnabled()) {
             return;
         }
 
-        $message = new Message($conversation, MessageSender::BOT, $organization->getBotMessage());
+        $message = new Message($conversation, MessageSender::BOT, $text);
         $this->entityManager->flush();
 
         $this->deliverOnWhatsApp($message);

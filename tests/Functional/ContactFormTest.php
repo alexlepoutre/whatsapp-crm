@@ -78,7 +78,8 @@ class ContactFormTest extends AppTestCase
         $this->client->request('GET', '/dufermont');
 
         self::assertSelectorTextContains('.public__org', 'Dufermont');
-        self::assertSelectorExists('a[href="https://wa.me/33600000000?text=%23dufermont%20"]');
+        self::assertSelectorExists('a[href="https://wa.me/33600000000?text='.rawurlencode('Bonjour Dufermont, je vous contacte depuis votre site (#dufermont).').'"]');
+        self::assertSelectorTextContains('.lead', 'envoyez-le d\'abord tel quel');
     }
 
     public function testUnknownOrganizationPageIsNotFound(): void
