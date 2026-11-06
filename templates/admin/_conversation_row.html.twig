@@ -3,7 +3,8 @@
     <span class="row__when">{{ conversation.lastMessageAt ? conversation.lastMessageAt|date('d/m à H\\hi') }}</span>
     <span class="row__what">
         {% if conversation.subject %}<strong>{{ conversation.subject }}</strong><br>{% endif %}
-        {{ conversation.lastClientMessage ? conversation.lastClientMessage.body|slice(0, 120) }}
+        {% set preview = conversation.lastClientMessage ? conversation.lastClientMessage.body : '' %}
+        {{ preview|length > 120 ? preview|slice(0, 120)|trim ~ '…' : preview }}
     </span>
     <span class="row__tags">
         <span class="tag tag--{{ conversation.channel.value }}">{{ conversation.channel.label }}</span>

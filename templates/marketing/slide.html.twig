@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'public/landing/_advisor.html.twig' as people %}
 
 {% block title %}Carrousel LinkedIn{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
@@ -6,32 +7,34 @@
 {% block theme %}
 <style>
     @page { size: 1080px 1350px; margin: 0; }
-    html, body { margin: 0; padding: 0; background: #14222f; }
-    .slide { position: relative; box-sizing: border-box; display: flex; flex-direction: column; width: 1080px; height: 1350px; padding: 72px; overflow: hidden; background: #14222f; color: #fff; page-break-after: always; break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .slide--light { background: #f7f9fb; color: #14222f; }
+    html, body { margin: 0; padding: 0; background: #e6f5f1; }
+    .slide { position: relative; box-sizing: border-box; display: flex; flex-direction: column; width: 1080px; height: 1350px; padding: 72px; overflow: hidden; background: #e6f5f1; color: #0f4c5c; page-break-after: always; break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide--light { background: #fff; }
+    .slide--end { background: #ffc845; color: #0a3540; }
     .slide__brand { display: flex; align-items: center; gap: 16px; font-size: 30px; font-weight: 700; }
     .slide__brand img { width: 56px; height: 56px; }
-    .slide__step { position: absolute; top: 80px; right: 72px; color: #526375; font-size: 28px; font-weight: 600; }
-    .slide:not(.slide--light) .slide__step { color: #a9bac9; }
-    .slide h1, .slide h2 { margin: 0; letter-spacing: -.03em; }
+    .slide__step { position: absolute; top: 80px; right: 72px; color: #4b6b75; font-size: 28px; font-weight: 600; }
+    .slide h1, .slide h2 { margin: 0; color: inherit; letter-spacing: -.03em; }
     .slide h2 { margin-top: 56px; font-size: 76px; line-height: 1.04; }
-    .slide p { margin: 24px 0 0; font-size: 36px; line-height: 1.32; color: #526375; }
-    .slide:not(.slide--light) p { color: #c3d0dc; }
-    .slide__shot { flex: 1; min-height: 0; margin-top: 48px; overflow: hidden; border-radius: 22px 22px 0 0; box-shadow: 0 0 0 2px #c6d0da, 0 30px 60px -20px rgb(20 34 47 / .45); margin-bottom: -72px; }
+    .slide p { margin: 24px 0 0; font-size: 36px; line-height: 1.32; color: #2f5a66; }
+    .slide--end p { color: #0a3540; }
     /* L'écran est large et son tiers droit est vide : on l'agrandit, et le fond prolonge l'application. */
-    .slide__shot { background: linear-gradient(90deg, #123341 0 168px, #e2e9ec 168px); }
-    .slide__shot img { display: block; width: 1182px; max-width: none; }
+    .slide__shot { flex: 1; min-height: 0; margin-top: 48px; margin-bottom: -72px; overflow: hidden; border-radius: 26px 26px 0 0; background: linear-gradient(90deg, #cfeae3 0 159px, #e2e9ec 159px); box-shadow: 0 0 0 2px #c9e2dc, 0 30px 60px -24px rgb(15 53 66 / .45); }
+    .slide__shot img { display: block; width: 1120px; max-width: none; }
     .slide__shot--page { background: #e2e9ec; }
     .slide__shot--page img { width: 100%; }
-    .slide__phone { align-self: center; flex: 1; min-height: 0; width: 470px; margin-top: 44px; margin-bottom: -72px; overflow: hidden; border: 12px solid #14222f; border-bottom: 0; border-radius: 52px 52px 0 0; }
+    .slide__phone { align-self: center; flex: 1; min-height: 0; width: 470px; margin-top: 44px; margin-bottom: -72px; overflow: hidden; border: 12px solid #0f4c5c; border-bottom: 0; border-radius: 52px 52px 0 0; }
     .slide__phone img { display: block; width: 100%; }
     .slide__cover { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    .slide__cover h1 { font-size: 112px; line-height: 1; }
+    .slide__cover h1 { font-size: 108px; line-height: 1.02; }
     .slide__cover p { font-size: 40px; }
-    .slide__led { width: fit-content; margin-bottom: 56px; padding: 26px 40px; border-radius: 18px; background: #070d13; box-shadow: inset 0 0 0 2px #2c3e4e; color: #ffb238; }
-    .slide__led .display__digits { font-size: 170px; }
-    .slide__for { margin-top: 40px !important; color: #ffb238 !important; font-weight: 700; }
-    .slide__who { margin-top: auto !important; font-size: 34px !important; }
+    .slide__led { width: fit-content; margin-bottom: 48px; padding: 24px 38px; border-radius: 20px; background: #0f1b26; color: #ffb238; }
+    .slide__led .display__digits { font-size: 150px; }
+    .slide__team { display: flex; margin-top: 48px; }
+    .slide__team span { width: 150px; height: 150px; margin-right: -24px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 8px #fff; }
+    .slide__for { margin-top: 36px !important; font-weight: 700; }
+    .slide__url { align-self: flex-start; margin-top: 44px; padding: 26px 46px; border-radius: 999px; background: #0f4c5c; color: #fff; font-size: 50px; font-weight: 700; letter-spacing: -.01em; }
+    .slide__who { margin-top: auto !important; font-size: 32px !important; }
 </style>
 {% endblock %}
 
@@ -44,6 +47,11 @@
                     <div class="slide__led"><span class="display__digits" data-ghost="88">04</span></div>
                     <h1>Vous êtes sur le chantier. Vos clients vous écrivent.</h1>
                     <p>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</p>
+                    <div class="slide__team">
+                        <span>{{ people.advisor('#f2c9a8', '#3b2a20', '#0f6e6e', '#bfe8df', true) }}</span>
+                        <span>{{ people.advisor('#8d5a3c', '#1d1612', '#f5b82e', '#fdeab5') }}</span>
+                        <span>{{ people.advisor('#e8b48f', '#a9592d', '#2b4c9b', '#d6dcfb', true) }}</span>
+                    </div>
                 </div>
             </section>
         {% elseif number == 2 %}
@@ -87,12 +95,12 @@
                 <div class="slide__phone"><img src="/marketing/suivi.png" alt=""></div>
             </section>
         {% else %}
-            <section class="slide">
+            <section class="slide slide--end">
                 <div class="slide__brand"><img src="/logo.svg" alt="">Ma Relation Clients</div>
                 <div class="slide__cover">
                     <h1>Vos clients ne restent plus sans réponse.</h1>
                     <p class="slide__for">Idéal pour les artisans, les auto-entrepreneurs et les PME.</p>
-                    <p>Une question ? Écrivez-moi en message privé.</p>
+                    <div class="slide__url">ma-relation-clients.fr</div>
                 </div>
                 <p class="slide__who">Alexis Lepoutre, IT-Room. Hébergé en France.</p>
             </section>
