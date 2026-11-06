@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Organization;
 use App\Entity\OrganizationLogo;
 use App\Entity\User;
+use App\Form\AccountEditType;
 use App\Form\AccountType;
 use App\Form\OrganizationCreateType;
 use App\Form\OrganizationEditType;
@@ -194,6 +195,45 @@ class OrganizationController extends AbstractController
             $this->entityManager->remove($logo);
             $organization->setLogoVersion(null);
         }
+    }
+
+    #[Route('/comptes/{id}', name: 'admin_account', requirements: ['id' => '\d+'])]
+    public function editAccount(User $user, Request $request, UserRepository $users, UserPasswordHasherInterface $hasher): Response
+    {
+        $organization = $user->getOrganization();
+
+        // Comme pour la suppression : cet écran ne doit pas pouvoir couper l'accès d'un super-admin.
+        if ($user->isSuperAdmin() || null === $organization) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->current->switchTo($organization);
+
+        $form = $this->createForm(AccountEditType::class, ['email' => $user->getEmail()]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $email = mb_strtolower($data['email']);
+            $other = $users->findOneBy(['email' => $email]);
+
+            if (null !== $other && $other !== $user) {
+                $form->get('email')->addError(new FormError('Un compte utilise déjà cette adresse.'));
+            } else {
+                $user->setEmail($email);
+
+                if ($data['password']) {
+                    $user->setPassword($hasher->hashPassword($user, $data['password']));
+                }
+
+                $this->entityManager->flush();
+                $this->addFlash('success', \sprintf('Compte %s enregistré.', $user->getEmail()));
+
+                return $this->redirectToRoute('admin_organization', ['id' => $organization->getId()]);
+            }
+        }
+
+        return $this->render('admin/account.html.twig', ['account' => $user, 'form' => $form]);
     }
 
     #[Route('/comptes/{id}/supprimer', name: 'admin_account_delete', requirements: ['id' => '\d+'], methods: ['POST'])]

@@ -89,9 +89,82 @@ class OrganizationManagementTest extends AppTestCase
         $this->em->flush();
 
         $this->client->request('GET', '/admin/organisations/'.$this->itroom->getId());
-        $this->client->submitForm('Supprimer equipe@itroom.test');
+        $this->client->submitForm('Supprimer');
 
         self::assertSame(0, $this->em->getRepository(User::class)->count(['email' => 'equipe@itroom.test']));
+    }
+
+    private function teamAccount(string $email = 'equipe@itroom.test'): User
+    {
+        $account = (new User($email))->setPassword('ancien-hash')->setOrganization($this->em->find(Organization::class, $this->itroom->getId()));
+        $this->em->persist($account);
+        $this->em->flush();
+
+        return $account;
+    }
+
+    public function testSuperAdminChangesEmailAndKeepsPasswordWhenEmpty(): void
+    {
+        $this->loginAsSuperAdmin();
+        $id = $this->teamAccount()->getId();
+
+        $this->client->request('GET', '/admin/organisations/comptes/'.$id);
+        $this->client->submitForm('Enregistrer le compte', ['account_edit[email]' => 'Nouvelle@Itroom.test']);
+
+        self::assertResponseRedirects();
+        $this->em->clear();
+        $user = $this->em->find(User::class, $id);
+        self::assertSame('nouvelle@itroom.test', $user->getEmail());
+        self::assertSame('ancien-hash', $user->getPassword());
+    }
+
+    public function testSuperAdminChangesPassword(): void
+    {
+        $this->loginAsSuperAdmin();
+        $id = $this->teamAccount()->getId();
+
+        $this->client->request('GET', '/admin/organisations/comptes/'.$id);
+        $this->client->submitForm('Enregistrer le compte', ['account_edit[password]' => 'un-nouveau-mot-de-passe']);
+
+        $this->em->clear();
+        $user = $this->em->find(User::class, $id);
+        $hasher = static::getContainer()->get(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class);
+        self::assertTrue($hasher->isPasswordValid($user, 'un-nouveau-mot-de-passe'));
+    }
+
+    public function testAccountEditRefusesDuplicateEmailAndShortPassword(): void
+    {
+        $this->loginAsSuperAdmin();
+        $id = $this->teamAccount()->getId();
+        $url = '/admin/organisations/comptes/'.$id;
+
+        $this->client->request('GET', $url);
+        $this->client->submitForm('Enregistrer le compte', ['account_edit[email]' => 'super@example.test']);
+        self::assertResponseStatusCodeSame(422);
+
+        $this->client->request('GET', $url);
+        $this->client->submitForm('Enregistrer le compte', ['account_edit[password]' => 'court']);
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    public function testSuperAdminAccountCannotBeEditedHere(): void
+    {
+        $this->loginAsSuperAdmin();
+        $id = $this->em->getRepository(User::class)->findOneBy(['email' => 'super@example.test'])->getId();
+
+        $this->client->request('GET', '/admin/organisations/comptes/'.$id);
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testNormalAccountCannotEditAccounts(): void
+    {
+        $this->loginAsOwner();
+        $id = $this->teamAccount()->getId();
+
+        $this->client->request('GET', '/admin/organisations/comptes/'.$id);
+
+        self::assertResponseStatusCodeSame(403);
     }
 
     public function testNormalAccountHasNoAccess(): void

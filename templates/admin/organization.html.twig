@@ -13,11 +13,14 @@
             <div class="rows">
                 {% for user in accounts %}
                     <div class="row">
-                        <span class="row__who">{{ user.email }}</span>
-                        <form method="post" action="{{ path('admin_account_delete', {id: user.id}) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
-                            <button type="submit" class="btn btn--quiet">Supprimer {{ user.email }}</button>
-                        </form>
+                        <a class="row__who" href="{{ path('admin_account', {id: user.id}) }}">{{ user.email }}</a>
+                        <div class="row__actions">
+                            <a class="btn btn--quiet" href="{{ path('admin_account', {id: user.id}) }}">Modifier</a>
+                            <form method="post" action="{{ path('admin_account_delete', {id: user.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
+                                <button type="submit" class="btn btn--quiet" aria-label="Supprimer {{ user.email }}">Supprimer</button>
+                            </form>
+                        </div>
                     </div>
                 {% else %}
                     <p class="empty">Aucun compte. Ajoutez-en un pour que cette organisation traite ses messages.</p>

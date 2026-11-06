@@ -154,6 +154,8 @@ input[type="color"] { width: 4rem; height: 2.5rem; padding: .15rem; cursor: poin
 .row__when { color: var(--muted); font-size: .9rem; white-space: nowrap; }
 .row__what { color: var(--muted); overflow-wrap: anywhere; }
 .row__what strong { color: var(--ink); font-weight: 600; }
+.row__actions { display: flex; gap: .5rem; align-items: center; }
+.row__actions form { margin: 0; }
 .row__tags { display: flex; gap: .4rem; align-items: end; justify-content: end; }
 
 .tag {

@@ -1,0 +1,15 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ account.email }}{% endblock %}
+
+{% block body %}
+    <h1>Modifier le compte</h1>
+    <p class="muted">{{ account.email }}, <a href="{{ path('admin_organization', {id: account.organization.id}) }}">retour à {{ account.organization.name }}</a></p>
+
+    <div class="narrow">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn">Enregistrer le compte</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
