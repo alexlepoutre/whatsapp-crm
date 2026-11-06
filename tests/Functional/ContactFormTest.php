@@ -89,8 +89,43 @@ class ContactFormTest extends AppTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.home__brand', 'Posez votre question');
         self::assertSelectorExists('a[href="/itroom"]');
+        self::assertSelectorExists('a.btn--whatsapp[href^="https://wa.me/33600000000?text="] svg.wa-logo');
         self::assertSelectorExists('a[href="/connexion"]');
         self::assertSelectorExists('link[rel="icon"][href="/favicon.svg"]');
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestWith(['/mentions-legales', '430 032 854'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/mentions-legales', 'OVH SAS'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/confidentialite', 'OpenAI'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/cgu', 'Usages interdits'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/cgv', 'Lille Métropole'])]
+    public function testLegalPagesAreAvailable(string $url, string $text): void
+    {
+        $this->client->request('GET', $url);
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('main', $text);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestWith(['/'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/itroom'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/connexion'])]
+    public function testFooterLinksToLegalPages(string $url): void
+    {
+        $this->client->request('GET', $url);
+
+        self::assertSelectorTextContains('.site-footer', 'Alexis Lepoutre');
+        self::assertSelectorTextContains('.site-footer', 'OVH à Roubaix');
+        foreach (['/mentions-legales', '/confidentialite', '/cgu', '/cgv'] as $link) {
+            self::assertSelectorExists('.site-footer a[href="'.$link.'"]');
+        }
+    }
+
+    public function testLegalAddressCannotBecomeAnOrganization(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Organization('cgv', 'Pirate');
     }
 
     public function testUnknownOrganizationPageIsNotFound(): void

@@ -1,0 +1,49 @@
+{% extends 'legal/layout.html.twig' %}
+
+{% block title %}Conditions générales de vente{% endblock %}
+
+{% block body %}
+    <h1>Conditions générales de vente</h1>
+    <p class="muted">Dernière mise à jour : novembre 2026</p>
+
+    <h2>1. Parties et champ d'application</h2>
+    <p>Ces conditions s'appliquent à la fourniture du service Posez votre question par Information Technology Room (IT-Room), SIREN 430 032 854, 5 allée Gabert, 59510 Hem (le « Prestataire »), à toute organisation professionnelle (le « Client »).</p>
+    <p>Elles concernent uniquement les relations entre professionnels. Le devis accepté prévaut sur ces conditions en cas de différence.</p>
+
+    <h2>2. Service</h2>
+    <p>Le service comprend une page de contact au nom du Client, la réception des demandes par WhatsApp et par formulaire, un espace de traitement des demandes avec comptes utilisateurs, la transcription des messages vocaux et l'envoi de courriels depuis la messagerie du Client.</p>
+
+    <h2>3. Commande</h2>
+    <p>La commande résulte de l'acceptation écrite d'un devis, qui précise le périmètre, le prix et la durée.</p>
+
+    <h2>4. Prix et paiement</h2>
+    <p>Les prix sont indiqués hors taxes dans le devis. Les factures sont payables dans un délai maximum de 30 jours nets à compter de leur réception.</p>
+    <p>Tout retard entraîne, sans rappel, des pénalités égales à trois fois le taux d'intérêt légal, et une indemnité forfaitaire de recouvrement de 40 euros.</p>
+
+    <h2>5. Durée et résiliation</h2>
+    <p>La durée et le préavis sont fixés par le devis. Le Prestataire peut suspendre ou résilier le service en cas de facture impayée après une relance restée sans effet pendant plus de 15 jours, ou de manquement grave aux <a href="{{ path('legal_terms') }}">CGU</a>.</p>
+
+    <h2>6. Obligations du Prestataire</h2>
+    <p>Le Prestataire fournit le service avec le soin d'un professionnel, dans le cadre d'une obligation de moyens. Il peut faire évoluer le service, sans en réduire les fonctions essentielles.</p>
+
+    <h2>7. Obligations du Client</h2>
+    <p>Le Client fournit les informations nécessaires, notamment l'accès à sa messagerie d'envoi. Il gère ses comptes utilisateurs et reste responsable de leur usage, de ses réponses et du respect de la réglementation vis-à-vis de ses propres clients, y compris leur information sur le traitement de leurs données.</p>
+
+    <h2>8. Services tiers</h2>
+    <p>Le service repose sur des tiers, notamment Meta pour WhatsApp, OpenAI pour la transcription et OVH pour l'hébergement. Le Prestataire ne répond pas de leurs interruptions, ni de l'évolution de leurs conditions ou de leurs tarifs.</p>
+
+    <h2>9. Données personnelles</h2>
+    <p>Le Client est responsable de traitement des données de ses clients, et le Prestataire agit comme sous-traitant au sens de l'article 28 du RGPD : il ne les traite que pour fournir le service, sur instruction du Client, en assure la confidentialité et la sécurité, et l'assiste pour répondre aux demandes d'exercice des droits. Les sous-traitants ultérieurs sont listés dans la page <a href="{{ path('legal_privacy') }}">Confidentialité et RGPD</a>.</p>
+
+    <h2>10. Fin du contrat</h2>
+    <p>À la fin du contrat, le Prestataire restitue au Client, à sa demande, les données de ses échanges, puis les supprime, sauf obligation légale de conservation.</p>
+
+    <h2>11. Responsabilité</h2>
+    <p>La responsabilité du Prestataire est limitée aux dommages directs et, tous faits confondus, aux sommes payées par le Client au cours des 12 mois précédant le fait générateur. Les dommages indirects, comme la perte de chiffre d'affaires, sont exclus.</p>
+
+    <h2>12. Propriété intellectuelle</h2>
+    <p>Le Prestataire reste propriétaire du service. Le Client dispose d'un droit d'usage pour la durée du contrat et reste propriétaire de ses données, logos et contenus.</p>
+
+    <h2>13. Droit applicable et litiges</h2>
+    <p>Ces conditions sont soumises au droit français. Les parties recherchent d'abord une solution amiable pendant deux mois. À défaut, le Tribunal de commerce de Lille Métropole est seul compétent.</p>
+{% endblock %}

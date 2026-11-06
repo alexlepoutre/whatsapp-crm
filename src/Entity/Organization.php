@@ -19,7 +19,7 @@ class Organization
     private const DARK_TEXT = '#17283a';
     private const PAGE_BACKGROUND = '#e9edf1';
 
-    public const RESERVED_SLUGS = ['admin', 'connexion', 'deconnexion', 'webhook', 'suivi', 'css', 'fonts', 'index'];
+    public const RESERVED_SLUGS = ['admin', 'connexion', 'deconnexion', 'webhook', 'suivi', 'css', 'fonts', 'index', 'mentions-legales', 'confidentialite', 'cgu', 'cgv'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

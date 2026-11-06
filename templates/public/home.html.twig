@@ -5,33 +5,66 @@
 {% block body_class %}home{% endblock %}
 
 {% block page %}
-    <header class="home__top">
-        <p class="home__brand">Posez votre question</p>
-        {% if app.user %}
-            <a class="btn btn--quiet" href="{{ path('admin_inbox') }}">Ouvrir mes messages</a>
-        {% else %}
-            <a class="btn btn--quiet" href="{{ path('login') }}">Se connecter</a>
-        {% endif %}
-    </header>
+    <div class="stage">
+        <header class="home__top">
+            <a class="home__brand" href="{{ path('home') }}">
+                <img src="{{ asset('favicon.svg') }}" alt="" width="32" height="32">
+                Posez votre question
+            </a>
+            {% if app.user %}
+                <a class="btn btn--on-dark" href="{{ path('admin_inbox') }}">Ouvrir mes messages</a>
+            {% else %}
+                <a class="btn btn--on-dark" href="{{ path('login') }}">Se connecter</a>
+            {% endif %}
+        </header>
 
-    <main>
         <section class="hero">
-            <div class="hero__text">
+            <div>
                 <h1>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</h1>
                 <p class="hero__lead">Vos clients vous écrivent sur WhatsApp ou par formulaire. Vous lisez leurs demandes au même endroit, et vous répondez quand vous êtes disponible.</p>
-                <a class="btn btn--large" href="{{ path('contact', {slug: 'itroom'}) }}">Nous poser une question</a>
+                <div class="hero__actions">
+                    {% if editor and whatsappNumber %}
+                        <a class="btn btn--whatsapp" href="https://wa.me/{{ whatsappNumber }}?text={{ editor.whatsAppOpening|url_encode }}">
+                            {{ include('_whatsapp_logo.html.twig') }}
+                            Écrire sur WhatsApp
+                        </a>
+                    {% endif %}
+                    <a class="btn btn--on-dark btn--big" href="{{ path('contact', {slug: 'itroom'}) }}">Utiliser le formulaire</a>
+                </div>
             </div>
 
             {# Illustration : ces messages sont fictifs. #}
-            <div class="device" aria-hidden="true">
+            <div class="device" data-device aria-hidden="true">
+                <span class="wa-tile wa-tile--float">{{ include('_whatsapp_logo.html.twig') }}</span>
                 <div class="device__display">
-                    <span class="display__digits" data-ghost="88">03</span>
+                    <span class="display__digits" data-ghost="88" data-counter>03</span>
                     <span class="display__label">à traiter</span>
                 </div>
                 <ul class="device__list">
-                    <li><strong>Camille</strong><span class="tag tag--whatsapp">WhatsApp</span><p>Où en est ma commande ?</p></li>
+                    <li><strong>Camille</strong><span class="tag tag--whatsapp">{{ include('_whatsapp_logo.html.twig') }} WhatsApp</span><p>Où en est ma commande ?</p></li>
                     <li><strong>Dominique</strong><span class="tag tag--form">Formulaire</span><p>Pouvez-vous m'envoyer un devis ?</p></li>
-                    <li><strong>Sacha</strong><span class="tag tag--whatsapp">WhatsApp</span><p>Message vocal, transcrit : êtes-vous ouverts samedi ?</p></li>
+                    <li><strong>Sacha</strong><span class="tag tag--whatsapp">{{ include('_whatsapp_logo.html.twig') }} WhatsApp</span><p>Message vocal, transcrit : êtes-vous ouverts samedi ?</p></li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <main>
+        <section class="compare">
+            <div class="compare__before">
+                <h2>Avec un répondeur</h2>
+                <ul>
+                    <li>Chaque message s'écoute du début à la fin</li>
+                    <li>Vous notez le numéro, puis vous cherchez qui c'est</li>
+                    <li>Votre client ne sait pas si vous l'avez entendu</li>
+                </ul>
+            </div>
+            <div class="compare__after">
+                <h2>Avec Posez votre question</h2>
+                <ul>
+                    <li>Chaque demande se lit en quelques secondes, même un vocal</li>
+                    <li>Le nom et l'historique du client sont sous vos yeux</li>
+                    <li>Votre client reçoit une réponse automatique, puis voit que vous avez lu</li>
                 </ul>
             </div>
         </section>
@@ -49,7 +82,7 @@
                 </li>
                 <li>
                     <h3>Vous répondez quand vous pouvez</h3>
-                    <p>Votre réponse part par WhatsApp ou par courriel, selon le canal choisi par le client. Lui reçoit tout de suite un message automatique.</p>
+                    <p>Votre réponse part par WhatsApp ou par courriel, selon le canal choisi par le client.</p>
                 </li>
             </ol>
         </section>
@@ -76,9 +109,36 @@
         </section>
 
         <section class="closing">
-            <h2>Une question sur l'outil ?</h2>
-            <p>Posez-la. C'est exactement à ça qu'il sert.</p>
-            <a class="btn btn--large" href="{{ path('contact', {slug: 'itroom'}) }}">Nous poser une question</a>
+            <div>
+                <h2>Une question sur l'outil ?</h2>
+                <p>Posez-la. C'est exactement à ça qu'il sert.</p>
+            </div>
+            <a class="btn btn--amber" href="{{ path('contact', {slug: 'itroom'}) }}">Nous poser une question</a>
         </section>
     </main>
+
+    {{ include('_footer.html.twig') }}
+
+    <script>
+        // Un seul moment animé : le compteur monte pendant que les messages arrivent.
+        (() => {
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            const device = document.querySelector('[data-device]');
+            const counter = device.querySelector('[data-counter]');
+            const rows = [...device.querySelectorAll('li')];
+
+            device.classList.add('is-playing');
+            counter.textContent = '00';
+
+            rows.forEach((row, index) => {
+                setTimeout(() => {
+                    row.classList.add('is-in');
+                    counter.textContent = String(index + 1).padStart(2, '0');
+                }, 500 + index * 650);
+            });
+        })();
+    </script>
 {% endblock %}

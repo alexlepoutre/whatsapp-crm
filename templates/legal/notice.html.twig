@@ -1,0 +1,36 @@
+{% extends 'legal/layout.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block body %}
+    <h1>Mentions légales</h1>
+
+    <h2>Éditeur</h2>
+    <p>
+        Posez votre question est édité par Information Technology Room (IT-Room).<br>
+        Siège social : 5 allée Gabert, 59510 Hem, France<br>
+        SIREN : 430 032 854<br>
+        TVA intracommunautaire : FR29 430 032 854<br>
+        Téléphone : 06 44 60 42 80<br>
+        E-mail : <a href="mailto:contact@itroom.fr">contact@itroom.fr</a><br>
+        Site : <a href="https://www.itroom.fr">itroom.fr</a>
+    </p>
+
+    <h2>Directeur de la publication</h2>
+    <p>Alexis Lepoutre</p>
+
+    <h2>Conception et développement</h2>
+    <p>Alexis Lepoutre, IT-Room.</p>
+
+    <h2>Hébergement</h2>
+    <p>
+        OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.<br>
+        Le service est hébergé à Roubaix.
+    </p>
+
+    <h2>Propriété intellectuelle</h2>
+    <p>Le service, ses textes, son code et son identité visuelle appartiennent à IT-Room. Les logos et contenus des organisations utilisatrices restent leur propriété. WhatsApp est une marque de Meta Platforms, Inc.</p>
+
+    <h2>Données personnelles</h2>
+    <p>Le traitement de vos données est décrit dans la page <a href="{{ path('legal_privacy') }}">Confidentialité et RGPD</a>.</p>
+{% endblock %}

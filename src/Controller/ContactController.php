@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Organization;
 use App\Form\ContactType;
+use App\Repository\OrganizationRepository;
 use App\Service\Inbox;
 use App\Service\PhoneNormalizer;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -17,9 +18,15 @@ use Symfony\Component\Routing\Attribute\Route;
 class ContactController extends AbstractController
 {
     #[Route('/', name: 'home')]
-    public function home(): Response
-    {
-        return $this->render('public/home.html.twig');
+    public function home(
+        OrganizationRepository $organizations,
+        #[Autowire('%env(WHATSAPP_PUBLIC_NUMBER)%')] string $publicNumber,
+    ): Response {
+        return $this->render('public/home.html.twig', [
+            // La présentation s'adresse à IT-Room, qui édite l'outil.
+            'editor' => $organizations->findBySlug('itroom'),
+            'whatsappNumber' => PhoneNormalizer::normalize($publicNumber),
+        ]);
     }
 
     /** Priorité négative : une adresse de l'application l'emporte toujours sur une organisation. */
