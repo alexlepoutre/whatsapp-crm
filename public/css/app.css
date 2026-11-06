@@ -5,12 +5,6 @@
     font-display: swap;
 }
 
-@font-face {
-    font-family: "DSEG7";
-    src: url("../fonts/dseg7.woff2") format("woff2");
-    font-display: block;
-}
-
 :root {
     --paper: #e6f5f1;
     --surface: #fff;
@@ -68,34 +62,13 @@ a { color: var(--link); }
     color: var(--on-panel);
 }
 
-.display {
-    display: block;
-    padding: 1rem;
-    border-radius: 6px;
-    background: #0b141c;
-    box-shadow: inset 0 0 0 1px #2c3e4e;
-    color: var(--amber);
-    text-decoration: none;
-}
+/* Le compteur : jaune tant que des messages attendent, blanc quand tout est traité. */
+.display { display: flex; align-items: baseline; gap: .55rem; padding: .85rem 1.1rem; border-radius: 18px; background: var(--surface); color: var(--ink); text-decoration: none; box-shadow: 0 8px 20px -14px rgb(15 53 66 / .5); }
+.display--waiting { background: var(--sun); color: #0a3540; }
 
-.display__digits {
-    position: relative;
-    display: block;
-    font: 700 4.25rem/1 "DSEG7", monospace;
-    text-align: right;
-    text-shadow: 0 0 14px rgb(255 178 56 / .45);
-}
+.display__digits { font-weight: 700; font-size: 3rem; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
 
-/* Les segments éteints restent visibles, comme sur un vrai afficheur. */
-.display__digits::before {
-    content: attr(data-ghost);
-    position: absolute;
-    inset: 0;
-    color: rgb(255 178 56 / .08);
-    text-shadow: none;
-}
-
-.display__label { display: block; margin-top: .5rem; text-align: right; font-size: .9rem; }
+.display__label { font-weight: 600; font-size: 1rem; }
 
 .rail__org { padding-inline: .6rem; font-weight: 600; }
 .orgs { display: grid; gap: .25rem; margin: 0; padding: 0; list-style: none; }
@@ -301,8 +274,6 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .stage :focus-visible { outline-color: var(--amber); }
 
 .device { position: relative; padding: 1rem; border-radius: 16px; background: #0f1b26; box-shadow: 0 0 0 1px #2c3e4e, 0 30px 60px -20px rgb(0 0 0 / .6); color: #dbe4ec; }
-.device__display { padding: 1rem 1.25rem; border-radius: 8px; background: #070d13; box-shadow: inset 0 0 0 1px #2c3e4e; color: var(--amber); }
-.device__display .display__digits { font-size: clamp(4.5rem, 10vw, 7rem); }
 .device__list { margin: .75rem 0 0; padding: 0; list-style: none; }
 .device__list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .75rem; padding: .7rem .5rem; border-top: 1px solid #2c3e4e; }
 .device__list li:first-child { border-top: 0; }
@@ -323,7 +294,7 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .steps { padding-block: clamp(1rem, 3vw, 2rem) clamp(3rem, 6vw, 5rem); }
 .steps ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 3rem); margin: 2rem 0 0; padding: 0; list-style: none; counter-reset: step; }
 .steps li { counter-increment: step; }
-.steps li::before { content: counter(step); display: grid; place-items: center; width: 3.5rem; height: 4rem; margin-bottom: 1rem; border-radius: 8px; background: var(--panel); color: var(--amber); font: 700 2rem/1 "DSEG7", monospace; }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 3.5rem; height: 4rem; margin-bottom: 1rem; border-radius: 8px; background: var(--panel); color: var(--amber); font: 700 2rem/1 "Familjen Grotesk", system-ui, sans-serif; }
 .steps h3 { margin: 0 0 .4rem; font-size: 1.25rem; letter-spacing: -.01em; }
 .steps p { color: var(--muted); }
 
@@ -347,10 +318,10 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .signin__card :focus-visible { outline-color: var(--action); }
 .signin__submit { width: 100%; padding-block: .8rem; }
 
-/* Pages d'erreur : l'afficheur montre le code, comme un appareil en panne. */
+/* Pages d'erreur : le code en grand. */
 .error-page { width: min(100%, 46rem); margin-inline: auto; padding: clamp(2rem, 6vw, 4rem) 1rem clamp(3rem, 7vw, 6rem); }
-.error-page__display { width: fit-content; margin-bottom: 1.75rem; padding: 1rem 1.5rem; border-radius: 10px; background: #070d13; box-shadow: inset 0 0 0 1px #2c3e4e; color: var(--amber); }
-.error-page__display .display__digits { font-size: clamp(4rem, 14vw, 7rem); }
+.error-page__display { margin-bottom: 1rem; color: var(--action); }
+.error-page__display .display__digits { font-size: clamp(5rem, 16vw, 8rem); }
 .error-page h1 { font-size: clamp(2.2rem, 6vw, 3.5rem); line-height: 1.05; letter-spacing: -.03em; }
 .error-page .hero__lead { margin-bottom: 1.75rem; }
 
@@ -381,9 +352,9 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
     .steps ol { grid-template-columns: minmax(0, 1fr); }
     .admin { grid-template-columns: minmax(0, 1fr); }
     .rail { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 1rem; padding: .75rem 1rem; }
-    .display { padding: .4rem .6rem; }
-    .display__digits { font-size: 2rem; }
-    .display__label { margin-top: .15rem; font-size: .75rem; }
+    .display { padding: .4rem .8rem; }
+    .display__digits { font-size: 1.8rem; }
+    .display__label { font-size: .85rem; }
     .rail__nav { display: flex; flex: 1 1 auto; }
     .rail__logout { margin-top: 0; }
     .split { grid-template-columns: minmax(0, 1fr); }
@@ -433,7 +404,6 @@ input:not([type="checkbox"]):focus, textarea:focus { border-color: var(--action)
 .stage .btn--amber { background: var(--ink); color: #fff; }
 .stage .l-for { color: #0a6a5c; }
 .signin__card { box-shadow: 0 24px 48px -28px rgb(15 53 66 / .6); }
-.error-page__display { background: #0f1b26; }
 
 /* Formulaire et suivi : l'entreprise en en-tête, le contenu en cartes. */
 .public { border-top: 0; background: var(--paper); }

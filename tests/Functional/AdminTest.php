@@ -38,7 +38,8 @@ class AdminTest extends AppTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.row__who', 'Camille');
-        self::assertSelectorTextContains('.display__digits', '01');
+        self::assertSelectorTextSame('.display__digits', '1');
+        self::assertSelectorExists('.display--waiting');
         // L'aperçu doit montrer le message du client, pas la réponse automatique qui le suit.
         self::assertSelectorTextContains('.row__what', 'Bonjour');
         self::assertSelectorTextNotContains('.row__what', 'merci pour votre message');
@@ -106,7 +107,8 @@ class AdminTest extends AppTestCase
         $this->client->request('GET', '/admin');
         self::assertResponseIsSuccessful();
         self::assertSelectorNotExists('a.row');
-        self::assertSelectorTextContains('.display__digits', '00');
+        self::assertSelectorTextSame('.display__digits', '0');
+        self::assertSelectorNotExists('.display--waiting');
 
         $this->client->request('GET', '/admin/clients');
         self::assertSelectorNotExists('a.row');

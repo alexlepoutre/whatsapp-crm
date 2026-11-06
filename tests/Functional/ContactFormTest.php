@@ -197,7 +197,7 @@ class ContactFormTest extends AppTestCase
         $html = static::getContainer()->get('twig')->render('@Twig/Exception/error.html.twig', ['status_code' => $status, 'status_text' => '']);
 
         self::assertStringContainsString($text, html_entity_decode($html, \ENT_QUOTES));
-        self::assertStringContainsString('data-ghost="888">'.$status, $html);
+        self::assertStringContainsString('<span class="display__digits">'.$status, $html);
     }
 
     #[\PHPUnit\Framework\Attributes\TestWith(['/'])]

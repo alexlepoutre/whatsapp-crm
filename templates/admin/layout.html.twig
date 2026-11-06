@@ -9,9 +9,9 @@
     {% set open = open_conversations() %}
     {% set organization = current_organization() %}
     <aside class="rail">
-        <a class="display" href="{{ path('admin_inbox') }}" aria-label="{{ open }} conversation(s) à traiter">
-            <span class="display__digits" data-ghost="88" aria-hidden="true">{{ open > 99 ? '99' : '%02d'|format(open) }}</span>
-            <span class="display__label">à traiter</span>
+        <a class="display{{ open ? ' display--waiting' }}" href="{{ path('admin_inbox') }}" aria-label="{{ open }} conversation(s) à traiter">
+            <span class="display__digits" aria-hidden="true">{{ open > 99 ? '99+' : open }}</span>
+            <span class="display__label" aria-hidden="true">à traiter</span>
         </a>
         {% if is_granted('ROLE_SUPER_ADMIN') %}
             {% set counts = open_by_organization() %}

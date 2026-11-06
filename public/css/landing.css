@@ -99,8 +99,8 @@
 @keyframes v2-flow { to { background-position-x: 22px; } }
 .v2-hub { padding: 1.25rem; border-radius: 18px; background: var(--panel); color: #fff; box-shadow: 0 26px 50px -24px rgb(20 34 47 / .7); }
 .v2-screen { padding: .75rem; border-radius: 10px; background: #0f1b26; }
-.v2-led { padding: .5rem .9rem; border-radius: 8px; background: #070d13; color: var(--amber); }
-.v2-led .display__digits { font-size: clamp(3rem, 6vw, 4.5rem); }
+.v2-led { display: flex; align-items: baseline; gap: .5rem; padding: .6rem 1rem; border-radius: 12px; background: var(--sun); color: #0a3540; }
+.v2-led .display__digits { font-size: clamp(2.6rem, 5vw, 3.4rem); }
 .v2-screen p { display: flex; align-items: center; gap: .5rem; padding: .5rem .25rem; border-top: 1px solid #2c3e4e; font-weight: 600; font-size: .95rem; }
 .v2-screen p:first-of-type { border-top: 0; }
 .v2-screen span:not(.display__digits, .display__label) { margin-left: auto; color: #a9bac9; font-weight: 400; font-size: .85rem; text-align: right; }
@@ -128,9 +128,9 @@
 .v3-app__rail { padding: .9rem .7rem; background: #0f1b26; color: #dbe4ec; font-size: .95rem; }
 .v3-app__rail p { padding: .35rem .55rem; border-radius: 4px; }
 .v3-app__rail .is-on { background: #22364a; font-weight: 600; }
-.v3-app__led { margin-bottom: .9rem; padding: .55rem .75rem; border-radius: 6px; background: #070d13; color: var(--amber); }
-.v3-app__led .display__digits { font-size: 2.75rem; }
-.v3-app__led .display__label { font-size: .75rem; }
+.v3-app__led { display: flex; align-items: baseline; gap: .4rem; margin-bottom: .9rem; padding: .55rem .75rem; border-radius: 12px; background: var(--sun); color: #0a3540; }
+.v3-app__led .display__digits { font-size: 2.2rem; }
+.v3-app__led .display__label { font-size: .85rem; }
 .v3-app__main { padding: 1.1rem 1.25rem; min-width: 0; }
 .v3-app__title { margin-bottom: .6rem; font-weight: 700; font-size: 1.3rem; }
 .v3-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem 1rem; padding: .6rem .75rem; border-top: 1px solid var(--line); border-left: 4px solid; }

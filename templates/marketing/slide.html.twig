@@ -27,8 +27,9 @@
     .slide__cover { flex: 1; display: flex; flex-direction: column; justify-content: center; }
     .slide__cover h1 { font-size: 108px; line-height: 1.02; }
     .slide__cover p { font-size: 40px; }
-    .slide__led { width: fit-content; margin-bottom: 48px; padding: 24px 38px; border-radius: 20px; background: #0f1b26; color: #ffb238; }
-    .slide__led .display__digits { font-size: 150px; }
+    .slide__led { display: flex; align-items: baseline; gap: 18px; width: fit-content; margin-bottom: 48px; padding: 18px 40px; border-radius: 28px; background: #ffc845; color: #0a3540; }
+    .slide__led .display__digits { font-size: 110px; }
+    .slide__led .display__label { font-size: 40px; }
     .slide__team { display: flex; margin-top: 48px; }
     .slide__team span { width: 150px; height: 150px; margin-right: -24px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 8px #fff; }
     .slide__for { margin-top: 36px !important; font-weight: 700; }
@@ -43,7 +44,7 @@
             <section class="slide">
                 <div class="slide__brand"><img src="/logo.svg" alt="">Ma Relation Clients</div>
                 <div class="slide__cover">
-                    <div class="slide__led"><span class="display__digits" data-ghost="88">04</span></div>
+                    <div class="slide__led"><span class="display__digits">4</span><span class="display__label">à traiter</span></div>
                     <h1>Vous êtes sur le chantier. Vos clients vous écrivent.</h1>
                     <p>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</p>
                     <div class="slide__team">
