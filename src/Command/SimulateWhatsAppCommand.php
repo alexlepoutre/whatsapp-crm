@@ -28,6 +28,7 @@ class SimulateWhatsAppCommand
         #[Argument('Numéro de l\'expéditeur, indicatif compris')] string $phone,
         #[Argument('Texte du message')] string $text,
         #[Option('Nom du profil WhatsApp')] string $name = 'Client de test',
+        #[Option('Simule un vocal dont le texte est la transcription')] bool $voice = false,
     ): int {
         $target = $this->organizations->findBySlug($organization);
 
@@ -45,9 +46,9 @@ class SimulateWhatsAppCommand
                         'messages' => [[
                             'from' => $phone,
                             'id' => 'wamid.simulation.'.bin2hex(random_bytes(8)),
-                            'type' => 'text',
-                            'text' => ['body' => $text],
-                        ]],
+                        ] + ($voice
+                            ? ['type' => 'audio', 'audio' => ['id' => 'simulation'], 'transcription' => $text]
+                            : ['type' => 'text', 'text' => ['body' => $text]])],
                     ],
                 ]],
             ]],

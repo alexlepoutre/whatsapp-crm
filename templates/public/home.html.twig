@@ -10,7 +10,7 @@
         <header class="home__top">
             <a class="home__brand" href="{{ path('home') }}">
                 <img src="{{ asset('logo.svg') }}" alt="" width="36" height="36">
-                Relation clients
+                <span class="brand-text">Relation clients<small class="l-for">Idéal pour les artisans, les auto-entrepreneurs et les PME</small></span>
             </a>
             {% if app.user %}
                 <a class="btn btn--on-dark" href="{{ path('admin_inbox') }}">Ouvrir mes messages</a>
@@ -23,7 +23,6 @@
             <div>
                 <h1>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</h1>
                 <p class="hero__lead">Vos clients vous écrivent sur WhatsApp ou par formulaire. Vous avez un dashboard qui centralise les demandes reçues : vous ne passez plus à côté d'une demande et vous les traitez au fil du temps.</p>
-                <p class="l-for">Idéal pour les artisans, les auto-entrepreneurs et les PME.</p>
                 <div class="hero__actions">
                     {% if editor and whatsappNumber %}
                         <a class="btn btn--whatsapp" href="https://wa.me/{{ whatsappNumber }}?text={{ editor.whatsAppOpening|url_encode }}">

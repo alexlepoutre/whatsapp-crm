@@ -1,7 +1,8 @@
 /* Propositions de page d'accueil. Chaque version reste isolée sous sa classe. */
 
 .l-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; width: min(100%, 74rem); margin-inline: auto; padding: 1.25rem 1rem; }
-.l-brand { display: inline-flex; align-items: center; gap: .6rem; color: inherit; font-weight: 700; font-size: 1.1rem; text-decoration: none; white-space: nowrap; }
+.l-brand { display: inline-flex; align-items: center; gap: .6rem; color: inherit; font-weight: 700; font-size: 1.2rem; text-decoration: none; }
+.l-brand img, .home__brand img { flex: none; }
 .l-login { color: inherit; font-weight: 600; }
 .l-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
 .l-btn { display: inline-flex; align-items: center; gap: .6rem; padding: .85rem 1.5rem; border: 2px solid transparent; border-radius: 999px; font-weight: 600; font-size: 1.1rem; text-decoration: none; }
@@ -17,7 +18,13 @@
 .advisor { display: block; width: 100%; height: 100%; }
 
 /* Le positionnement, commun à toutes les versions : la journée dehors, le soir devant l'écran. */
-.l-for { margin-bottom: 1.25rem; font-weight: 700; font-size: 1.1rem; }
+/* La baseline dit à qui s'adresse l'outil, dès le haut de la page. */
+.l-login, .home__top .btn { flex: none; white-space: nowrap; }
+.brand-text { display: grid; line-height: 1.2; white-space: normal; }
+.l-for { font-weight: 600; font-size: .95rem; letter-spacing: 0; }
+.stage .l-for, .lv3 .l-for { color: var(--amber); }
+.lv1 .l-for { color: #0a6a5c; }
+.lv2 .l-for { color: var(--action); }
 .l-field { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) minmax(0, 4fr); gap: 1rem; align-items: stretch; width: min(100%, 74rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4.5rem) 1rem; }
 .l-field__intro { align-self: center; padding-right: clamp(0rem, 3vw, 2rem); }
 .l-field__intro h2 { margin: 0 0 .75rem; font-size: clamp(1.8rem, 3.6vw, 2.6rem); line-height: 1.08; letter-spacing: -.025em; }
