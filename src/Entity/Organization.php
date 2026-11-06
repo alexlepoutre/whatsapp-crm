@@ -53,9 +53,9 @@ class Organization
     #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Choisissez une couleur.')]
     private string $primaryColor = '#0f4c5c';
 
-    #[ORM\Column(length: 7, options: ['default' => '#0f3542'])]
+    #[ORM\Column(length: 7, options: ['default' => '#cfeae3'])]
     #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Choisissez une couleur.')]
-    private string $secondaryColor = '#0f3542';
+    private string $secondaryColor = '#cfeae3';
 
     /**
      * Textes automatiques personnalisés, par clé de MessageCatalog. Seuls ceux qui diffèrent de
