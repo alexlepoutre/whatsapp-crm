@@ -6,3 +6,6 @@ var
 vendor
 tests
 .phpunit.cache
+
+marketing
+templates/marketing

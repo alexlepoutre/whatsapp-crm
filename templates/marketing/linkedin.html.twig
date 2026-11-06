@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Post LinkedIn{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}marketing{% endblock %}
+
+{% block theme %}
+<style>
+    .marketing { background: #f3f2ef; }
+    .m-wrap { display: grid; grid-template-columns: minmax(0, 34rem) minmax(0, 24rem); gap: 2rem; justify-content: center; align-items: start; padding: 2rem 1rem; }
+    .m-post { padding: 1.25rem; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px #e0dfdc; }
+    .m-author { display: flex; gap: .75rem; align-items: center; margin-bottom: .9rem; }
+    .m-author img { width: 48px; height: 48px; }
+    .m-author small { display: block; color: var(--muted); }
+    #post { white-space: pre-wrap; margin: 0 0 1rem; font: inherit; line-height: 1.45; }
+    .m-carousel { position: relative; overflow: hidden; border-radius: 8px; background: #14222f; aspect-ratio: 4 / 5; }
+    .m-carousel img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .4s ease; }
+    .m-carousel img.is-on { opacity: 1; }
+    .m-controls { display: flex; justify-content: space-between; align-items: center; gap: .5rem; margin-top: .6rem; }
+    .m-side h1 { margin-bottom: .75rem; font-size: 1.5rem; }
+    .m-side ol { padding-left: 1.2rem; }
+    .m-side li { margin-block: .4rem; }
+    .m-side .btn { margin-bottom: .5rem; }
+    @media (max-width: 900px) { .m-wrap { grid-template-columns: minmax(0, 1fr); } }
+    @media (prefers-reduced-motion: reduce) { .m-carousel img { transition: none; } }
+</style>
+{% endblock %}
+
+{% block page %}
+    <main class="m-wrap">
+        <article class="m-post">
+            <div class="m-author">
+                <img src="/logo.svg" alt="">
+                <div><strong>Alexis Lepoutre</strong><small>IT-Room</small></div>
+            </div>
+<pre id="post">Un artisan sur un chantier ne décroche pas.
+
+Il rappelle le soir. S'il a le temps d'écouter son répondeur. S'il arrive à noter le numéro. Si le client n'a pas déjà appelé quelqu'un d'autre.
+
+C'est pour ça que j'ai créé Relation clients.
+
+L'idée est simple : remplacer le répondeur que vous n'avez pas le temps d'écouter.
+
+→ Vos clients vous écrivent sur WhatsApp, ou par un formulaire s'ils ne l'ont pas
+→ Une réponse automatique les rassure tout de suite
+→ Tout arrive sur un seul dashboard, classé par client
+→ Les messages vocaux sont transcrits : vous les lisez au lieu de les écouter
+→ Vous répondez le soir, depuis votre ordinateur ou votre téléphone
+
+Résultat : vous ne passez plus à côté d'une demande, et vous la traitez quand vous êtes disponible.
+
+C'est fait pour les artisans, les auto-entrepreneurs et les PME : ceux qui sont sur le terrain toute la journée.
+
+Vous êtes concerné, ou vous connaissez quelqu'un qui perd des clients à cause de son répondeur ? Écrivez-moi en message privé, je vous montre.
+
+#Artisans #TPE #RelationClient</pre>
+
+            <div class="m-carousel" id="carousel">
+                {% for number in 1..slides %}
+                    <img src="/marketing/slide-{{ number }}.png" alt="Diapositive {{ number }}" {% if loop.first %}class="is-on"{% endif %}>
+                {% endfor %}
+            </div>
+            <div class="m-controls">
+                <button type="button" class="btn btn--quiet" id="prev">Précédente</button>
+                <span id="position" class="muted">1 / {{ slides }}</span>
+                <button type="button" class="btn btn--quiet" id="next">Suivante</button>
+            </div>
+        </article>
+
+        <aside class="m-side">
+            <h1>À publier sur LinkedIn</h1>
+            <button type="button" class="btn" id="copy">Copier le texte</button>
+            <a class="btn btn--quiet" href="/marketing/relation-clients-carrousel.pdf" download>Télécharger le carrousel (PDF)</a>
+            <ol>
+                <li>Créez un post et collez le texte.</li>
+                <li>Ajoutez un document et choisissez le PDF : LinkedIn l'affiche en diapositives à faire défiler.</li>
+                <li>Donnez-lui un titre, par exemple « Remplacez votre répondeur ».</li>
+            </ol>
+            <p class="muted">Cette page n'existe qu'en local. Clients et entreprise visibles dans les captures sont fictifs.</p>
+            <h2>Images séparées</h2>
+            <p>
+                {% for number in 1..slides %}
+                    <a href="/marketing/slide-{{ number }}.png" download>Diapositive {{ number }}</a>{{ not loop.last ? ', ' }}
+                {% endfor %}
+            </p>
+        </aside>
+    </main>
+
+    <script>
+        (() => {
+            const images = [...document.querySelectorAll('#carousel img')];
+            const position = document.getElementById('position');
+            let current = 0;
+            let timer = null;
+
+            const show = (index) => {
+                images[current].classList.remove('is-on');
+                current = (index + images.length) % images.length;
+                images[current].classList.add('is-on');
+                position.textContent = `${current + 1} / ${images.length}`;
+            };
+
+            const stop = () => clearInterval(timer);
+
+            document.getElementById('next').addEventListener('click', () => { stop(); show(current + 1); });
+            document.getElementById('prev').addEventListener('click', () => { stop(); show(current - 1); });
+
+            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                timer = setInterval(() => show(current + 1), 3000);
+            }
+
+            document.getElementById('copy').addEventListener('click', async (event) => {
+                await navigator.clipboard.writeText(document.getElementById('post').textContent);
+                event.target.textContent = 'Texte copié';
+            });
+        })();
+    </script>
+{% endblock %}

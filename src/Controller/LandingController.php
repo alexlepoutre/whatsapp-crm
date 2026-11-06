@@ -10,11 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Propositions de page d'accueil, à comparer avant d'en retenir une.
+ * Propositions de page d'accueil non retenues, gardées pour comparaison. La V1 est devenue l'accueil.
  */
 class LandingController extends AbstractController
 {
-    #[Route('/{version}', name: 'landing', requirements: ['version' => 'v[123]'])]
+    #[Route('/v1', name: 'landing_v1')]
+    public function formerV1(): Response
+    {
+        return $this->redirectToRoute('home', [], Response::HTTP_MOVED_PERMANENTLY);
+    }
+
+    #[Route('/{version}', name: 'landing', requirements: ['version' => 'v[23]'])]
     public function show(
         string $version,
         OrganizationRepository $organizations,

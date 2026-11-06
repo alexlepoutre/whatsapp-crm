@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block robots %}{% if version %}<meta name="robots" content="noindex, nofollow">{% endif %}{% endblock %}
 {% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}">{% endblock %}
 
 {% block page %}
@@ -18,10 +18,16 @@
 
     {{ include('_footer.html.twig') }}
 
-    <nav class="l-switch" aria-label="Comparer les propositions">
-        <a href="{{ path('home') }}">Actuelle</a>
-        {% for item in ['v1', 'v2', 'v3'] %}
-            <a href="{{ path('landing', {version: item}) }}" {% if item == version %}aria-current="page"{% endif %}>{{ item|upper }}</a>
-        {% endfor %}
-    </nav>
+    {% if waUrl %}
+        <a class="l-float" href="{{ waUrl }}" aria-label="Écrire sur WhatsApp">{{ include('_whatsapp_logo.html.twig') }}</a>
+    {% endif %}
+
+    {% if version %}
+        <nav class="l-switch" aria-label="Comparer les propositions">
+            <a href="{{ path('home') }}">Accueil</a>
+            {% for item in ['v2', 'v3'] %}
+                <a href="{{ path('landing', {version: item}) }}" {% if item == version %}aria-current="page"{% endif %}>{{ item|upper }}</a>
+            {% endfor %}
+        </nav>
+    {% endif %}
 {% endblock %}

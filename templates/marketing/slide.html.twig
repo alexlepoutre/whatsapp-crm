@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carrousel LinkedIn{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block theme %}
+<style>
+    @page { size: 1080px 1350px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: #14222f; }
+    .slide { position: relative; box-sizing: border-box; display: flex; flex-direction: column; width: 1080px; height: 1350px; padding: 72px; overflow: hidden; background: #14222f; color: #fff; page-break-after: always; break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide--light { background: #f7f9fb; color: #14222f; }
+    .slide__brand { display: flex; align-items: center; gap: 16px; font-size: 30px; font-weight: 700; }
+    .slide__brand img { width: 56px; height: 56px; }
+    .slide__step { position: absolute; top: 80px; right: 72px; color: #526375; font-size: 28px; font-weight: 600; }
+    .slide:not(.slide--light) .slide__step { color: #a9bac9; }
+    .slide h1, .slide h2 { margin: 0; letter-spacing: -.03em; }
+    .slide h2 { margin-top: 56px; font-size: 76px; line-height: 1.04; }
+    .slide p { margin: 24px 0 0; font-size: 36px; line-height: 1.32; color: #526375; }
+    .slide:not(.slide--light) p { color: #c3d0dc; }
+    .slide__shot { flex: 1; min-height: 0; margin-top: 48px; overflow: hidden; border-radius: 22px 22px 0 0; box-shadow: 0 0 0 2px #c6d0da, 0 30px 60px -20px rgb(20 34 47 / .45); margin-bottom: -72px; }
+    /* L'écran est large et son tiers droit est vide : on l'agrandit, et le fond prolonge l'application. */
+    .slide__shot { background: linear-gradient(90deg, #133443 0 168px, #e9edf1 168px); }
+    .slide__shot img { display: block; width: 1182px; max-width: none; }
+    .slide__shot--page { background: #e6eaee; }
+    .slide__shot--page img { width: 100%; }
+    .slide__phone { align-self: center; flex: 1; min-height: 0; width: 470px; margin-top: 44px; margin-bottom: -72px; overflow: hidden; border: 12px solid #14222f; border-bottom: 0; border-radius: 52px 52px 0 0; }
+    .slide__phone img { display: block; width: 100%; }
+    .slide__cover { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .slide__cover h1 { font-size: 112px; line-height: 1; }
+    .slide__cover p { font-size: 40px; }
+    .slide__led { width: fit-content; margin-bottom: 56px; padding: 26px 40px; border-radius: 18px; background: #070d13; box-shadow: inset 0 0 0 2px #2c3e4e; color: #ffb238; }
+    .slide__led .display__digits { font-size: 170px; }
+    .slide__for { margin-top: 40px !important; color: #ffb238 !important; font-weight: 700; }
+    .slide__who { margin-top: auto !important; font-size: 34px !important; }
+</style>
+{% endblock %}
+
+{% block page %}
+    {% for number in numbers %}
+        {% if number == 1 %}
+            <section class="slide">
+                <div class="slide__brand"><img src="/logo.svg" alt="">Relation clients</div>
+                <div class="slide__cover">
+                    <div class="slide__led"><span class="display__digits" data-ghost="88">04</span></div>
+                    <h1>Vous êtes sur le chantier. Vos clients vous écrivent.</h1>
+                    <p>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</p>
+                </div>
+            </section>
+        {% elseif number == 2 %}
+            <section class="slide slide--light">
+                <div class="slide__brand"><img src="/logo.svg" alt="">Relation clients</div>
+                <span class="slide__step">2 / 7</span>
+                <h2>Vos clients écrivent comme ils veulent.</h2>
+                <p>Sur WhatsApp, ou par un formulaire s'ils ne l'ont pas. À vos couleurs.</p>
+                <div class="slide__shot slide__shot--page"><img src="/marketing/contact.png" alt=""></div>
+            </section>
+        {% elseif number == 3 %}
+            <section class="slide slide--light">
+                <div class="slide__brand"><img src="/logo.svg" alt="">Relation clients</div>
+                <span class="slide__step">3 / 7</span>
+                <h2>Tout arrive sur un seul dashboard.</h2>
+                <p>Vous ne passez plus à côté d'une demande. Le compteur vous dit ce qu'il reste à traiter.</p>
+                <div class="slide__shot"><img src="/marketing/inbox.jpg" alt=""></div>
+            </section>
+        {% elseif number == 4 %}
+            <section class="slide slide--light">
+                <div class="slide__brand"><img src="/logo.svg" alt="">Relation clients</div>
+                <span class="slide__step">4 / 7</span>
+                <h2>Les messages vocaux se lisent.</h2>
+                <p>Ils arrivent transcrits, et le client voit ce que vous avez compris.</p>
+                <div class="slide__shot"><img src="/marketing/vocal.jpg" alt=""></div>
+            </section>
+        {% elseif number == 5 %}
+            <section class="slide slide--light">
+                <div class="slide__brand"><img src="/logo.svg" alt="">Relation clients</div>
+                <span class="slide__step">5 / 7</span>
+                <h2>Le soir, vous traitez tout au même endroit.</h2>
+                <p>Votre réponse repart par WhatsApp ou par courriel, selon le client.</p>
+                <div class="slide__shot"><img src="/marketing/conversation.jpg" alt=""></div>
+            </section>
+        {% elseif number == 6 %}
+            <section class="slide slide--light">
+                <div class="slide__brand"><img src="/logo.svg" alt="">Relation clients</div>
+                <span class="slide__step">6 / 7</span>
+                <h2>Pas de WhatsApp ? Un lien privé.</h2>
+                <p>Le client suit l'échange sans créer de compte.</p>
+                <div class="slide__phone"><img src="/marketing/suivi.png" alt=""></div>
+            </section>
+        {% else %}
+            <section class="slide">
+                <div class="slide__brand"><img src="/logo.svg" alt="">Relation clients</div>
+                <div class="slide__cover">
+                    <h1>Vos clients ne restent plus sans réponse.</h1>
+                    <p class="slide__for">Idéal pour les artisans, les auto-entrepreneurs et les PME.</p>
+                    <p>Une question ? Écrivez-moi en message privé.</p>
+                </div>
+                <p class="slide__who">Alexis Lepoutre, IT-Room. Hébergé en France.</p>
+            </section>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

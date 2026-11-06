@@ -22,7 +22,8 @@ class ContactController extends AbstractController
         OrganizationRepository $organizations,
         #[Autowire('%env(WHATSAPP_PUBLIC_NUMBER)%')] string $publicNumber,
     ): Response {
-        return $this->render('public/home.html.twig', [
+        return $this->render('public/landing/v1.html.twig', [
+            'version' => null,
             // La présentation s'adresse à IT-Room, qui édite l'outil.
             'editor' => $organizations->findBySlug('itroom'),
             'whatsappNumber' => PhoneNormalizer::normalize($publicNumber),

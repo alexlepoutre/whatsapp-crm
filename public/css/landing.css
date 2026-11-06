@@ -1,6 +1,12 @@
 /* Propositions de page d'accueil. Chaque version reste isolée sous sa classe. */
 
-.l-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; width: min(100%, 74rem); margin-inline: auto; padding: 1.25rem 1rem; }
+.l-top { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .9rem max(1rem, calc((100% - 72rem) / 2)); box-shadow: 0 1px 0 rgb(20 34 47 / .1); }
+.lv1 .l-top { background: var(--mint); }
+.lv2 .l-top { background: #fff; }
+.l-float { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 30; display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 50%; background: var(--wa-green); color: #fff; box-shadow: 0 10px 26px -6px rgb(11 60 40 / .6); }
+.l-float .wa-logo { width: 2.5rem; height: 2.5rem; }
+.l-float:hover { filter: brightness(.95); }
+.l-float:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .l-brand { display: inline-flex; align-items: center; gap: .6rem; color: inherit; font-weight: 700; font-size: 1.2rem; text-decoration: none; }
 .l-brand img, .home__brand img { flex: none; }
 .l-login { color: inherit; font-weight: 600; }
@@ -113,7 +119,7 @@
 
 /* V3 : commerciale. Une promesse nette, le produit à l'écran, les objections traitées. */
 .lv3 { background: #fff; }
-.lv3 .l-top { width: 100%; max-width: none; padding-inline: max(1rem, calc((100% - 72rem) / 2)); background: var(--panel); color: #fff; }
+.lv3 .l-top { background: var(--panel); color: #fff; }
 .v3-hero { padding: clamp(2.5rem, 6vw, 4.5rem) 1rem 0; background: linear-gradient(var(--panel) 72%, #fff 72%); color: #fff; text-align: center; }
 .v3-hero h1 { max-width: 56rem; margin-inline: auto; font-size: clamp(2.5rem, 6.2vw, 4.75rem); line-height: 1.03; letter-spacing: -.03em; }
 .v3-hero > p { max-width: 42rem; margin: 1.25rem auto 1.75rem; color: #c3d0dc; font-size: 1.25rem; line-height: 1.45; }

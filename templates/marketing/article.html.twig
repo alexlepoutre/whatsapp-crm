@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Article pour itroom.fr{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}legal{% endblock %}
+
+{% block theme %}
+<style>
+    .a-meta { max-width: 44rem; margin: 1.5rem auto 0; padding: 1rem; border-radius: 10px; background: #fdf1da; }
+    .a-meta dt { font-weight: 700; }
+    .a-meta dd { margin: 0 0 .5rem; }
+    .a-text { max-width: 44rem; margin-inline: auto; padding: 1.5rem 1rem 4rem; font-size: 1.1rem; line-height: 1.65; }
+    .a-text h1 { font-size: clamp(2.1rem, 5vw, 3rem); line-height: 1.08; letter-spacing: -.025em; }
+    .a-text h2 { margin-top: 2.25rem; font-size: 1.6rem; line-height: 1.2; }
+    .a-text p, .a-text ul { margin-block: 1rem; }
+    .a-text figure { margin: 1.5rem 0; }
+    .a-text img { display: block; width: 100%; border-radius: 10px; box-shadow: 0 0 0 1px var(--line); }
+    .a-text img.is-phone { max-width: 20rem; margin-inline: auto; }
+    .a-text figcaption { margin-top: .5rem; color: var(--muted); font-size: .95rem; }
+</style>
+{% endblock %}
+
+{% block page %}
+    <dl class="a-meta">
+        <dt>Titre SEO</dt><dd>Remplacer son répondeur : WhatsApp et formulaire pour artisans et PME</dd>
+        <dt>Description</dt><dd>Sur le terrain toute la journée ? Relation clients centralise les demandes reçues sur WhatsApp et par formulaire pour les traiter le soir, sans en perdre une.</dd>
+        <dt>Adresse suggérée</dt><dd>/blog/remplacer-repondeur-artisans-pme</dd>
+        <dd><button type="button" class="btn" id="copy">Copier le HTML de l'article</button> <span class="muted">Cette page n'existe qu'en local. Les images sont à envoyer sur votre blog, et leurs adresses à remplacer.</span></dd>
+    </dl>
+
+    <article class="a-text" id="article">
+        <h1>Artisans, PME : remplacez le répondeur que vous n'avez pas le temps d'écouter</h1>
+
+        <p>Quand on travaille sur le terrain, le téléphone sonne toujours au mauvais moment. Sur un chantier, en rendez-vous, au volant : impossible de décrocher. Le client tombe sur le répondeur, laisse parfois un message, et attend.</p>
+
+        <p>Le soir, il faut écouter chaque message, noter un numéro, retrouver de qui il s'agit, puis rappeler à une heure où plus personne ne répond. Certaines demandes passent à la trappe. Et un client sans réponse ne reste pas longtemps : il appelle quelqu'un d'autre.</p>
+
+        <p>C'est ce constat qui m'a amené à créer <strong>Relation clients</strong>, un outil pensé pour les artisans, les auto-entrepreneurs et les PME qui passent leurs journées chez leurs clients.</p>
+
+        <h2>Laissez vos clients écrire, au lieu de les faire attendre</h2>
+
+        <p>Vos clients utilisent déjà WhatsApp tous les jours. Avec Relation clients, vous disposez d'une page de contact à vos couleurs, avec votre logo. Un bouton ouvre directement WhatsApp. Ceux qui n'ont pas l'application remplissent un formulaire classique.</p>
+
+        <figure>
+            <img src="/marketing/contact.png" alt="Page de contact d'une entreprise avec un bouton WhatsApp et un formulaire">
+            <figcaption>La page de contact, aux couleurs de l'entreprise. Ici, une entreprise fictive.</figcaption>
+        </figure>
+
+        <p>Dès le premier message, une réponse automatique, que vous rédigez vous-même, confirme au client que sa demande est bien arrivée. Il n'a plus l'impression de parler dans le vide.</p>
+
+        <h2>Un dashboard pour ne plus passer à côté d'une demande</h2>
+
+        <p>Toutes les demandes arrivent au même endroit, quel que soit le canal. Le compteur indique ce qu'il reste à traiter, et une demande y reste tant que personne n'y a répondu. Vous recevez aussi un courriel à chaque nouveau message.</p>
+
+        <figure>
+            <img src="/marketing/inbox.jpg" alt="Tableau de bord listant les demandes à traiter, avec un compteur">
+            <figcaption>Le dashboard : WhatsApp et formulaires réunis, avec le nombre de demandes à traiter.</figcaption>
+        </figure>
+
+        <p>Chaque client a sa fiche, avec l'historique des échanges et vos notes. Quand il vous recontacte, vous savez tout de suite de qui il s'agit.</p>
+
+        <h2>Les vocaux se lisent, ils ne s'écoutent plus</h2>
+
+        <p>Beaucoup de clients préfèrent parler plutôt qu'écrire. Leurs messages vocaux sont transcrits automatiquement : vous lisez en quelques secondes ce qu'il aurait fallu écouter. Le client reçoit le texte compris, et peut corriger si besoin.</p>
+
+        <figure>
+            <img src="/marketing/vocal.jpg" alt="Conversation avec un message vocal transcrit en texte">
+            <figcaption>Un message vocal, transcrit et renvoyé au client.</figcaption>
+        </figure>
+
+        <h2>Le soir, vous traitez tout au même endroit</h2>
+
+        <p>Quand vous êtes disponible, depuis votre ordinateur ou votre téléphone, vous ouvrez votre dashboard et vous répondez. Votre réponse repart toute seule par le bon canal : sur WhatsApp, ou par courriel. Vous êtes plusieurs ? Chacun a son compte, et toute l'équipe est prévenue.</p>
+
+        <figure>
+            <img src="/marketing/conversation.jpg" alt="Conversation WhatsApp avec zone de réponse">
+            <figcaption>La conversation complète, avec la réponse automatique et votre réponse.</figcaption>
+        </figure>
+
+        <p>Quand la demande vous semble traitée, le bouton « Dernière réponse » propose au client de la clôturer ou de continuer l'échange.</p>
+
+        <h2>Et pour ceux qui n'ont pas WhatsApp ?</h2>
+
+        <p>Après avoir rempli le formulaire, le client reçoit un lien privé. Il y retrouve toute la conversation et peut répondre, sans compte ni mot de passe.</p>
+
+        <figure>
+            <img class="is-phone" src="/marketing/suivi.png" alt="Page de suivi d'une demande sur un téléphone">
+            <figcaption>Le suivi d'une demande sur téléphone.</figcaption>
+        </figure>
+
+        <h2>Vos données restent sous contrôle</h2>
+
+        <p>Relation clients est conçu et édité par IT-Room, à Hem, et hébergé en France, chez OVH à Roubaix. Chaque entreprise n'accède qu'à ses propres échanges, et WhatsApp passe par l'API officielle de Meta.</p>
+
+        <h2>Envie d'essayer ?</h2>
+
+        <p>Si vous passez vos journées sur le terrain et que votre répondeur déborde, parlons-en. <a href="https://www.itroom.fr">Contactez IT-Room</a> : je vous montre l'outil avec vos propres cas.</p>
+
+        <p><em>Alexis Lepoutre, IT-Room</em></p>
+    </article>
+
+    <script>
+        document.getElementById('copy').addEventListener('click', async (event) => {
+            await navigator.clipboard.writeText(document.getElementById('article').innerHTML.trim());
+            event.target.textContent = 'HTML copié';
+        });
+    </script>
+{% endblock %}

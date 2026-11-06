@@ -85,17 +85,36 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorTextContains('.lead', 'envoyez-le d\'abord tel quel');
     }
 
-    public function testHomePresentsTheToolWithFaviconAndAccess(): void
+    public function testHomeIsTheHumanVersionWithWhatsAppAlwaysAtHand(): void
     {
         $this->client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.home__brand', 'Relation clients');
+        self::assertSelectorTextContains('h1', 'quelqu\'un qui répond');
+        self::assertSelectorTextContains('.l-brand', 'Relation clients');
         self::assertSelectorExists('a[href="/itroom"]');
-        self::assertSelectorExists('a.btn--whatsapp[href^="https://wa.me/33600000000?text="] svg.wa-logo');
         self::assertSelectorExists('a[href="/connexion"]');
         self::assertSelectorExists('link[rel="icon"][href^="/favicon.svg"]');
         self::assertSelectorExists('img[src="/logo.svg"]');
+        self::assertSelectorExists('a.l-float[href^="https://wa.me/33600000000?text="] svg.wa-logo');
+        self::assertSelectorNotExists('meta[name="robots"]');
+        self::assertSelectorNotExists('.l-switch');
+    }
+
+    public function testFormerV1RedirectsToHome(): void
+    {
+        $this->client->request('GET', '/v1');
+
+        self::assertResponseRedirects('/', 301);
+    }
+
+    public function testMarketingPagesDoNotExistOutsideDevelopment(): void
+    {
+        foreach (['/linkedin', '/article', '/marketing/inbox.jpg'] as $url) {
+            $this->client->request('GET', $url);
+
+            self::assertResponseStatusCodeSame(404);
+        }
     }
 
     #[\PHPUnit\Framework\Attributes\TestWith(['/mentions-legales', '430 032 854'])]
@@ -144,7 +163,6 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorTextContains('.flash--error', 'E-mail ou mot de passe incorrect');
     }
 
-    #[\PHPUnit\Framework\Attributes\TestWith(['v1', 'quelqu\'un qui répond'])]
     #[\PHPUnit\Framework\Attributes\TestWith(['v2', 'un seul flux'])]
     #[\PHPUnit\Framework\Attributes\TestWith(['v3', 'Chaque demande perdue'])]
     public function testLandingProposalsAreAvailableAndNotIndexed(string $version, string $headline): void
@@ -159,7 +177,6 @@ class ContactFormTest extends AppTestCase
     }
 
     #[\PHPUnit\Framework\Attributes\TestWith(['/'])]
-    #[\PHPUnit\Framework\Attributes\TestWith(['/v1'])]
     #[\PHPUnit\Framework\Attributes\TestWith(['/v2'])]
     #[\PHPUnit\Framework\Attributes\TestWith(['/v3'])]
     public function testEveryVersionAddressesPeopleOnTheField(string $url): void
@@ -183,7 +200,7 @@ class ContactFormTest extends AppTestCase
         self::assertStringContainsString('data-ghost="888">'.$status, $html);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestWith(['/v1'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/'])]
     #[\PHPUnit\Framework\Attributes\TestWith(['/v2'])]
     public function testFlowIsShownFromClientToAdvisor(string $url): void
     {
