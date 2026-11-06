@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}admin{% endblock %}
+
+{% block page %}
+    {% set open = open_conversations() %}
+    <aside class="rail">
+        <a class="display" href="{{ path('admin_inbox') }}" aria-label="{{ open }} conversation(s) à traiter">
+            <span class="display__digits" data-ghost="88" aria-hidden="true">{{ open > 99 ? '99' : '%02d'|format(open) }}</span>
+            <span class="display__label">à traiter</span>
+        </a>
+        <nav class="rail__nav">
+            <a href="{{ path('admin_inbox') }}" {% if app.current_route == 'admin_inbox' %}aria-current="page"{% endif %}>Messages</a>
+            <a href="{{ path('admin_clients') }}" {% if app.current_route == 'admin_clients' %}aria-current="page"{% endif %}>Clients</a>
+            <a href="{{ path('admin_settings') }}" {% if app.current_route == 'admin_settings' %}aria-current="page"{% endif %}>Réglages</a>
+        </nav>
+        <a class="rail__logout" href="{{ path('logout') }}">Se déconnecter</a>
+    </aside>
+    <main class="main">
+        {{ include('_flashes.html.twig') }}
+        {% block body %}{% endblock %}
+    </main>
+{% endblock %}

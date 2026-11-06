@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}public{% endblock %}
+
+{% block page %}
+    <main class="public__main public__main--narrow">
+        <h1>Connexion</h1>
+
+        {% if error %}
+            <p class="flash flash--error" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+        {% endif %}
+
+        <form method="post">
+            <div>
+                <label for="email">E-mail</label>
+                <input id="email" type="email" name="_username" value="{{ lastEmail }}" autocomplete="email" required autofocus>
+            </div>
+            <div>
+                <label for="password">Mot de passe</label>
+                <input id="password" type="password" name="_password" autocomplete="current-password" required>
+            </div>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <button type="submit" class="btn">Se connecter</button>
+        </form>
+    </main>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Réglages{% endblock %}
+
+{% block body %}
+    <h1>Réglages</h1>
+
+    <p class="notice">
+        {% if whatsappConfigured %}
+            WhatsApp est connecté : les réponses partent réellement.
+        {% else %}
+            WhatsApp n'est pas encore connecté : les réponses sont enregistrées sans partir.
+        {% endif %}
+    </p>
+
+    <div class="narrow">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn">Enregistrer les réglages</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

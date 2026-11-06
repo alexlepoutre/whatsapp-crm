@@ -1,0 +1,22 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Messages{% endblock %}
+
+{% block body %}
+    <h1>Messages</h1>
+
+    <nav class="filters" aria-label="Filtrer les conversations">
+        {% for status in statuses %}
+            <a href="{{ path('admin_inbox', {filtre: status.value}) }}" {% if filter == status.value %}aria-current="true"{% endif %}>{{ status.label }}</a>
+        {% endfor %}
+        <a href="{{ path('admin_inbox', {filtre: 'toutes'}) }}" {% if filter == 'toutes' %}aria-current="true"{% endif %}>Toutes</a>
+    </nav>
+
+    <div class="rows">
+        {% for conversation in conversations %}
+            {{ include('admin/_conversation_row.html.twig') }}
+        {% else %}
+            <p class="empty">Aucune conversation ici. Les nouveaux messages WhatsApp et formulaires arrivent dans « À traiter ».</p>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Clients{% endblock %}
+
+{% block body %}
+    <h1>Clients</h1>
+
+    <form method="get" class="search" role="search">
+        <label for="q">Rechercher un client</label>
+        <input id="q" type="search" name="q" value="{{ term }}" placeholder="Nom, e-mail, téléphone ou note">
+        <button type="submit" class="btn btn--quiet">Rechercher</button>
+    </form>
+
+    <div class="rows">
+        {% for client in clients %}
+            <a class="row" href="{{ path('admin_client', {id: client.id}) }}">
+                <span class="row__who">{{ client.displayName }}</span>
+                <span class="row__when">{{ client.conversations|length }} conversation{{ client.conversations|length > 1 ? 's' }}</span>
+                <span class="row__what">{{ [client.phone ? '+' ~ client.phone, client.email]|filter(v => v)|join(', ') }}</span>
+            </a>
+        {% else %}
+            <p class="empty">{{ term ? 'Aucun client ne correspond à cette recherche.' : 'Les clients apparaissent ici dès leur premier message.' }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

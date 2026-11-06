@@ -1,0 +1,12 @@
+<a class="row row--{{ conversation.channel.value }}" href="{{ path('admin_conversation', {id: conversation.id}) }}">
+    <span class="row__who">{{ conversation.client.displayName }}</span>
+    <span class="row__when">{{ conversation.lastMessageAt ? conversation.lastMessageAt|date('d/m à H\\hi') }}</span>
+    <span class="row__what">
+        {% if conversation.subject %}<strong>{{ conversation.subject }}</strong><br>{% endif %}
+        {{ conversation.lastClientMessage ? conversation.lastClientMessage.body|slice(0, 120) }}
+    </span>
+    <span class="row__tags">
+        <span class="tag tag--{{ conversation.channel.value }}">{{ conversation.channel.label }}</span>
+        <span class="tag">{{ conversation.status.label }}</span>
+    </span>
+</a>

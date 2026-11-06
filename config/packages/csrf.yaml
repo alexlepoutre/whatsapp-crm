@@ -1,0 +1,8 @@
+# Jetons en session plutôt que « stateless » : ces derniers reposent sur du JavaScript
+# ou sur l'en-tête Origin, alors que ces formulaires doivent marcher sans script.
+framework:
+    form:
+        csrf_protection:
+            token_id: submit
+
+    csrf_protection: true

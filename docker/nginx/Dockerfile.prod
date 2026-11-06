@@ -1,0 +1,9 @@
+FROM nginx:1.27-alpine
+
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# nginx est aussi sur le réseau Traefik, partagé avec d'autres projets : le nom « php »
+# pourrait y désigner le conteneur d'un autre site. D'où cet alias propre à l'application.
+RUN sed -i 's/fastcgi_pass php:9000/fastcgi_pass whatsapp-crm-php:9000/' /etc/nginx/conf.d/default.conf
+
+COPY public /var/www/app/public

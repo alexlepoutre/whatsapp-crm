@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Me contacter{% endblock %}
+{% block body_class %}public{% endblock %}
+
+{% block page %}
+    <main class="public__main">
+        <h1 class="public__title">Laissez-moi un message, je vous réponds.</h1>
+        {{ include('_flashes.html.twig') }}
+
+        {% if whatsappNumber %}
+            <p class="lead">Le plus rapide est de m'écrire sur WhatsApp.</p>
+            <a class="btn btn--whatsapp" href="https://wa.me/{{ whatsappNumber }}">Écrire sur WhatsApp</a>
+            <h2>Vous n'avez pas WhatsApp ?</h2>
+        {% endif %}
+
+        <p class="lead">Remplissez ce formulaire. Vous recevrez un lien privé pour suivre notre échange, sans créer de compte.</p>
+
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <p class="muted">Vos coordonnées servent uniquement à répondre à votre demande.</p>
+            <button type="submit" class="btn">Envoyer ma demande</button>
+        {{ form_end(form) }}
+    </main>
+{% endblock %}

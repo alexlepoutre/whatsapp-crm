@@ -1,0 +1,29 @@
+# Image de production : le code et les dépendances sont embarqués, rien n'est monté.
+FROM php:8.4-fpm-alpine
+
+RUN apk add --no-cache icu-libs libzip \
+    && apk add --no-cache --virtual .build-deps icu-dev libzip-dev oniguruma-dev \
+    && docker-php-ext-install -j$(nproc) pdo_mysql intl zip opcache \
+    && apk del --no-network .build-deps
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+COPY docker/php/php-prod.ini "$PHP_INI_DIR/conf.d/zz-app.ini"
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/app
+COPY . .
+
+ENV APP_ENV=prod APP_DEBUG=0
+
+# ARG et non ENV : ce secret de construction ne doit pas subsister dans l'image.
+ARG APP_SECRET=build-time-placeholder
+
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress \
+    && rm /usr/bin/composer \
+    && chown -R www-data:www-data var
+
+# Aussi pour les commandes console : un cache écrit en root bloquerait php-fpm.
+USER www-data
+
+EXPOSE 9000
+CMD ["php-fpm"]

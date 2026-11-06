@@ -1,0 +1,65 @@
+name: whatsapp-crm
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.prod
+    env_file: .env.prod
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 256m
+    networks:
+      internal:
+        aliases:
+          - whatsapp-crm-php
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile.prod
+    depends_on:
+      - php
+    restart: unless-stopped
+    mem_limit: 64m
+    networks:
+      - internal
+      - traefik-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-network
+      - traefik.http.routers.whatsapp-crm.rule=Host(`crm.v1.re7itroom.fr`)
+      - traefik.http.routers.whatsapp-crm.entrypoints=websecure
+      - traefik.http.routers.whatsapp-crm.tls.certresolver=letsencrypt
+      - traefik.http.services.whatsapp-crm.loadbalancer.server.port=80
+
+  database:
+    image: mariadb:11.4
+    # Réglages serrés : le serveur héberge de nombreux projets et la mémoire y est comptée.
+    command: --innodb-buffer-pool-size=64M --performance-schema=OFF --max-connections=30
+    environment:
+      MARIADB_DATABASE: whatsapp_crm
+      MARIADB_USER: app
+      MARIADB_PASSWORD: ${DB_PASSWORD:?}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?}
+    volumes:
+      - database_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    mem_limit: 256m
+    networks:
+      - internal
+
+volumes:
+  database_data:
+
+networks:
+  internal:
+  traefik-network:
+    external: true

@@ -1,0 +1,52 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ conversation.client.displayName }}{% endblock %}
+
+{% block body %}
+    <header class="head">
+        <div>
+            <h1><a href="{{ path('admin_client', {id: conversation.client.id}) }}">{{ conversation.client.displayName }}</a></h1>
+            <p class="muted">{{ conversation.title }}</p>
+        </div>
+        <div class="row__tags">
+            <span class="tag tag--{{ conversation.channel.value }}">{{ conversation.channel.label }}</span>
+            <span class="tag">{{ conversation.status.label }}</span>
+        </div>
+    </header>
+
+    <div class="thread">
+        {% for message in conversation.messages %}
+            <article class="bubble {{ message.isFromClient ? 'bubble--in' : (message.isFromBot ? 'bubble--bot' : 'bubble--out') }}">
+                <p class="bubble__meta">
+                    {{ message.isFromClient ? conversation.client.displayName : (message.isFromBot ? 'Réponse automatique' : 'Vous') }},
+                    le {{ message.createdAt|date('d/m/Y à H\\hi') }}
+                </p>
+                <p>{{ message.body|nl2br }}</p>
+                {% if message.deliveryStatus %}
+                    <p class="bubble__status{{ message.deliveryStatus.value == 'failed' ? ' bubble__status--failed' }}">
+                        {{ message.deliveryStatus.label }}{% if message.failureReason %} : {{ message.failureReason }}{% endif %}
+                    </p>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
+
+    {% if conversation.isWhatsApp and not conversation.isWhatsAppWindowOpen %}
+        <p class="notice">Le dernier message de ce client date de plus de 24 heures : WhatsApp n'autorise plus de réponse libre. Il faut attendre qu'il réécrive.</p>
+    {% else %}
+        {% if conversation.isWhatsApp and not whatsappConfigured %}
+            <p class="notice">WhatsApp n'est pas encore connecté : votre réponse sera enregistrée sans partir.</p>
+        {% endif %}
+        {{ form_start(form, {attr: {class: 'composer'}}) }}
+            {{ form_row(form.body) }}
+            <button type="submit" class="btn">Envoyer la réponse</button>
+        {{ form_end(form) }}
+    {% endif %}
+
+    {% if not conversation.isClosed %}
+        <form method="post" action="{{ path('admin_conversation_close', {id: conversation.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('close-conversation') }}">
+            <button type="submit" class="btn btn--quiet">Clôturer la conversation</button>
+        </form>
+    {% endif %}
+{% endblock %}

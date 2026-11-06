@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Suivi de votre demande{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}public{% endblock %}
+
+{% block page %}
+    <main class="public__main">
+        <h1>{{ conversation.title }}</h1>
+        <p class="muted">Demande envoyée le {{ conversation.createdAt|date('d/m/Y') }}. Ce lien est privé : ne le partagez pas.</p>
+        {{ include('_flashes.html.twig') }}
+
+        <div class="thread">
+            {% for message in conversation.messages %}
+                <article class="bubble {{ message.isFromClient ? 'bubble--out' : 'bubble--in' }}">
+                    <p class="bubble__meta">{{ message.isFromClient ? 'Vous' : 'Réponse' }}, le {{ message.createdAt|date('d/m/Y à H\\hi') }}</p>
+                    <p>{{ message.body|nl2br }}</p>
+                </article>
+            {% endfor %}
+        </div>
+
+        {{ form_start(form, {attr: {class: 'composer'}}) }}
+            {{ form_row(form.body) }}
+            <button type="submit" class="btn">Envoyer mon message</button>
+        {{ form_end(form) }}
+    </main>
+{% endblock %}

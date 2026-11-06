@@ -1,0 +1,35 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ client.displayName }}{% endblock %}
+
+{% block body %}
+    <h1>{{ client.displayName }}</h1>
+    <p class="muted">Client depuis le {{ client.createdAt|date('d/m/Y') }}</p>
+
+    <div class="split">
+        <section>
+            <h2>Conversations</h2>
+            <div class="rows">
+                {% for conversation in client.conversations %}
+                    {{ include('admin/_conversation_row.html.twig') }}
+                {% else %}
+                    <p class="empty">Aucune conversation avec ce client.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <h2>Fiche</h2>
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn">Enregistrer la fiche</button>
+            {{ form_end(form) }}
+
+            <form method="post" action="{{ path('admin_client_delete', {id: client.id}) }}" class="danger-zone">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete-client') }}">
+                <p class="muted">Supprime aussi ses conversations. Cette action est définitive.</p>
+                <button type="submit" class="btn btn--danger">Supprimer ce client</button>
+            </form>
+        </section>
+    </div>
+{% endblock %}
