@@ -19,7 +19,7 @@ class ContactController extends AbstractController
     #[Route('/', name: 'home')]
     public function home(): Response
     {
-        return $this->redirectToRoute('admin_inbox');
+        return $this->render('public/home.html.twig');
     }
 
     /** Priorité négative : une adresse de l'application l'emporte toujours sur une organisation. */

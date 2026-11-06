@@ -1,4 +1,4 @@
-# Répondeur — CRM WhatsApp et formulaire
+# Posez votre question — CRM WhatsApp et formulaire
 
 Remplace un répondeur téléphonique, pour plusieurs organisations (itroom, dufermont…). Chacune
 a sa page publique `/<slug>` : WhatsApp ou formulaire avec lien privé. Son équipe traite tout
@@ -16,6 +16,7 @@ make test      # la base whatsapp_crm_test se crée avec :
                # docker compose exec -e APP_ENV=test php bin/console doctrine:database:create
 ```
 
+- Présentation de l'outil : http://localhost:8140/
 - Page publique d'une organisation : http://localhost:8140/itroom
 - Back-office : http://localhost:8140/admin
 - Courriels (Mailpit) : http://localhost:8026

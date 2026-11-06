@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Posez votre question : le répondeur que vous avez le temps de lire{% endblock %}
+{% block description %}<meta name="description" content="Vos clients vous écrivent sur WhatsApp ou par formulaire. Toutes leurs demandes arrivent au même endroit, classées par client.">{% endblock %}
+{% block body_class %}home{% endblock %}
+
+{% block page %}
+    <header class="home__top">
+        <p class="home__brand">Posez votre question</p>
+        {% if app.user %}
+            <a class="btn btn--quiet" href="{{ path('admin_inbox') }}">Ouvrir mes messages</a>
+        {% else %}
+            <a class="btn btn--quiet" href="{{ path('login') }}">Se connecter</a>
+        {% endif %}
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero__text">
+                <h1>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</h1>
+                <p class="hero__lead">Vos clients vous écrivent sur WhatsApp ou par formulaire. Vous lisez leurs demandes au même endroit, et vous répondez quand vous êtes disponible.</p>
+                <a class="btn btn--large" href="{{ path('contact', {slug: 'itroom'}) }}">Nous poser une question</a>
+            </div>
+
+            {# Illustration : ces messages sont fictifs. #}
+            <div class="device" aria-hidden="true">
+                <div class="device__display">
+                    <span class="display__digits" data-ghost="88">03</span>
+                    <span class="display__label">à traiter</span>
+                </div>
+                <ul class="device__list">
+                    <li><strong>Camille</strong><span class="tag tag--whatsapp">WhatsApp</span><p>Où en est ma commande ?</p></li>
+                    <li><strong>Dominique</strong><span class="tag tag--form">Formulaire</span><p>Pouvez-vous m'envoyer un devis ?</p></li>
+                    <li><strong>Sacha</strong><span class="tag tag--whatsapp">WhatsApp</span><p>Message vocal, transcrit : êtes-vous ouverts samedi ?</p></li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="steps">
+            <h2>Comment ça se passe</h2>
+            <ol>
+                <li>
+                    <h3>Votre client vous écrit</h3>
+                    <p>Depuis votre page de contact, il choisit WhatsApp ou le formulaire. Il n'a aucun compte à créer.</p>
+                </li>
+                <li>
+                    <h3>Tout arrive au même endroit</h3>
+                    <p>Un courriel vous prévient. Les demandes attendent dans votre boîte, classées par client, et le compteur vous dit combien il en reste.</p>
+                </li>
+                <li>
+                    <h3>Vous répondez quand vous pouvez</h3>
+                    <p>Votre réponse part par WhatsApp ou par courriel, selon le canal choisi par le client. Lui reçoit tout de suite un message automatique.</p>
+                </li>
+            </ol>
+        </section>
+
+        <section class="sides">
+            <div>
+                <h2>Pour vos clients</h2>
+                <ul>
+                    <li>Un bouton qui ouvre WhatsApp, avec le premier message déjà prêt</li>
+                    <li>Un formulaire pour ceux qui n'ont pas WhatsApp</li>
+                    <li>Un lien privé pour suivre l'échange et répondre, sans mot de passe</li>
+                    <li>Des messages vocaux acceptés : le texte compris leur est renvoyé</li>
+                </ul>
+            </div>
+            <div>
+                <h2>Pour votre équipe</h2>
+                <ul>
+                    <li>Une fiche par client, avec tous ses échanges et vos notes</li>
+                    <li>Des comptes pour chaque personne qui répond</li>
+                    <li>Les vocaux à lire plutôt qu'à écouter, grâce à la transcription</li>
+                    <li>Votre logo, vos couleurs et votre adresse d'envoi</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="closing">
+            <h2>Une question sur l'outil ?</h2>
+            <p>Posez-la. C'est exactement à ça qu'il sert.</p>
+            <a class="btn btn--large" href="{{ path('contact', {slug: 'itroom'}) }}">Nous poser une question</a>
+        </section>
+    </main>
+{% endblock %}

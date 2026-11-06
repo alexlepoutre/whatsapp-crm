@@ -82,6 +82,17 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorTextContains('.lead', 'envoyez-le d\'abord tel quel');
     }
 
+    public function testHomePresentsTheToolWithFaviconAndAccess(): void
+    {
+        $this->client->request('GET', '/');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.home__brand', 'Posez votre question');
+        self::assertSelectorExists('a[href="/itroom"]');
+        self::assertSelectorExists('a[href="/connexion"]');
+        self::assertSelectorExists('link[rel="icon"][href="/favicon.svg"]');
+    }
+
     public function testUnknownOrganizationPageIsNotFound(): void
     {
         $this->client->request('GET', '/inconnue');

@@ -13,7 +13,7 @@ services:
       MAILER_DSN: "smtp://mailer:1025"
       DEFAULT_URI: "http://localhost:8140"
       WHATSAPP_PUBLIC_NUMBER: "33600000000"
-      MAIL_FROM: "Répondeur <noreply@localhost.test>"
+      MAIL_FROM: "Posez votre question <noreply@localhost.test>"
 
   nginx:
     image: nginx:1.27-alpine
