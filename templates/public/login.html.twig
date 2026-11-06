@@ -1,29 +1,51 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion{% endblock %}
+{% block title %}Connexion : Posez votre question{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
-{% block body_class %}public{% endblock %}
+{% block body_class %}home{% endblock %}
 
 {% block page %}
-    <main class="public__main public__main--narrow">
-        <h1>Connexion</h1>
+    <div class="stage stage--signin">
+        <header class="home__top">
+            <a class="home__brand" href="{{ path('home') }}">
+                <img src="{{ asset('favicon.svg') }}" alt="" width="32" height="32">
+                Posez votre question
+            </a>
+            <a class="btn btn--on-dark" href="{{ path('home') }}">Accueil</a>
+        </header>
 
-        {% if error %}
-            <p class="flash flash--error" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
-        {% endif %}
+        <main class="signin">
+            <div class="signin__intro">
+                <p class="signin__claim">Vos messages vous attendent.</p>
+                <p class="hero__lead">Retrouvez les demandes de vos clients, sur WhatsApp et par formulaire, au même endroit.</p>
+            </div>
 
-        <form method="post">
-            <div>
-                <label for="email">E-mail</label>
-                <input id="email" type="email" name="_username" value="{{ lastEmail }}" autocomplete="email" required autofocus>
+            <div class="signin__card">
+                <h1>Connexion</h1>
+
+                {% if error %}
+                    <p class="flash flash--error" role="alert">
+                        {{ 'Too many' in error.messageKey
+                            ? 'Trop de tentatives. Réessayez dans quelques minutes.'
+                            : 'E-mail ou mot de passe incorrect.' }}
+                    </p>
+                {% endif %}
+
+                <form method="post">
+                    <div>
+                        <label for="email">E-mail</label>
+                        <input id="email" type="email" name="_username" value="{{ lastEmail }}" autocomplete="email" required autofocus>
+                    </div>
+                    <div>
+                        <label for="password">Mot de passe</label>
+                        <input id="password" type="password" name="_password" autocomplete="current-password" required>
+                    </div>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    <button type="submit" class="btn signin__submit">Se connecter</button>
+                </form>
             </div>
-            <div>
-                <label for="password">Mot de passe</label>
-                <input id="password" type="password" name="_password" autocomplete="current-password" required>
-            </div>
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            <button type="submit" class="btn">Se connecter</button>
-        </form>
-    </main>
+        </main>
+    </div>
+
     {{ include('_footer.html.twig') }}
 {% endblock %}

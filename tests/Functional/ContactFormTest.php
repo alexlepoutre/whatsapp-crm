@@ -128,6 +128,18 @@ class ContactFormTest extends AppTestCase
         new Organization('cgv', 'Pirate');
     }
 
+    public function testLoginBelongsToTheSiteAndExplainsErrorsInFrench(): void
+    {
+        $this->client->request('GET', '/connexion');
+        self::assertSelectorTextContains('.home__brand', 'Posez votre question');
+        self::assertSelectorExists('a[href="/"]');
+
+        $this->client->submitForm('Se connecter', ['_username' => 'inconnu@example.test', '_password' => 'mauvais']);
+        $this->client->followRedirect();
+
+        self::assertSelectorTextContains('.flash--error', 'E-mail ou mot de passe incorrect');
+    }
+
     public function testUnknownOrganizationPageIsNotFound(): void
     {
         $this->client->request('GET', '/inconnue');

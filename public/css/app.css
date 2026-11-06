@@ -275,7 +275,7 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .stage { position: relative; background: var(--panel); color: #fff; }
 .home__top, .hero, .compare, .steps, .sides, .closing { width: min(100%, 74rem); margin-inline: auto; padding-inline: 1rem; }
 .home__top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 1.25rem; }
-.home__brand { display: inline-flex; align-items: center; gap: .6rem; color: inherit; font-weight: 700; font-size: 1.1rem; letter-spacing: -.01em; text-decoration: none; }
+.home__brand { white-space: nowrap; display: inline-flex; align-items: center; gap: .6rem; color: inherit; font-weight: 700; font-size: 1.1rem; letter-spacing: -.01em; text-decoration: none; }
 .hero { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; padding-block: clamp(2.5rem, 7vw, 5.5rem) clamp(3rem, 7vw, 6rem); }
 .hero h1 { font-size: clamp(2.6rem, 6.4vw, 4.75rem); line-height: 1.02; letter-spacing: -.03em; }
 .hero__lead { max-width: 33rem; margin-block: 1.5rem 2rem; color: #c3d0dc; font-size: 1.25rem; line-height: 1.45; }
@@ -322,6 +322,16 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .site-footer nav { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; }
 .site-footer a { color: inherit; }
 
+/* Connexion : même façade que l'accueil, le formulaire y est posé comme une carte claire. */
+.stage--signin { min-height: calc(100vh - 4.5rem); }
+.signin { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; width: min(100%, 74rem); margin-inline: auto; padding: clamp(2rem, 7vw, 5rem) 1rem clamp(3rem, 7vw, 6rem); }
+.signin__claim { font-size: clamp(2.6rem, 6.4vw, 4.75rem); font-weight: 700; line-height: 1.02; letter-spacing: -.03em; }
+.signin__intro .hero__lead { margin-bottom: 0; }
+.signin__card { padding: clamp(1.5rem, 4vw, 2.25rem); border-radius: 16px; background: var(--surface); color: var(--ink); box-shadow: 0 30px 60px -20px rgb(0 0 0 / .6); }
+.signin__card h1 { margin-bottom: 1.25rem; font-size: 1.75rem; letter-spacing: -.02em; }
+.signin__card :focus-visible { outline-color: var(--action); }
+.signin__submit { width: 100%; padding-block: .8rem; }
+
 /* Pages légales */
 .legal { background: var(--surface); }
 .legal__top { padding: 1.25rem max(1rem, calc((100% - 42rem) / 2)); }
@@ -332,7 +342,7 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .legal__text h2 { margin-top: 2.25rem; }
 
 @media (max-width: 760px) {
-    .hero, .sides, .compare { grid-template-columns: minmax(0, 1fr); }
+    .hero, .sides, .compare, .signin { grid-template-columns: minmax(0, 1fr); }
     .wa-tile--float { top: -1.25rem; left: auto; right: -.25rem; width: 3.5rem; height: 3.5rem; }
     .wa-tile--float .wa-logo { width: 2.25rem; height: 2.25rem; }
     .wa-card { flex-direction: column; }
