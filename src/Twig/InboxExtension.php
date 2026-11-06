@@ -23,6 +23,13 @@ class InboxExtension
         return $this->conversations->countOpen($this->current->get());
     }
 
+    /** @return array<int, int> */
+    #[AsTwigFunction('open_by_organization')]
+    public function openByOrganization(): array
+    {
+        return $this->conversations->countOpenByOrganization();
+    }
+
     #[AsTwigFunction('current_organization')]
     public function currentOrganization(): Organization
     {

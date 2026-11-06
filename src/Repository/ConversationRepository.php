@@ -45,6 +45,21 @@ class ConversationRepository extends ServiceEntityRepository
         return $query->getQuery()->getResult();
     }
 
+    /** @return array<int, int> nombre de conversations à traiter, par identifiant d'organisation */
+    public function countOpenByOrganization(): array
+    {
+        $rows = $this->createQueryBuilder('v')
+            ->select('IDENTITY(c.organization) AS organization, COUNT(v.id) AS total')
+            ->join('v.client', 'c')
+            ->andWhere('v.status = :status')
+            ->setParameter('status', ConversationStatus::OPEN)
+            ->groupBy('c.organization')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column(array_map(static fn (array $row) => [(int) $row['organization'], (int) $row['total']], $rows), 1, 0);
+    }
+
     public function countOpen(Organization $organization): int
     {
         return (int) $this->createQueryBuilder('v')

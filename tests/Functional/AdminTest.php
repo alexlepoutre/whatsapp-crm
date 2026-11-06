@@ -139,11 +139,40 @@ class AdminTest extends AppTestCase
         self::assertSelectorTextContains('.rail__org', 'Dufermont');
         self::assertSelectorExists('a.row');
 
-        $this->client->submitForm('Voir IT-Room');
+        $this->client->submitForm('IT-Room 0');
         $this->client->followRedirect();
         self::assertSelectorTextContains('.rail__org', 'IT-Room');
         self::assertSelectorNotExists('a.row');
         self::assertSame('Dufermont', $other->getName());
+    }
+
+    public function testSuperAdminSeesWaitingCountOfEveryOrganization(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+        $this->postWebhook($this->textMessage('wamid.1', '33611111111'));
+        $this->postWebhook($this->textMessage('wamid.2', '33622222222'));
+        $this->postWebhook($this->textMessage('wamid.3', '33633333333'), slug: 'dufermont');
+        $user = (new User('super@example.test'))->setPassword('inutilisé')->setSuperAdmin(true);
+        $this->em->persist($user);
+        $this->em->flush();
+        $this->client->loginUser($user);
+
+        $crawler = $this->client->request('GET', '/admin');
+
+        $items = $crawler->filter('.orgs__item')->each(static fn ($node) => preg_replace('/\s+/', ' ', trim($node->text())));
+        self::assertSame(['Dufermont 1', 'IT-Room 2'], $items);
+    }
+
+    public function testNormalAccountDoesNotSeeOtherOrganizations(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+        $this->postWebhook($this->textMessage(), slug: 'dufermont');
+        $this->loginAsOwner();
+
+        $this->client->request('GET', '/admin');
+
+        self::assertSelectorNotExists('.orgs');
+        self::assertStringNotContainsString('Dufermont', (string) $this->client->getResponse()->getContent());
     }
 
     public function testSettingsAreSavedForCurrentOrganizationOnly(): void

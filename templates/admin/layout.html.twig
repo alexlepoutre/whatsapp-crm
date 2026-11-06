@@ -11,7 +11,30 @@
             <span class="display__digits" data-ghost="88" aria-hidden="true">{{ open > 99 ? '99' : '%02d'|format(open) }}</span>
             <span class="display__label">à traiter</span>
         </a>
-        <p class="rail__org">{{ organization.name }}</p>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+            {% set counts = open_by_organization() %}
+            <ul class="orgs" aria-label="Organisations et messages à traiter">
+                {% for item in all_organizations() %}
+                    {% set count = counts[item.id] ?? 0 %}
+                    <li>
+                        {% if item.id == organization.id %}
+                            <span class="orgs__item rail__org" aria-current="true">
+                                {{ item.name }} <span class="orgs__count{{ count ? ' orgs__count--waiting' }}">{{ count }}</span>
+                            </span>
+                        {% else %}
+                            <form method="post" action="{{ path('admin_organization_switch', {id: item.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('switch-organization') }}">
+                                <button type="submit" class="orgs__item">
+                                    {{ item.name }} <span class="orgs__count{{ count ? ' orgs__count--waiting' }}">{{ count }}</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="rail__org">{{ organization.name }}</p>
+        {% endif %}
         <nav class="rail__nav">
             <a href="{{ path('admin_inbox') }}" {% if app.current_route == 'admin_inbox' %}aria-current="page"{% endif %}>Messages</a>
             <a href="{{ path('admin_clients') }}" {% if app.current_route == 'admin_clients' %}aria-current="page"{% endif %}>Clients</a>
@@ -20,16 +43,6 @@
                 <a href="{{ path('admin_organizations') }}" {% if app.current_route starts with 'admin_organization' %}aria-current="page"{% endif %}>Organisations</a>
             {% endif %}
         </nav>
-        {% if is_granted('ROLE_SUPER_ADMIN') %}
-            <div class="rail__switch">
-                {% for other in all_organizations() | filter(o => o.id != organization.id) %}
-                    <form method="post" action="{{ path('admin_organization_switch', {id: other.id}) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('switch-organization') }}">
-                        <button type="submit">Voir {{ other.name }}</button>
-                    </form>
-                {% endfor %}
-            </div>
-        {% endif %}
         <a class="rail__logout" href="{{ path('logout') }}">Se déconnecter</a>
     </aside>
     <main class="main">

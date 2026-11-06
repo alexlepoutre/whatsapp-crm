@@ -93,7 +93,13 @@ a { color: var(--action); }
 .display__label { display: block; margin-top: .5rem; text-align: right; font-size: .9rem; }
 
 .rail__org { padding-inline: .6rem; font-weight: 600; color: #fff; }
-.rail__switch button { padding: .3rem .6rem; border: 0; background: none; color: inherit; font: inherit; font-size: .9rem; text-align: left; text-decoration: underline; cursor: pointer; }
+.orgs { display: grid; gap: .25rem; margin: 0; padding: 0; list-style: none; }
+.orgs form { margin: 0; }
+.orgs__item { display: flex; justify-content: space-between; align-items: center; gap: .5rem; width: 100%; padding: .45rem .6rem; border: 0; border-radius: 4px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+button.orgs__item:hover { background: #22364a; }
+.orgs__item[aria-current] { background: #0b141c; box-shadow: inset 0 0 0 1px #2c3e4e; cursor: default; }
+.orgs__count { min-width: 1.6rem; padding-inline: .3rem; border-radius: 3px; color: #8fa3b5; text-align: center; font-variant-numeric: tabular-nums; }
+.orgs__count--waiting { background: var(--amber); color: var(--panel); font-weight: 700; }
 .public__org { margin-bottom: .75rem; color: var(--muted); font-weight: 600; font-size: 1.1rem; }
 .rail__nav { display: grid; gap: .25rem; }
 
