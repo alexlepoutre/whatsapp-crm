@@ -1,4 +1,4 @@
-# Posez votre question — CRM WhatsApp et formulaire
+# Relation clients — CRM WhatsApp et formulaire
 
 Remplace un répondeur téléphonique, pour plusieurs organisations (itroom, dufermont…). Chacune
 a sa page publique `/<slug>` : WhatsApp ou formulaire avec lien privé. Son équipe traite tout

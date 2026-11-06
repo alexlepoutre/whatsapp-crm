@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion : Posez votre question{% endblock %}
+{% block title %}Connexion : Relation clients{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block body_class %}home{% endblock %}
 
@@ -9,15 +9,15 @@
         <header class="home__top">
             <a class="home__brand" href="{{ path('home') }}">
                 <img src="{{ asset('logo.svg') }}" alt="" width="36" height="36">
-                Posez votre question
+                Relation clients
             </a>
             <a class="btn btn--on-dark" href="{{ path('home') }}">Accueil</a>
         </header>
 
         <main class="signin">
             <div class="signin__intro">
-                <p class="signin__claim">Vos messages vous attendent.</p>
-                <p class="hero__lead">Retrouvez les demandes de vos clients, sur WhatsApp et par formulaire, au même endroit.</p>
+                <p class="signin__claim">Vos clients vous attendent.</p>
+                <p class="hero__lead">Retrouvez sur votre dashboard toutes les demandes reçues, sur WhatsApp et par formulaire.</p>
             </div>
 
             <div class="signin__card">

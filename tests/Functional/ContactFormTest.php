@@ -90,7 +90,7 @@ class ContactFormTest extends AppTestCase
         $this->client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.home__brand', 'Posez votre question');
+        self::assertSelectorTextContains('.home__brand', 'Relation clients');
         self::assertSelectorExists('a[href="/itroom"]');
         self::assertSelectorExists('a.btn--whatsapp[href^="https://wa.me/33600000000?text="] svg.wa-logo');
         self::assertSelectorExists('a[href="/connexion"]');
@@ -135,7 +135,7 @@ class ContactFormTest extends AppTestCase
     public function testLoginBelongsToTheSiteAndExplainsErrorsInFrench(): void
     {
         $this->client->request('GET', '/connexion');
-        self::assertSelectorTextContains('.home__brand', 'Posez votre question');
+        self::assertSelectorTextContains('.home__brand', 'Relation clients');
         self::assertSelectorExists('a[href="/"]');
 
         $this->client->submitForm('Se connecter', ['_username' => 'inconnu@example.test', '_password' => 'mauvais']);

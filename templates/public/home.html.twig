@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Posez votre question : le répondeur que vous avez le temps de lire{% endblock %}
-{% block description %}<meta name="description" content="Vos clients vous écrivent sur WhatsApp ou par formulaire. Toutes leurs demandes arrivent au même endroit, classées par client.">{% endblock %}
+{% block title %}Relation clients : remplacez le répondeur que vous n'avez pas le temps d'écouter{% endblock %}
+{% block description %}<meta name="description" content="Vos clients vous écrivent sur WhatsApp ou par formulaire. Un dashboard centralise leurs demandes : vous n'en manquez plus aucune.">{% endblock %}
 {% block body_class %}home{% endblock %}
 
 {% block page %}
@@ -9,7 +9,7 @@
         <header class="home__top">
             <a class="home__brand" href="{{ path('home') }}">
                 <img src="{{ asset('logo.svg') }}" alt="" width="36" height="36">
-                Posez votre question
+                Relation clients
             </a>
             {% if app.user %}
                 <a class="btn btn--on-dark" href="{{ path('admin_inbox') }}">Ouvrir mes messages</a>
@@ -21,7 +21,7 @@
         <section class="hero">
             <div>
                 <h1>Remplacez le répondeur que vous n'avez pas le temps d'écouter.</h1>
-                <p class="hero__lead">Vos clients vous écrivent sur WhatsApp ou par formulaire. Vous lisez leurs demandes au même endroit, et vous répondez quand vous êtes disponible.</p>
+                <p class="hero__lead">Vos clients vous écrivent sur WhatsApp ou par formulaire. Vous avez un dashboard qui centralise les demandes reçues : vous ne passez plus à côté d'une demande et vous les traitez au fil du temps.</p>
                 <div class="hero__actions">
                     {% if editor and whatsappNumber %}
                         <a class="btn btn--whatsapp" href="https://wa.me/{{ whatsappNumber }}?text={{ editor.whatsAppOpening|url_encode }}">
@@ -55,15 +55,15 @@
                 <h2>Avec un répondeur</h2>
                 <ul>
                     <li>Chaque message s'écoute du début à la fin</li>
-                    <li>Vous notez le numéro, puis vous cherchez qui c'est</li>
+                    <li>Une demande oubliée est une demande perdue</li>
                     <li>Votre client ne sait pas si vous l'avez entendu</li>
                 </ul>
             </div>
             <div class="compare__after">
-                <h2>Avec Posez votre question</h2>
+                <h2>Avec Relation clients</h2>
                 <ul>
                     <li>Chaque demande se lit en quelques secondes, même un vocal</li>
-                    <li>Le nom et l'historique du client sont sous vos yeux</li>
+                    <li>Une demande reste à traiter tant que vous n'y avez pas répondu</li>
                     <li>Votre client reçoit une réponse automatique, puis voit que vous avez lu</li>
                 </ul>
             </div>
@@ -77,12 +77,12 @@
                     <p>Depuis votre page de contact, il choisit WhatsApp ou le formulaire. Il n'a aucun compte à créer.</p>
                 </li>
                 <li>
-                    <h3>Tout arrive au même endroit</h3>
-                    <p>Un courriel vous prévient. Les demandes attendent dans votre boîte, classées par client, et le compteur vous dit combien il en reste.</p>
+                    <h3>Tout arrive sur votre dashboard</h3>
+                    <p>Un courriel vous prévient à chaque message. Le compteur vous dit combien de demandes restent à traiter : rien ne vous échappe.</p>
                 </li>
                 <li>
-                    <h3>Vous répondez quand vous pouvez</h3>
-                    <p>Votre réponse part par WhatsApp ou par courriel, selon le canal choisi par le client.</p>
+                    <h3>Vous traitez au fil du temps</h3>
+                    <p>Votre réponse part par WhatsApp ou par courriel, selon le canal choisi par le client. Il peut ensuite clôturer sa demande ou continuer.</p>
                 </li>
             </ol>
         </section>
@@ -100,6 +100,7 @@
             <div>
                 <h2>Pour votre équipe</h2>
                 <ul>
+                    <li>Un dashboard qui centralise toutes les demandes reçues</li>
                     <li>Une fiche par client, avec tous ses échanges et vos notes</li>
                     <li>Des comptes pour chaque personne qui répond</li>
                     <li>Les vocaux à lire plutôt qu'à écouter, grâce à la transcription</li>
@@ -111,7 +112,7 @@
         <section class="closing">
             <div>
                 <h2>Une question sur l'outil ?</h2>
-                <p>Posez-la. C'est exactement à ça qu'il sert.</p>
+                <p>Posez-la : c'est le meilleur moyen de l'essayer.</p>
             </div>
             <a class="btn btn--amber" href="{{ path('contact', {slug: 'itroom'}) }}">Nous poser une question</a>
         </section>
