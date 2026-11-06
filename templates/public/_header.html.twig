@@ -1,5 +1,6 @@
-{% if organization.logoVersion %}
-    <img class="public__logo" src="{{ path('organization_logo', {slug: organization.slug, v: organization.logoVersion}) }}" alt="{{ organization.name }}">
-{% else %}
+<div class="public__head">
+    {% if organization.logoVersion %}
+        <img class="public__logo" src="{{ path('organization_logo', {slug: organization.slug, v: organization.logoVersion}) }}" alt="">
+    {% endif %}
     <p class="public__org">{{ organization.name }}</p>
-{% endif %}
+</div>

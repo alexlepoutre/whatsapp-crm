@@ -20,6 +20,15 @@ class AdminTest extends AppTestCase
         self::assertResponseRedirects('/connexion');
     }
 
+    public function testNoMeasureInAdmin(): void
+    {
+        $this->loginAsOwner();
+
+        $this->client->request('GET', '/admin');
+
+        self::assertSelectorNotExists('#consent');
+    }
+
     public function testInboxListsWaitingConversation(): void
     {
         $this->postWebhook($this->textMessage());

@@ -38,7 +38,7 @@ class WebhookTest extends AppTestCase
     public function testFirstReplyIsTheConfiguredMessageAndIsNotRepeated(): void
     {
         $organization = $this->em->find(\App\Entity\Organization::class, $this->itroom->getId());
-        $organization->setBotMessage('Bonjour, ici Arnaud. Relation clients.');
+        $organization->setBotMessage('Bonjour, ici Arnaud. Ma Relation Clients.');
         $this->em->flush();
 
         $this->postWebhook($this->textMessage('wamid.1', text: 'Bonjour IT-Room, je vous contacte depuis votre site (#itroom).'));
@@ -46,7 +46,7 @@ class WebhookTest extends AppTestCase
         self::assertEmailCount(0);
         $bot = $this->em->getRepository(Message::class)->findBy(['sender' => MessageSender::BOT]);
         self::assertCount(1, $bot);
-        self::assertSame('Bonjour, ici Arnaud. Relation clients.', $bot[0]->getBody());
+        self::assertSame('Bonjour, ici Arnaud. Ma Relation Clients.', $bot[0]->getBody());
         self::assertSame('Conversation ouverte depuis la page de contact.', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
 
         $this->postWebhook($this->textMessage('wamid.2', text: 'Où en est ma commande ?'));

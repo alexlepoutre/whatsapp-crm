@@ -6,11 +6,12 @@
     <header class="legal__top">
         <a class="home__brand" href="{{ path('home') }}">
             <img src="{{ asset('logo.svg') }}" alt="" width="36" height="36">
-            Relation clients
+            Ma Relation Clients
         </a>
     </header>
     <main class="legal__text">
         {% block body %}{% endblock %}
     </main>
     {{ include('_footer.html.twig') }}
+    {{ include('_consent.html.twig') }}
 {% endblock %}

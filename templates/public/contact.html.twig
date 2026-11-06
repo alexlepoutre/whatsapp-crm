@@ -1,38 +1,56 @@
 {% extends 'base.html.twig' %}
+{% import 'public/landing/_advisor.html.twig' as people %}
 
 {% block title %}Contacter {{ organization.name }}{% endblock %}
 {% block body_class %}public{% endblock %}
 {% block favicon %}{% if organization.logoVersion %}{{ include('_favicon_organization.html.twig', {theme: organization}) }}{% else %}{{ parent() }}{% endif %}{% endblock %}
-{% block theme %}{{ include('_theme.html.twig', {theme: organization}) }}{% endblock %}
+{% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ assets_version }}">{{ include('_theme.html.twig', {theme: organization}) }}{% endblock %}
 
 {% block page %}
-    <main class="public__main">
+    <header class="l-top">
         {{ include('public/_header.html.twig') }}
+    </header>
+
+    <main class="public__main">
         <h1 class="public__title">Laissez-nous un message, nous vous répondons.</h1>
         {{ include('_flashes.html.twig') }}
 
-        {% if whatsappNumber %}
-            <section class="wa-card">
-                <span class="wa-tile">{{ include('_whatsapp_logo.html.twig') }}</span>
-                <div>
-                    <h2>Écrivez-nous sur WhatsApp</h2>
-                    <p class="lead">C'est le plus rapide. Votre premier message est déjà prêt : <strong>envoyez-le d'abord tel quel</strong>, puis posez votre question dans le message suivant.</p>
-                    <a class="btn btn--whatsapp" href="https://wa.me/{{ whatsappNumber }}?text={{ organization.whatsAppOpening|url_encode }}">
-                        {{ include('_whatsapp_logo.html.twig') }}
-                        Ouvrir WhatsApp
-                    </a>
+        <div class="contact-grid">
+            <div>
+                {% if whatsappNumber %}
+                    <section class="wa-card">
+                        <span class="wa-tile">{{ include('_whatsapp_logo.html.twig') }}</span>
+                        <div>
+                            <h2>Écrivez-nous sur WhatsApp</h2>
+                            <p class="lead">C'est le plus rapide. Votre premier message est déjà prêt : <strong>envoyez-le d'abord tel quel</strong>, puis posez votre question dans le message suivant.</p>
+                            <a class="btn btn--whatsapp" href="https://wa.me/{{ whatsappNumber }}?text={{ organization.whatsAppOpening|url_encode }}">
+                                {{ include('_whatsapp_logo.html.twig') }}
+                                Ouvrir WhatsApp
+                            </a>
+                        </div>
+                    </section>
+                {% endif %}
+                <div class="contact-team" aria-hidden="true">
+                    <span>{{ people.advisor('#f2c9a8', '#3b2a20', '#0f6e6e', '#bfe8df', true) }}</span>
+                    <span>{{ people.advisor('#8d5a3c', '#1d1612', '#f5b82e', '#fdeab5') }}</span>
+                    <span>{{ people.advisor('#e8b48f', '#a9592d', '#2b4c9b', '#d6dcfb', true) }}</span>
                 </div>
+                <p class="contact-note">Une vraie personne lit votre message et vous répond.</p>
+            </div>
+
+            <section class="contact-form">
+                <h2>{{ whatsappNumber ? "Vous n'avez pas WhatsApp ?" : 'Votre demande' }}</h2>
+                <p class="lead">Remplissez ce formulaire. Vous recevrez par e-mail un lien privé pour suivre notre échange, sans créer de compte.</p>
+
+                {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <p class="muted">Vos coordonnées servent uniquement à répondre à votre demande. <a href="{{ path('legal_privacy') }}">En savoir plus sur vos données</a>.</p>
+                    <button type="submit" class="btn">Envoyer ma demande</button>
+                {{ form_end(form) }}
             </section>
-            <h2>Vous n'avez pas WhatsApp ?</h2>
-        {% endif %}
-
-        <p class="lead">Remplissez ce formulaire. Vous recevrez par e-mail un lien privé pour suivre notre échange, sans créer de compte.</p>
-
-        {{ form_start(form) }}
-            {{ form_widget(form) }}
-            <p class="muted">Vos coordonnées servent uniquement à répondre à votre demande. <a href="{{ path('legal_privacy') }}">En savoir plus sur vos données</a>.</p>
-            <button type="submit" class="btn">Envoyer ma demande</button>
-        {{ form_end(form) }}
+        </div>
     </main>
     {{ include('_footer.html.twig') }}
+    {# Les visiteurs des autres organisations ne sont pas ceux d'IT-Room. #}
+    {% if organization.slug == 'itroom' %}{{ include('_consent.html.twig') }}{% endif %}
 {% endblock %}

@@ -1,0 +1,108 @@
+{#
+    À n'inclure que sur les pages où la mesure d'audience a sa place. Jamais sur l'admin ni sur un
+    lien de suivi : l'adresse de ce dernier contient le jeton privé du client.
+    Google n'est chargé qu'après l'accord du visiteur.
+#}
+<section class="consent" id="consent" aria-label="Cookies" hidden>
+    <p>Nous aimerions mesurer la fréquentation du site avec Google Analytics. C'est facultatif, et vous pouvez changer d'avis à tout moment. <a href="{{ path('legal_privacy') }}#cookies">En savoir plus</a></p>
+    <div class="consent__actions">
+        <button type="button" class="btn btn--quiet" data-consent="denied">Refuser</button>
+        <button type="button" class="btn btn--quiet" data-consent="granted">Accepter</button>
+    </div>
+</section>
+
+<script>
+    (() => {
+        const KEY = 'cookie-consent';
+        const VALIDITY = 183 * 24 * 3600 * 1000; // 6 mois, durée recommandée par la CNIL
+        const TAG_URL = {{ (app.environment == 'prod' ? 'https://www.googletagmanager.com/gtm.js?id=GTM-5WRCM4X8' : '/gtm-local-test.js')|json_encode|raw }};
+        const banner = document.getElementById('consent');
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+
+        gtag('consent', 'default', {
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            analytics_storage: 'denied',
+        });
+
+        const read = () => {
+            try {
+                const saved = JSON.parse(localStorage.getItem(KEY));
+
+                return saved && Date.now() - saved.at < VALIDITY ? saved.choice : null;
+            } catch {
+                return null;
+            }
+        };
+
+        const save = (choice) => {
+            try {
+                localStorage.setItem(KEY, JSON.stringify({ choice, at: Date.now() }));
+            } catch {
+                // Navigation privée : le bandeau reviendra à la prochaine visite.
+            }
+        };
+
+        const loadTag = () => {
+            if (document.querySelector('script[data-tag]')) {
+                return;
+            }
+
+            gtag('consent', 'update', { analytics_storage: 'granted' });
+            gtag('js', new Date());
+
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = TAG_URL;
+            script.dataset.tag = '';
+            document.head.append(script);
+        };
+
+        const forgetCookies = () => {
+            const domains = [location.hostname, '.' + location.hostname, '.' + location.hostname.split('.').slice(-2).join('.')];
+
+            document.cookie.split(';').map((cookie) => cookie.split('=')[0].trim()).filter((name) => name.startsWith('_ga')).forEach((name) => {
+                domains.forEach((domain) => {
+                    document.cookie = `${name}=; Max-Age=0; path=/; domain=${domain}`;
+                });
+                document.cookie = `${name}=; Max-Age=0; path=/`;
+            });
+        };
+
+        banner.querySelectorAll('[data-consent]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const wasGranted = read() === 'granted';
+                const choice = button.dataset.consent;
+
+                save(choice);
+                banner.hidden = true;
+
+                if ('granted' === choice) {
+                    loadTag();
+                } else if (wasGranted) {
+                    // Le script déjà chargé ne s'arrête pas tout seul : on repart d'une page vierge.
+                    forgetCookies();
+                    location.reload();
+                }
+            });
+        });
+
+        document.querySelectorAll('[data-consent-open]').forEach((button) => {
+            button.hidden = false;
+            button.addEventListener('click', () => {
+                banner.hidden = false;
+            });
+        });
+
+        const choice = read();
+
+        if ('granted' === choice) {
+            loadTag();
+        } else if (null === choice) {
+            banner.hidden = false;
+        }
+    })();
+</script>

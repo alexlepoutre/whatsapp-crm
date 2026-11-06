@@ -1,13 +1,13 @@
 {% extends 'public/landing/layout.html.twig' %}
 
-{% block title %}Relation clients : ne perdez plus aucune demande client{% endblock %}
+{% block title %}Ma Relation Clients : ne perdez plus aucune demande client{% endblock %}
 {% block body_class %}lv3{% endblock %}
 
 {% block landing %}
     <main>
         <section class="v3-hero">
             <h1>Chaque demande perdue est un client qui part ailleurs.</h1>
-            <p>Relation clients remplace votre répondeur par un dashboard : WhatsApp et formulaires y arrivent ensemble, et rien ne reste sans réponse.</p>
+            <p>Ma Relation Clients remplace votre répondeur par un dashboard : WhatsApp et formulaires y arrivent ensemble, et rien ne reste sans réponse.</p>
             <div class="l-actions">
                 <a class="l-btn l-btn--action" href="{{ path('contact', {slug: 'itroom'}) }}">Demander une démonstration</a>
                 {% if waUrl %}

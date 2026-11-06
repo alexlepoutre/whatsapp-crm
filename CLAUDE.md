@@ -1,4 +1,4 @@
-# Relation clients — CRM WhatsApp et formulaire
+# Ma Relation Clients — CRM WhatsApp et formulaire
 
 Remplace un répondeur téléphonique, pour plusieurs organisations (itroom, dufermont…). Chacune
 a sa page publique `/<slug>` : WhatsApp ou formulaire avec lien privé. Son équipe traite tout
@@ -110,6 +110,11 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
   retélécharger depuis GitHub à chaque fois. Garder cet ordre.
 - **Pages d'erreur** : `templates/bundles/TwigBundle/Exception/error.html.twig` pour Symfony (à
   voir en dev sur `/_error/404`), `public/erreur.html` servie par nginx quand PHP est tombé.
+- **Mesure d'audience** : GTM n'est chargé qu'après accord (`_consent.html.twig`, 6 mois). À n'inclure
+  que sur les pages vitrine et `/itroom`, jamais sur l'admin ni un lien de suivi, dont l'adresse
+  contient le jeton privé. Toute évolution doit se refléter dans `/confidentialite`.
+- **CSS** : incrémenter `assets_version` (`config/packages/twig.yaml`) à chaque modification, sinon les
+  navigateurs gardent l'ancienne feuille de style.
 - **Dernière réponse** : deuxième bouton de l'admin. Le client se voit alors proposer de clôturer
   ou de continuer : boutons WhatsApp (`WhatsAppClient::sendTextWithChoice`, texte limité à 1024
   caractères par Meta) ou bloc sur le lien de suivi (`Conversation::awaitingClosure`). Le lien de

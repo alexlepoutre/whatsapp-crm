@@ -4,11 +4,14 @@
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block body_class %}public{% endblock %}
 {% block favicon %}{% if conversation.organization.logoVersion %}{{ include('_favicon_organization.html.twig', {theme: conversation.organization}) }}{% else %}{{ parent() }}{% endif %}{% endblock %}
-{% block theme %}{{ include('_theme.html.twig', {theme: conversation.organization}) }}{% endblock %}
+{% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ assets_version }}">{{ include('_theme.html.twig', {theme: conversation.organization}) }}{% endblock %}
 
 {% block page %}
-    <main class="public__main">
+    <header class="l-top">
         {{ include('public/_header.html.twig', {organization: conversation.organization}) }}
+    </header>
+
+    <main class="public__main public__main--thread">
         <h1>{{ conversation.title }}</h1>
         <p class="muted">Demande envoyée le {{ conversation.createdAt|date('d/m/Y') }}. Ce lien est privé : ne le partagez pas.</p>
         {{ include('_flashes.html.twig') }}

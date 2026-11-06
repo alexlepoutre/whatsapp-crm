@@ -49,13 +49,13 @@ class Organization
     private string $botMessage = "Bonjour, merci pour votre message. Je l'ai bien reçu et je vous réponds dès que possible.";
 
     /** Par défaut, le thème de l'application : une organisation sans réglage reste lisible. */
-    #[ORM\Column(length: 7, options: ['default' => '#2346d5'])]
+    #[ORM\Column(length: 7, options: ['default' => '#0f4c5c'])]
     #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Choisissez une couleur.')]
-    private string $primaryColor = '#2346d5';
+    private string $primaryColor = '#0f4c5c';
 
-    #[ORM\Column(length: 7, options: ['default' => '#14222f'])]
+    #[ORM\Column(length: 7, options: ['default' => '#0f3542'])]
     #[Assert\Regex('/^#[0-9a-f]{6}$/i', message: 'Choisissez une couleur.')]
-    private string $secondaryColor = '#14222f';
+    private string $secondaryColor = '#0f3542';
 
     /** Change à chaque nouveau logo, pour que le cache des navigateurs ne garde pas l'ancien. Nul sans logo. */
     #[ORM\Column(nullable: true)]

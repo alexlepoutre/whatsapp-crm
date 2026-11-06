@@ -1,15 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion : Relation clients{% endblock %}
+{% block title %}Connexion : Ma Relation Clients{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block body_class %}home{% endblock %}
+{% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ assets_version }}">{% endblock %}
 
 {% block page %}
     <div class="stage stage--signin">
         <header class="home__top">
             <a class="home__brand" href="{{ path('home') }}">
                 <img src="{{ asset('logo.svg') }}" alt="" width="36" height="36">
-                Relation clients
+                Ma Relation Clients
             </a>
             <a class="btn btn--on-dark" href="{{ path('home') }}">Accueil</a>
         </header>

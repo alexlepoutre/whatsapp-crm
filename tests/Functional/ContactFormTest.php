@@ -91,7 +91,7 @@ class ContactFormTest extends AppTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'quelqu\'un qui répond');
-        self::assertSelectorTextContains('.l-brand', 'Relation clients');
+        self::assertSelectorTextContains('.l-brand', 'Ma Relation Clients');
         self::assertSelectorExists('a[href="/itroom"]');
         self::assertSelectorExists('a[href="/connexion"]');
         self::assertSelectorExists('link[rel="icon"][href^="/favicon.svg"]');
@@ -154,7 +154,7 @@ class ContactFormTest extends AppTestCase
     public function testLoginBelongsToTheSiteAndExplainsErrorsInFrench(): void
     {
         $this->client->request('GET', '/connexion');
-        self::assertSelectorTextContains('.home__brand', 'Relation clients');
+        self::assertSelectorTextContains('.home__brand', 'Ma Relation Clients');
         self::assertSelectorExists('a[href="/"]');
 
         $this->client->submitForm('Se connecter', ['_username' => 'inconnu@example.test', '_password' => 'mauvais']);
@@ -208,6 +208,38 @@ class ContactFormTest extends AppTestCase
 
         self::assertSelectorTextContains('.v2-flow', 'Le client écrit');
         self::assertSelectorTextContains('.v2-flow', 'Le conseiller répond');
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestWith(['/'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/v3'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/cgu'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['/itroom'])]
+    public function testConsentBannerExistsAndGoogleIsNotLoadedBeforeChoice(string $url): void
+    {
+        $this->client->request('GET', $url);
+
+        self::assertSelectorExists('#consent [data-consent="granted"]');
+        self::assertSelectorExists('#consent [data-consent="denied"]');
+        self::assertSelectorNotExists('script[src*="googletagmanager"]');
+    }
+
+    public function testNoMeasureOnOtherOrganizationsOrLogin(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+
+        foreach (['/dufermont', '/connexion'] as $url) {
+            $this->client->request('GET', $url);
+            self::assertSelectorNotExists('#consent');
+        }
+    }
+
+    public function testNoMeasureOnPrivateLink(): void
+    {
+        $this->submitContact();
+        $this->client->followRedirect();
+
+        self::assertSelectorNotExists('#consent');
+        self::assertStringNotContainsString('gtm', (string) $this->client->getResponse()->getContent());
     }
 
     public function testUnknownOrganizationPageIsNotFound(): void

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block robots %}{% if version %}<meta name="robots" content="noindex, nofollow">{% endif %}{% endblock %}
-{% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}">{% endblock %}
+{% block theme %}<link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ assets_version }}">{% endblock %}
 
 {% block page %}
     {% set waUrl = editor and whatsappNumber ? 'https://wa.me/' ~ whatsappNumber ~ '?text=' ~ editor.whatsAppOpening|url_encode : null %}
@@ -9,7 +9,7 @@
     <header class="l-top">
         <a class="l-brand" href="{{ path('home') }}">
             <img src="{{ asset('logo.svg') }}" alt="" width="36" height="36">
-            <span class="brand-text">Relation clients<small class="l-for">Idéal pour les artisans, les auto-entrepreneurs et les PME</small></span>
+            <span class="brand-text">Ma Relation Clients<small class="l-for">Idéal pour les artisans, les auto-entrepreneurs et les PME</small></span>
         </a>
         <a class="l-login" href="{{ path('login') }}">Se connecter</a>
     </header>
@@ -17,6 +17,7 @@
     {% block landing %}{% endblock %}
 
     {{ include('_footer.html.twig') }}
+    {{ include('_consent.html.twig') }}
 
     {% if waUrl %}
         <a class="l-float" href="{{ waUrl }}" aria-label="Écrire sur WhatsApp">{{ include('_whatsapp_logo.html.twig') }}</a>

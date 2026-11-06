@@ -172,7 +172,7 @@ class OrganizationMailTest extends AppTestCase
     public function testDefaultSenderIsConfigurableAndUsed(): void
     {
         $this->loginAsSuperAdmin();
-        $this->saveDefaultSender('Relation clients', 'contact@re7itroom.test');
+        $this->saveDefaultSender('Ma Relation Clients', 'contact@re7itroom.test');
         self::assertResponseRedirects('/admin/organisations');
 
         $this->client->request('GET', '/admin/organisations');
@@ -188,7 +188,7 @@ class OrganizationMailTest extends AppTestCase
 
         $from = self::getMailerMessage(0)->getFrom()[0];
         self::assertSame('contact@re7itroom.test', $from->getAddress());
-        self::assertSame('Relation clients', $from->getName());
+        self::assertSame('Ma Relation Clients', $from->getName());
     }
 
     public function testSavingTwiceKeepsOneSetting(): void
