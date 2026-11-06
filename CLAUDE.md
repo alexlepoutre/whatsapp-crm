@@ -52,7 +52,7 @@ Un seul numéro et un seul webhook Meta pour tous les projets IT-Room : le hook
 `immo.alesski.fr` (`/home/ubuntu/immo-sergic/whatsapp-sergic`, Sergic, Partenord, BDN).
 
 - Entrant : `wa.me/<numéro>?text=…` préremplit une phrase contenant `(#itroom)`, à envoyer telle
-  quelle d'abord. Le bot demande alors la question, et l'alerte part sur celle-ci. Un client déjà
+  quelle d'abord. Il reçoit le message automatique de l'organisation, et l'alerte part sur sa question. Un client déjà
   rattaché ne change d'organisation qu'avec la forme `(#code)`. Le hook retient le lien entre
   ce téléphone et le code, et relaie le contenu Meta brut, signé (`X-Hub-Signature-256`,
   secret `WHATSAPP_RELAY_SECRET`), vers `POST /webhook/relay/<slug>`.

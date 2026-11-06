@@ -26,7 +26,6 @@ class Inbox
     private const QUIET_PERIOD = '-12 hours';
 
     private const OPENED = 'Conversation ouverte depuis la page de contact.';
-    private const OPENED_REPLY = 'Bonjour, nous sommes bien en contact. Posez maintenant votre question ici, nous vous répondons dès que possible.';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -52,9 +51,7 @@ class Inbox
 
         $conversation = $this->whatsAppConversation($organization, $phone, $profileName);
 
-        // La vraie demande suit la phrase d'ouverture : c'est elle qui doit déclencher l'alerte.
-        $isNewSolicitation = $conversation->isQuietSince(new \DateTimeImmutable(self::QUIET_PERIOD))
-            || self::OPENED === $conversation->getLastClientMessage()?->getBody();
+        $isNewSolicitation = $conversation->isQuietSince(new \DateTimeImmutable(self::QUIET_PERIOD));
 
         $body = $this->withoutWhatsAppOpening($organization, $body);
         (new Message($conversation, MessageSender::CLIENT, $body))->setWaMessageId($waMessageId);
@@ -65,9 +62,10 @@ class Inbox
             $this->sendAutomatic($conversation, "🎤 Voici ce que nous avons compris de votre message vocal :\n\n« ".$transcription.' »');
         }
 
-        // La phrase d'ouverture ne contient aucune demande : l'équipe n'a rien à lire à ce stade.
+        // La phrase d'ouverture ne contient aucune demande : le client reçoit le message automatique
+        // de l'organisation, et l'équipe ne sera alertée que par sa question.
         if (self::OPENED === $body) {
-            $this->sendBotReply($conversation, self::OPENED_REPLY);
+            $this->sendBotReply($conversation, $organization->getBotMessage());
 
             return;
         }

@@ -35,19 +35,35 @@ class WebhookTest extends AppTestCase
         self::assertSame('Conversation ouverte depuis la page de contact.', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.2'])->getBody());
     }
 
-    public function testOpeningSentenceAsksForTheQuestionThenQuestionTriggersAlert(): void
+    public function testFirstReplyIsTheConfiguredMessageAndIsNotRepeated(): void
     {
+        $organization = $this->em->find(\App\Entity\Organization::class, $this->itroom->getId());
+        $organization->setBotMessage('Bonjour, ici Arnaud. Posez votre question.');
+        $this->em->flush();
+
         $this->postWebhook($this->textMessage('wamid.1', text: 'Bonjour IT-Room, je vous contacte depuis votre site (#itroom).'));
 
         self::assertEmailCount(0);
-        $bot = $this->em->getRepository(Message::class)->findOneBy(['sender' => MessageSender::BOT]);
-        self::assertStringContainsString('Posez maintenant votre question', $bot->getBody());
+        $bot = $this->em->getRepository(Message::class)->findBy(['sender' => MessageSender::BOT]);
+        self::assertCount(1, $bot);
+        self::assertSame('Bonjour, ici Arnaud. Posez votre question.', $bot[0]->getBody());
         self::assertSame('Conversation ouverte depuis la page de contact.', $this->em->getRepository(Message::class)->findOneBy(['waMessageId' => 'wamid.1'])->getBody());
 
         $this->postWebhook($this->textMessage('wamid.2', text: 'Où en est ma commande ?'));
 
         self::assertEmailCount(1);
         self::assertEmailTextBodyContains(self::getMailerMessage(), 'Où en est ma commande ?');
+        self::assertSame(1, $this->em->getRepository(Message::class)->count(['sender' => MessageSender::BOT]));
+    }
+
+    public function testNoAutomaticReplyAfterOpeningWhenBotIsDisabled(): void
+    {
+        $this->em->find(\App\Entity\Organization::class, $this->itroom->getId())->setBotEnabled(false);
+        $this->em->flush();
+
+        $this->postWebhook($this->textMessage('wamid.1', text: 'Bonjour IT-Room, je vous contacte depuis votre site (#itroom).'));
+
+        self::assertSame(0, $this->em->getRepository(Message::class)->count(['sender' => MessageSender::BOT]));
     }
 
     public function testQuestionWrittenInTheSameMessageAsOpeningIsKept(): void

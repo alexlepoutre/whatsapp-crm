@@ -25,7 +25,7 @@ class SettingsType extends AbstractType
             ])
             ->add('botMessage', TextareaType::class, [
                 'label' => 'Message automatique',
-                'help' => 'Envoyé au premier message d\'un client, puis après 12 heures de silence dans la conversation.',
+                'help' => 'Première réponse reçue par le client sur WhatsApp, puis de nouveau après 12 heures de silence. Pensez à l\'inviter à poser sa question.',
                 'attr' => ['rows' => 5],
             ])
         ;
