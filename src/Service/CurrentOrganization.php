@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Client;
 use App\Entity\Organization;
 use App\Entity\User;
+use App\Repository\ConversationRepository;
 use App\Repository\OrganizationRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,6 +23,7 @@ class CurrentOrganization
         private readonly Security $security,
         private readonly RequestStack $requests,
         private readonly OrganizationRepository $organizations,
+        private readonly ConversationRepository $conversations,
     ) {
     }
 
@@ -37,8 +39,22 @@ class CurrentOrganization
         $id = $this->requests->getSession()->get(self::SESSION_KEY);
 
         return ($id ? $this->organizations->find($id) : null)
+            ?? $this->busiest()
             ?? $this->organizations->findAllByName()[0]
             ?? throw new NotFoundHttpException('Aucune organisation.');
+    }
+
+    /**
+     * Sans choix en session, ce qui arrive après chaque déploiement, on ouvre là où des messages
+     * attendent : une organisation vide affichée par défaut fait croire à des messages perdus.
+     */
+    private function busiest(): ?Organization
+    {
+        $counts = $this->conversations->countOpenByOrganization();
+        arsort($counts);
+        $id = array_key_first($counts);
+
+        return null === $id ? null : $this->organizations->find($id);
     }
 
     public function switchTo(Organization $organization): void

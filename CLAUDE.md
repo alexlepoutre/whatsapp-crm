@@ -72,6 +72,8 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
 
 ## Règles métier à ne pas casser
 
+- **Production** : ne jamais supprimer de données, même de test, sans accord explicite. Tester
+  en local. Il n'y a pas encore de sauvegarde de la base.
 - **Super-admin** : lui seul gère organisations et comptes (`/admin/organisations`). L'adresse
   d'une organisation ne change plus après création : c'est aussi son code WhatsApp.
 - **Identité** : couleurs et logo par organisation, sur l'admin et les pages publiques. Le logo

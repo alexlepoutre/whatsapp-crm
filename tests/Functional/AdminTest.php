@@ -163,6 +163,22 @@ class AdminTest extends AppTestCase
         self::assertSame(['Dufermont 1', 'IT-Room 2'], $items);
     }
 
+    public function testSuperAdminOpensOnOrganizationWithWaitingMessages(): void
+    {
+        // Dufermont vient d'abord par ordre alphabétique, mais c'est IT-Room qui a un message.
+        $this->createOrganization('dufermont', 'Dufermont');
+        $this->postWebhook($this->textMessage());
+        $user = (new User('super@example.test'))->setPassword('inutilisé')->setSuperAdmin(true);
+        $this->em->persist($user);
+        $this->em->flush();
+        $this->client->loginUser($user);
+
+        $this->client->request('GET', '/admin');
+
+        self::assertSelectorTextContains('.banner__name', 'IT-Room');
+        self::assertSelectorTextContains('.row__who', 'Camille');
+    }
+
     public function testNormalAccountDoesNotSeeOtherOrganizations(): void
     {
         $this->createOrganization('dufermont', 'Dufermont');
