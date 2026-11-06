@@ -11,6 +11,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class WhatsAppClient
 {
+    public const CHOICE_CLOSE = 'crm_close';
+    public const CHOICE_CONTINUE = 'crm_continue';
+
+    /** Limite de Meta pour le texte d'un message à boutons. */
+    private const CHOICE_BODY_LIMIT = 1024;
+    private const CHOICE_PROMPT = 'Votre demande est-elle traitée ?';
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         #[Autowire('%env(WHATSAPP_ACCESS_TOKEN)%')] private readonly string $accessToken,
@@ -38,6 +45,16 @@ class WhatsAppClient
             'text' => ['body' => $body],
         ]);
 
+        return $this->messageId($data);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @throws WhatsAppException
+     */
+    private function messageId(array $data): string
+    {
         $id = $data['messages'][0]['id'] ?? null;
 
         if (!\is_string($id)) {
@@ -45,6 +62,50 @@ class WhatsAppClient
         }
 
         return $id;
+    }
+
+    /**
+     * Une réponse de l'équipe, suivie du choix « Clôturer » ou « Continuer ».
+     *
+     * @return string identifiant Meta de la réponse
+     *
+     * @throws WhatsAppException
+     */
+    public function sendTextWithChoice(string $to, string $body): string
+    {
+        if (mb_strlen($body) <= self::CHOICE_BODY_LIMIT) {
+            return $this->sendChoice($to, $body);
+        }
+
+        $id = $this->sendText($to, $body);
+
+        // La réponse est partie : l'absence des boutons ne doit pas la faire passer pour un échec.
+        try {
+            $this->sendChoice($to, self::CHOICE_PROMPT);
+        } catch (WhatsAppException) {
+        }
+
+        return $id;
+    }
+
+    /** @throws WhatsAppException */
+    private function sendChoice(string $to, string $body): string
+    {
+        $data = $this->post([
+            'messaging_product' => 'whatsapp',
+            'to' => $to,
+            'type' => 'interactive',
+            'interactive' => [
+                'type' => 'button',
+                'body' => ['text' => $body],
+                'action' => ['buttons' => [
+                    ['type' => 'reply', 'reply' => ['id' => self::CHOICE_CLOSE, 'title' => 'Clôturer']],
+                    ['type' => 'reply', 'reply' => ['id' => self::CHOICE_CONTINUE, 'title' => 'Continuer']],
+                ]],
+            ],
+        ]);
+
+        return $this->messageId($data);
     }
 
     /**

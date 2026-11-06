@@ -46,6 +46,10 @@ class Conversation
     #[ORM\Column(length: 64, unique: true, nullable: true)]
     private ?string $accessToken = null;
 
+    /** L'équipe a envoyé sa dernière réponse : le client doit choisir de clôturer ou de continuer. */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $awaitingClosure = false;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastInboundAt = null;
 
@@ -116,6 +120,28 @@ class Conversation
     public function close(): void
     {
         $this->status = ConversationStatus::CLOSED;
+        $this->awaitingClosure = false;
+    }
+
+    public function isAwaitingClosure(): bool
+    {
+        return $this->awaitingClosure;
+    }
+
+    public function askForClosure(): void
+    {
+        $this->awaitingClosure = true;
+    }
+
+    public function cancelClosureQuestion(): void
+    {
+        $this->awaitingClosure = false;
+    }
+
+    /** Le client n'a encore rien demandé de nouveau : la balle reste de son côté. */
+    public function markAnswered(): void
+    {
+        $this->status = ConversationStatus::ANSWERED;
     }
 
     public function isClosed(): bool
@@ -175,6 +201,7 @@ class Conversation
     {
         $this->status = ConversationStatus::OPEN;
         $this->lastInboundAt = $message->getCreatedAt();
+        $this->awaitingClosure = false;
     }
 
     public function isWhatsAppWindowOpen(): bool

@@ -192,6 +192,118 @@ class ContactFormTest extends AppTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
+    private function openTrackingPage(): string
+    {
+        $this->submitContact();
+        $url = (string) $this->client->getResponse()->headers->get('Location');
+        $this->client->followRedirect();
+
+        return $url;
+    }
+
+    private function conversationStatus(): \App\Enum\ConversationStatus
+    {
+        $this->em->clear();
+
+        return $this->em->getRepository(Conversation::class)->findOneBy([])->getStatus();
+    }
+
+    public function testClientClosesRequestAndTeamIsTold(): void
+    {
+        $this->openTrackingPage();
+
+        $this->client->submitForm('Clôturer ma demande');
+
+        self::assertResponseRedirects();
+        self::assertSame(\App\Enum\ConversationStatus::CLOSED, $this->conversationStatus());
+        self::assertEmailCount(1);
+        self::assertEmailAddressContains(self::getMailerMessage(), 'To', 'alerte@itroom.test');
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Le client a clôturé sa demande.');
+
+        $this->client->followRedirect();
+        self::assertSelectorTextContains('.notice', 'clôturée');
+        self::assertSelectorNotExists('form[action$="/cloturer"]');
+    }
+
+    public function testClientMessageReopensClosedRequest(): void
+    {
+        $this->openTrackingPage();
+        $this->client->submitForm('Clôturer ma demande');
+        $this->client->followRedirect();
+
+        $this->client->submitForm('Envoyer mon message', ['message[body]' => 'Finalement, encore une question.']);
+
+        self::assertSame(\App\Enum\ConversationStatus::OPEN, $this->conversationStatus());
+    }
+
+    public function testClosingNeedsValidToken(): void
+    {
+        $url = $this->openTrackingPage();
+
+        $this->client->request('POST', $url.'/cloturer', ['_token' => 'faux']);
+
+        self::assertResponseStatusCodeSame(403);
+        self::assertSame(\App\Enum\ConversationStatus::OPEN, $this->conversationStatus());
+    }
+
+    public function testClosingFailsUnderAnotherOrganizationAddress(): void
+    {
+        $this->createOrganization('dufermont', 'Dufermont');
+        $url = $this->openTrackingPage();
+
+        $this->client->request('POST', str_replace('/itroom/', '/dufermont/', $url).'/cloturer');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    private function sendFinalReply(string $tracking): void
+    {
+        $conversationId = $this->em->getRepository(Conversation::class)->findOneBy([])->getId();
+        $this->loginAsOwner();
+        $this->client->request('GET', '/admin/conversations/'.$conversationId);
+        $this->client->submitForm('Dernière réponse', ['message[body]' => 'Voici le devis.']);
+        self::assertEmailCount(1);
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Votre demande est-elle traitée');
+        $this->client->request('GET', $tracking);
+    }
+
+    public function testFinalReplyOffersChoiceOnTrackingPage(): void
+    {
+        $tracking = $this->openTrackingPage();
+        $this->sendFinalReply($tracking);
+
+        self::assertSelectorTextContains('.closure-choice', 'Votre demande est-elle traitée');
+
+        $this->client->submitForm('Clôturer ma demande');
+
+        self::assertSame(\App\Enum\ConversationStatus::CLOSED, $this->conversationStatus());
+    }
+
+    public function testContinueRemovesTheQuestionWithoutReopening(): void
+    {
+        $tracking = $this->openTrackingPage();
+        $this->sendFinalReply($tracking);
+
+        $this->client->submitForm('Continuer la conversation');
+        $this->client->followRedirect();
+
+        self::assertSelectorNotExists('.closure-choice');
+        self::assertSame(\App\Enum\ConversationStatus::ANSWERED, $this->conversationStatus());
+    }
+
+    public function testNormalReplyDoesNotOfferTheChoice(): void
+    {
+        $tracking = $this->openTrackingPage();
+        $conversationId = $this->em->getRepository(Conversation::class)->findOneBy([])->getId();
+        $this->loginAsOwner();
+        $this->client->request('GET', '/admin/conversations/'.$conversationId);
+        $this->client->submitForm('Envoyer la réponse', ['message[body]' => 'Bonjour']);
+
+        self::assertStringNotContainsString('est-elle traitée', (string) self::getMailerMessage()->getTextBody());
+        $this->client->request('GET', $tracking);
+        self::assertSelectorNotExists('.closure-choice');
+    }
+
     public function testUnknownTokenIsNotFound(): void
     {
         $this->client->request('GET', '/itroom/suivi/'.str_repeat('a', 64));

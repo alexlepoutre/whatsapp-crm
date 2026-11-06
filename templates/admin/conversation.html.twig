@@ -31,6 +31,10 @@
         {% endfor %}
     </div>
 
+    {% if conversation.awaitingClosure %}
+        <p class="notice">Dernière réponse envoyée : le client peut clôturer ou continuer.</p>
+    {% endif %}
+
     {% if conversation.isWhatsApp and not conversation.isWhatsAppWindowOpen %}
         <p class="notice">Le dernier message de ce client date de plus de 24 heures : WhatsApp n'autorise plus de réponse libre. Il faut attendre qu'il réécrive.</p>
     {% else %}
@@ -39,7 +43,11 @@
         {% endif %}
         {{ form_start(form, {attr: {class: 'composer'}}) }}
             {{ form_row(form.body) }}
-            <button type="submit" class="btn">Envoyer la réponse</button>
+            <div class="composer__actions">
+                <button type="submit" class="btn">Envoyer la réponse</button>
+                <button type="submit" name="final" value="1" class="btn btn--quiet">Dernière réponse</button>
+            </div>
+            <p class="muted">« Dernière réponse » envoie votre message et propose au client de clôturer ou de continuer.</p>
         {{ form_end(form) }}
     {% endif %}
 

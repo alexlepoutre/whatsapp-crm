@@ -111,6 +111,79 @@ class WebhookTest extends AppTestCase
         self::assertSame(['a@itroom.test', 'alerte@itroom.test'], $to);
     }
 
+    /** @return array<string, mixed> */
+    private function buttonClick(string $id, string $choice): array
+    {
+        return ['messages' => [[
+            'from' => '33612345678', 'id' => $id, 'type' => 'interactive',
+            'interactive' => ['type' => 'button_reply', 'button_reply' => ['id' => $choice, 'title' => 'x']],
+        ]]];
+    }
+
+    private function conversationStatus(): ConversationStatus
+    {
+        $this->em->clear();
+
+        return $this->em->getRepository(Conversation::class)->findOneBy([])->getStatus();
+    }
+
+    private function answerConversation(): void
+    {
+        $this->postWebhook($this->textMessage('wamid.1'));
+        $this->em->getRepository(Conversation::class)->findOneBy([])->markAnswered();
+        $this->em->flush();
+    }
+
+    public function testCloseButtonClosesConversationAndTellsEveryone(): void
+    {
+        $this->answerConversation();
+
+        $this->postWebhook($this->buttonClick('wamid.2', 'crm_close'));
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(ConversationStatus::CLOSED, $this->conversationStatus());
+        self::assertEmailCount(1);
+        self::assertEmailTextBodyContains(self::getMailerMessage(), 'Le client a clôturé sa demande.');
+
+        $replies = $this->em->getRepository(Message::class)->findBy(['sender' => MessageSender::BOT], ['id' => 'DESC']);
+        self::assertStringContainsString('Votre demande est clôturée', $replies[0]->getBody());
+    }
+
+    public function testContinueButtonKeepsStatusAndSendsNoAlert(): void
+    {
+        $this->answerConversation();
+
+        $this->postWebhook($this->buttonClick('wamid.2', 'crm_continue'));
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(ConversationStatus::ANSWERED, $this->conversationStatus());
+        self::assertEmailCount(0);
+
+        $replies = $this->em->getRepository(Message::class)->findBy(['sender' => MessageSender::BOT], ['id' => 'DESC']);
+        self::assertStringContainsString('écrivez votre message', $replies[0]->getBody());
+    }
+
+    public function testMessageAfterContinueNeedsAnAnswer(): void
+    {
+        $this->answerConversation();
+        $this->postWebhook($this->buttonClick('wamid.2', 'crm_continue'));
+
+        $this->postWebhook($this->textMessage('wamid.3', text: 'Une autre question'));
+
+        self::assertSame(ConversationStatus::OPEN, $this->conversationStatus());
+        self::assertEmailCount(1);
+    }
+
+    public function testRedeliveredButtonClickIsIgnored(): void
+    {
+        $this->answerConversation();
+        $this->postWebhook($this->buttonClick('wamid.2', 'crm_close'));
+        $this->postWebhook($this->buttonClick('wamid.2', 'crm_close'));
+
+        self::assertEmailCount(0);
+        self::assertSame(1, $this->em->getRepository(Message::class)->count(['waMessageId' => 'wamid.2']));
+    }
+
     public function testSamePhoneHasSeparateRecordPerOrganization(): void
     {
         $this->createOrganization('dufermont', 'Dufermont');

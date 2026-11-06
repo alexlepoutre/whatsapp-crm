@@ -50,23 +50,7 @@ class Inbox
             return;
         }
 
-        $client = $this->clients->findByPhone($organization, $phone);
-
-        if (null === $client) {
-            $client = (new Client($organization))->setPhone($phone);
-            $this->entityManager->persist($client);
-        }
-
-        if (null === $client->getName() && $profileName) {
-            $client->setName(mb_substr($profileName, 0, 120));
-        }
-
-        $conversation = $client->getId() ? $this->conversations->findWhatsAppFor($client) : null;
-
-        if (null === $conversation) {
-            $conversation = new Conversation($client, Channel::WHATSAPP);
-            $this->entityManager->persist($conversation);
-        }
+        $conversation = $this->whatsAppConversation($organization, $phone, $profileName);
 
         // La vraie demande suit la phrase d'ouverture : c'est elle qui doit déclencher l'alerte.
         $isNewSolicitation = $conversation->isQuietSince(new \DateTimeImmutable(self::QUIET_PERIOD))
@@ -93,6 +77,55 @@ class Inbox
         if ($isNewSolicitation) {
             $this->sendBotReply($conversation, $organization->getBotMessage());
         }
+    }
+
+    /** Le client a touché « Clôturer » ou « Continuer » sous la dernière réponse de l'équipe. */
+    public function receiveWhatsAppChoice(Organization $organization, string $phone, ?string $profileName, string $waMessageId, string $choice): void
+    {
+        if (null !== $this->messages->findByWaMessageId($waMessageId)) {
+            return;
+        }
+
+        $conversation = $this->whatsAppConversation($organization, $phone, $profileName);
+        $closing = WhatsAppClient::CHOICE_CLOSE === $choice;
+
+        (new Message($conversation, MessageSender::CLIENT, $closing ? 'Le client a choisi de clôturer.' : 'Le client a choisi de continuer.'))
+            ->setWaMessageId($waMessageId);
+
+        if ($closing) {
+            $this->closeFromClient($conversation);
+            $this->sendAutomatic($conversation, 'Votre demande est clôturée. Écrivez-nous à tout moment si vous avez besoin de la rouvrir.');
+
+            return;
+        }
+
+        // Un clic ne contient aucune demande : ni « À traiter », ni alerte, tant qu'il n'a rien écrit.
+        $conversation->markAnswered();
+        $this->entityManager->flush();
+        $this->sendAutomatic($conversation, 'Très bien, écrivez votre message ici.');
+    }
+
+    private function whatsAppConversation(Organization $organization, string $phone, ?string $profileName): Conversation
+    {
+        $client = $this->clients->findByPhone($organization, $phone);
+
+        if (null === $client) {
+            $client = (new Client($organization))->setPhone($phone);
+            $this->entityManager->persist($client);
+        }
+
+        if (null === $client->getName() && $profileName) {
+            $client->setName(mb_substr($profileName, 0, 120));
+        }
+
+        $conversation = $client->getId() ? $this->conversations->findWhatsAppFor($client) : null;
+
+        if (null === $conversation) {
+            $conversation = new Conversation($client, Channel::WHATSAPP);
+            $this->entityManager->persist($conversation);
+        }
+
+        return $conversation;
     }
 
     /**
@@ -158,15 +191,43 @@ class Inbox
         $this->notifier->notifyTeam($conversation, $body);
     }
 
+    /** Le client veut poursuivre : la question disparaît, la conversation reste telle quelle. */
+    public function continueFromClient(Conversation $conversation): void
+    {
+        $conversation->cancelClosureQuestion();
+        $this->entityManager->flush();
+    }
+
+    /** Sans alerte, la demande quitterait « À traiter » sans que l'équipe sache pourquoi. */
+    public function closeFromClient(Conversation $conversation): void
+    {
+        if ($conversation->isClosed()) {
+            return;
+        }
+
+        $conversation->close();
+        $this->entityManager->flush();
+
+        $this->notifier->notifyTeam($conversation, 'Le client a clôturé sa demande.');
+    }
+
     /** Le message est enregistré avant l'envoi : un échec reste visible et n'efface rien. */
-    public function replyFromOwner(Conversation $conversation, string $body): Message
+    public function replyFromOwner(Conversation $conversation, string $body, bool $final = false): Message
     {
         $message = new Message($conversation, MessageSender::OWNER, $body);
+
+        // Une réponse normale après une dernière réponse relance l'échange : la question ne tient plus.
+        if ($final) {
+            $conversation->askForClosure();
+        } else {
+            $conversation->cancelClosureQuestion();
+        }
+
         $this->entityManager->flush();
 
         if ($conversation->isWhatsApp()) {
-            $this->deliverOnWhatsApp($message);
-        } elseif ($this->notifier->sendReply($conversation, $body)) {
+            $this->deliverOnWhatsApp($message, $final);
+        } elseif ($this->notifier->sendReply($conversation, $body, $final)) {
             $message->markDelivery(DeliveryStatus::SENT);
         } else {
             $message->markDelivery(DeliveryStatus::FAILED, 'Le courriel n\'a pas pu partir.');
@@ -229,7 +290,7 @@ class Inbox
         $this->entityManager->flush();
     }
 
-    private function deliverOnWhatsApp(Message $message): void
+    private function deliverOnWhatsApp(Message $message, bool $withChoice = false): void
     {
         if (!$this->whatsApp->isConfigured()) {
             $message->markDelivery(DeliveryStatus::SIMULATED);
@@ -238,7 +299,10 @@ class Inbox
         }
 
         try {
-            $id = $this->whatsApp->sendText((string) $message->getConversation()->getClient()->getPhone(), $message->getBody());
+            $phone = (string) $message->getConversation()->getClient()->getPhone();
+            $id = $withChoice
+                ? $this->whatsApp->sendTextWithChoice($phone, $message->getBody())
+                : $this->whatsApp->sendText($phone, $message->getBody());
             $message->setWaMessageId($id);
             $message->markDelivery(DeliveryStatus::SENT);
         } catch (WhatsAppException $e) {

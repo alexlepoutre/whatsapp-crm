@@ -245,6 +245,11 @@ form ul { margin: .25rem 0 0; padding: 0; list-style: none; color: var(--danger)
 .wa-card .lead { margin-bottom: 1rem; font-size: 1.05rem; }
 
 .composer { margin-bottom: 1rem; }
+.composer__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .5rem; }
+.closure-choice { margin-block: 1.5rem; padding: 1.25rem 1.5rem; border-radius: 12px; border: 2px solid var(--action); background: var(--surface); }
+.public .closure-choice h2 { margin: 0 0 .75rem; }
+.closure-choice__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.closure-choice__actions form { margin: 0; }
 #messagerie { scroll-margin-top: 1rem; }
 [data-pending] + .flash { margin-top: 1rem; }
 .search { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-block: 1rem 1.5rem; }

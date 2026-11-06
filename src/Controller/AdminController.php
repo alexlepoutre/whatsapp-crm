@@ -60,7 +60,7 @@ class AdminController extends AbstractController
             if ($conversation->isWhatsApp() && !$conversation->isWhatsAppWindowOpen()) {
                 $this->addFlash('error', 'Réponse non envoyée : le dernier message du client date de plus de 24 heures.');
             } else {
-                $message = $inbox->replyFromOwner($conversation, $form->get('body')->getData());
+                $message = $inbox->replyFromOwner($conversation, $form->get('body')->getData(), $request->request->has('final'));
 
                 if (DeliveryStatus::FAILED === $message->getDeliveryStatus()) {
                     $this->addFlash('error', 'Réponse enregistrée mais non envoyée : '.$message->getFailureReason());

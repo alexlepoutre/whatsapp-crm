@@ -102,6 +102,11 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
   formulaire de réponse disparaît. Les modèles validés ne sont pas encore gérés.
 - **Bot** : message fixe, au premier contact puis après 12 h de silence (`Inbox::QUIET_PERIOD`).
   Il ne change jamais le statut du fil.
+- **Dernière réponse** : deuxième bouton de l'admin. Le client se voit alors proposer de clôturer
+  ou de continuer : boutons WhatsApp (`WhatsAppClient::sendTextWithChoice`, texte limité à 1024
+  caractères par Meta) ou bloc sur le lien de suivi (`Conversation::awaitingClosure`). Le lien de
+  suivi garde en plus un bouton de clôture permanent. L'équipe est prévenue d'une clôture ;
+  « Continuer » ne change rien tant que le client n'a pas écrit. Un nouveau message rouvre.
 - **Alertes** : chaque message client prévient tous les comptes de l'organisation et son adresse
   d'alerte, sauf la phrase d'ouverture WhatsApp. L'envoi se fait après la réponse à la requête
   (`Notifier::sendPending`), jamais pendant : un SMTP lent bloquerait le client et le relais.

@@ -79,6 +79,14 @@ class WebhookProcessor
             return;
         }
 
+        $choice = $message['interactive']['button_reply']['id'] ?? null;
+
+        if (WhatsAppClient::CHOICE_CLOSE === $choice || WhatsAppClient::CHOICE_CONTINUE === $choice) {
+            $this->inbox->receiveWhatsAppChoice($organization, $from, $names[$from] ?? null, $id, $choice);
+
+            return;
+        }
+
         $transcription = trim((string) ($message['transcription'] ?? ''));
 
         $this->inbox->receiveWhatsApp($organization, $from, $names[$from] ?? null, $id, $this->bodyOf($message), '' === $transcription ? null : $transcription);

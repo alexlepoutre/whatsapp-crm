@@ -44,9 +44,9 @@ class Notifier implements EventSubscriberInterface
         return $this->toClient($conversation, 'Votre demande : '.$conversation->getTitle(), 'email/tracking_link.txt.twig', []);
     }
 
-    public function sendReply(Conversation $conversation, string $body): bool
+    public function sendReply(Conversation $conversation, string $body, bool $final = false): bool
     {
-        return $this->toClient($conversation, 'Nouvelle réponse : '.$conversation->getTitle(), 'email/reply.txt.twig', ['body' => $body]);
+        return $this->toClient($conversation, 'Nouvelle réponse : '.$conversation->getTitle(), 'email/reply.txt.twig', ['body' => $body, 'final' => $final]);
     }
 
     /**

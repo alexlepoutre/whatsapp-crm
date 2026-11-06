@@ -21,10 +21,39 @@
             {% endfor %}
         </div>
 
+        {% set routeArguments = {slug: conversation.organization.slug, token: conversation.accessToken} %}
+
+        {% if conversation.awaitingClosure %}
+            <section class="closure-choice">
+                <h2>Votre demande est-elle traitée ?</h2>
+                <div class="closure-choice__actions">
+                    <form method="post" action="{{ path('tracking_close', routeArguments) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('tracking-choice') }}">
+                        <button type="submit" class="btn">Clôturer ma demande</button>
+                    </form>
+                    <form method="post" action="{{ path('tracking_continue', routeArguments) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('tracking-choice') }}">
+                        <button type="submit" class="btn btn--quiet">Continuer la conversation</button>
+                    </form>
+                </div>
+            </section>
+        {% endif %}
+
+        {% if conversation.isClosed %}
+            <p class="notice">Cette demande est clôturée. Si vous écrivez un nouveau message, elle sera rouverte.</p>
+        {% endif %}
+
         {{ form_start(form, {attr: {class: 'composer'}}) }}
             {{ form_row(form.body) }}
             <button type="submit" class="btn">Envoyer mon message</button>
         {{ form_end(form) }}
+
+        {% if not conversation.isClosed and not conversation.awaitingClosure %}
+            <form method="post" action="{{ path('tracking_close', routeArguments) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('tracking-choice') }}">
+                <button type="submit" class="btn btn--quiet">Clôturer ma demande</button>
+            </form>
+        {% endif %}
     </main>
     {{ include('_footer.html.twig') }}
 {% endblock %}

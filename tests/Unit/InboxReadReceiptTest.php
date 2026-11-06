@@ -100,6 +100,32 @@ class InboxReadReceiptTest extends TestCase
         $this->inbox($whatsApp)->markAsRead($conversation);
     }
 
+    public function testNormalReplyHasNoButtons(): void
+    {
+        $conversation = $this->conversation();
+        $whatsApp = $this->createMock(WhatsAppClient::class);
+        $whatsApp->method('isConfigured')->willReturn(true);
+        $whatsApp->expects(self::once())->method('sendText')->willReturn('wamid.1');
+        $whatsApp->expects(self::never())->method('sendTextWithChoice');
+
+        $this->inbox($whatsApp)->replyFromOwner($conversation, 'Bonjour');
+
+        self::assertFalse($conversation->isAwaitingClosure());
+    }
+
+    public function testFinalReplyOffersTheChoice(): void
+    {
+        $conversation = $this->conversation();
+        $whatsApp = $this->createMock(WhatsAppClient::class);
+        $whatsApp->method('isConfigured')->willReturn(true);
+        $whatsApp->expects(self::once())->method('sendTextWithChoice')->willReturn('wamid.1');
+        $whatsApp->expects(self::never())->method('sendText');
+
+        $this->inbox($whatsApp)->replyFromOwner($conversation, 'Bonjour', true);
+
+        self::assertTrue($conversation->isAwaitingClosure());
+    }
+
     public function testFormConversationIsIgnored(): void
     {
         $conversation = $this->conversation(Channel::FORM);
