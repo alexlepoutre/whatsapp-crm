@@ -16,6 +16,7 @@
         const KEY = 'cookie-consent';
         const VALIDITY = 183 * 24 * 3600 * 1000; // 6 mois, durée recommandée par la CNIL
         const TAG_URL = {{ (app.environment == 'prod' ? 'https://www.googletagmanager.com/gtm.js?id=GTM-5WRCM4X8' : '/gtm-local-test.js')|json_encode|raw }};
+        const ORGANIZATION = {{ (organization.slug ?? null)|json_encode|raw }};
         const banner = document.getElementById('consent');
 
         window.dataLayer = window.dataLayer || [];
@@ -49,6 +50,14 @@
         const loadTag = () => {
             if (document.querySelector('script[data-tag]')) {
                 return;
+            }
+
+            // Google lit l'adresse de la page : c'est ce qui identifie l'organisation dans GA4,
+            // sans réglage dans GTM. Ne rien y ajouter d'autre que son code.
+            if (ORGANIZATION) {
+                const url = new URL(location.href);
+                url.searchParams.set('organisation', ORGANIZATION);
+                history.replaceState(history.state, '', url);
             }
 
             gtag('consent', 'update', { analytics_storage: 'granted' });

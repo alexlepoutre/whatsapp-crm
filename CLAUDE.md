@@ -115,7 +115,7 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
 - **Mesure d'audience** : GTM n'est chargé qu'après accord (`_consent.html.twig`, 6 mois), sur tout le
   site sauf les liens de suivi (jeton dans l'adresse) et les recherches de l'admin. Google reçoit titre,
   adresse et page d'origine : aucun nom de client dans un titre d'admin, et `meta referrer` sur les
-  pages sensibles. Toute évolution doit se refléter dans `/confidentialite`.
+  pages sensibles. Après accord, `?organisation=<slug>` s'ajoute à l'adresse pour filtrer GA4 par organisation. Toute évolution doit se refléter dans `/confidentialite`.
 - **CSS** : incrémenter `assets_version` (`config/packages/twig.yaml`) à chaque modification, sinon les
   navigateurs gardent l'ancienne feuille de style.
 - **Dernière réponse** : deuxième bouton de l'admin. Le client se voit alors proposer de clôturer

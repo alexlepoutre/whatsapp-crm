@@ -237,6 +237,7 @@ class ContactFormTest extends AppTestCase
 
         $this->client->request('GET', '/dufermont');
         self::assertSelectorExists('#consent');
+        self::assertStringContainsString('const ORGANIZATION = "dufermont"', (string) $this->client->getResponse()->getContent());
 
         $this->client->request('GET', '/connexion');
         self::assertSelectorNotExists('#consent');

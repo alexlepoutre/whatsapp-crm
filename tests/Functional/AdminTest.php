@@ -28,6 +28,7 @@ class AdminTest extends AppTestCase
 
         $this->client->request('GET', '/admin');
         self::assertSelectorExists('#consent');
+        self::assertStringContainsString('const ORGANIZATION = "'.$conversation->getOrganization()->getSlug().'"', (string) $this->client->getResponse()->getContent());
 
         $this->client->request('GET', '/admin/conversations/'.$conversation->getId());
         self::assertSelectorExists('#consent');
