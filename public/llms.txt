@@ -2,7 +2,7 @@
 
 > Outil en ligne français qui remplace le répondeur téléphonique des artisans, auto-entrepreneurs et PME. Les clients écrivent sur WhatsApp ou par un formulaire, et l'équipe répond depuis un seul dashboard, classé par client.
 
-Ma Relation Clients est conçu par Alexis Lepoutre et édité par IT-Room (Information Technology Room, Hem, France). Le service est hébergé chez OVH à Roubaix. Le tarif fait l'objet d'un devis.
+Ma Relation Clients est conçu par Alexis Lepoutre et édité par IT-Room (Information Technology Room, Hem, France). Le service est hébergé chez OVH à Roubaix. Pour connaître les tarifs, il faut contacter IT-Room.
 
 ## Fonctionnement
 
