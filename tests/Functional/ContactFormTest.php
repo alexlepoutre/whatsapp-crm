@@ -144,6 +144,20 @@ class ContactFormTest extends AppTestCase
         self::assertSelectorTextContains('.flash--error', 'E-mail ou mot de passe incorrect');
     }
 
+    #[\PHPUnit\Framework\Attributes\TestWith(['v1', 'quelqu\'un qui répond'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['v2', 'un seul flux'])]
+    #[\PHPUnit\Framework\Attributes\TestWith(['v3', 'Chaque demande perdue'])]
+    public function testLandingProposalsAreAvailableAndNotIndexed(string $version, string $headline): void
+    {
+        $this->client->request('GET', '/'.$version);
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', $headline);
+        self::assertSelectorExists('meta[name="robots"][content="noindex, nofollow"]');
+        self::assertSelectorExists('a[href^="https://wa.me/33600000000"]');
+        self::assertSelectorExists('.l-switch a[aria-current]');
+    }
+
     public function testUnknownOrganizationPageIsNotFound(): void
     {
         $this->client->request('GET', '/inconnue');

@@ -1,0 +1,152 @@
+/* Propositions de page d'accueil. Chaque version reste isolée sous sa classe. */
+
+.l-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; width: min(100%, 74rem); margin-inline: auto; padding: 1.25rem 1rem; }
+.l-brand { display: inline-flex; align-items: center; gap: .6rem; color: inherit; font-weight: 700; font-size: 1.1rem; text-decoration: none; white-space: nowrap; }
+.l-login { color: inherit; font-weight: 600; }
+.l-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.l-btn { display: inline-flex; align-items: center; gap: .6rem; padding: .85rem 1.5rem; border: 2px solid transparent; border-radius: 999px; font-weight: 600; font-size: 1.1rem; text-decoration: none; }
+.l-btn--wa { background: var(--wa-green); color: #08261a; }
+.l-btn--ghost { border-color: currentcolor; color: inherit; }
+.l-btn--dark { background: var(--ink); color: #fff; }
+.l-btn--action { background: var(--action); color: #fff; }
+.l-btn--amber { background: var(--amber); color: #14222f; }
+.l-switch { position: fixed; bottom: 1rem; left: 50%; z-index: 10; display: flex; gap: .25rem; padding: .3rem; border-radius: 999px; background: #14222f; box-shadow: 0 10px 30px -10px rgb(0 0 0 / .6); transform: translateX(-50%); }
+.l-switch a { padding: .3rem .8rem; border-radius: 999px; color: #dbe4ec; font-size: .9rem; text-decoration: none; white-space: nowrap; }
+.l-switch a[aria-current] { background: var(--amber); color: #14222f; font-weight: 700; }
+.lv1 .site-footer, .lv2 .site-footer, .lv3 .site-footer { padding-bottom: 5rem; }
+.advisor { display: block; width: 100%; height: 100%; }
+
+/* V1 : humaine. Des visages, des bulles, des formes rondes. */
+.lv1 { --teal: #0f4c5c; --mint: #e6f5f1; --coral: #ff6b5e; background: var(--mint); color: var(--teal); }
+.lv1 h1, .lv1 h2 { color: var(--teal); letter-spacing: -.025em; }
+.v1-hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; width: min(100%, 74rem); margin-inline: auto; padding: clamp(1.5rem, 5vw, 4rem) 1rem; }
+.v1-hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.04; }
+.v1-lead { max-width: 33rem; margin-block: 1.25rem 2rem; font-size: 1.25rem; line-height: 1.45; }
+.v1-team { position: relative; aspect-ratio: 1 / .92; }
+.v1-face { position: absolute; margin: 0; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 6px #fff, 0 22px 40px -18px rgb(15 76 92 / .55); }
+.v1-face--a { top: 4%; left: 6%; width: 52%; aspect-ratio: 1; }
+.v1-face--b { top: 0; right: 2%; width: 34%; aspect-ratio: 1; }
+.v1-face--c { bottom: 2%; right: 12%; width: 42%; aspect-ratio: 1; }
+.v1-bubble { position: absolute; max-width: 15rem; padding: .7rem 1rem; border-radius: 18px; background: #fff; color: var(--teal); font-weight: 600; box-shadow: 0 12px 26px -14px rgb(15 76 92 / .5); }
+.v1-bubble--a { bottom: 26%; left: 0; border-bottom-left-radius: 4px; }
+.v1-bubble--b { bottom: 0; left: 10%; border-bottom-right-radius: 4px; background: var(--coral); color: #2b0d0a; }
+.v1-talk { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; padding: clamp(3rem, 7vw, 5rem) max(1rem, calc((100% - 72rem) / 2)); background: #fff; }
+.v1-talk h2, .v1-promises h2, .v1-end h2 { margin: 0 0 .75rem; font-size: clamp(1.8rem, 4vw, 2.75rem); line-height: 1.1; }
+.v1-talk p { font-size: 1.15rem; }
+.v1-chat { display: flex; flex-direction: column; gap: .6rem; padding: 1.25rem; border-radius: 24px; background: var(--mint); }
+.v1-chat .v1-msg { max-width: 82%; padding: .6rem .95rem; border-radius: 16px; font-size: 1rem; }
+.v1-msg--in { align-self: flex-start; background: #fff; }
+.v1-msg--auto { align-self: flex-end; border: 1px dashed var(--teal); }
+.v1-msg--out { align-self: flex-end; background: var(--teal); color: #fff; }
+.v1-promises { width: min(100%, 74rem); margin-inline: auto; padding: clamp(3rem, 7vw, 5rem) 1rem; }
+.v1-promises ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 3rem; margin: 1.5rem 0 0; padding: 0; list-style: none; font-size: 1.15rem; }
+.v1-promises strong { display: block; font-size: 1.25rem; }
+.v1-end { padding: clamp(3rem, 7vw, 5rem) 1rem; background: var(--coral); color: #2b0d0a; text-align: center; }
+.lv1 .v1-end h2 { color: inherit; }
+.v1-end p { margin-bottom: 1.5rem; font-size: 1.2rem; }
+.lv1 .site-footer { background: #fff; }
+
+/* V2 : le flux. Du blanc, des pictos au trait, des liaisons animées. */
+.lv2 { background: #fff; }
+.p-line { fill: #fff; stroke: var(--ink); stroke-width: 3; }
+.p-stroke { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.p-soft { fill: var(--line); }
+.p-fill { fill: var(--ink); }
+.p-wa { fill: var(--wa-green); }
+.p-action { fill: var(--action); }
+.v2-head { max-width: 50rem; margin-inline: auto; padding: clamp(1.5rem, 5vw, 3.5rem) 1rem 2rem; text-align: center; }
+.v2-head h1 { font-size: clamp(2.5rem, 6vw, 4.25rem); line-height: 1.04; letter-spacing: -.03em; }
+.v2-head p { margin-block: 1.25rem 1.75rem; color: var(--muted); font-size: 1.25rem; line-height: 1.45; }
+.v2-head .l-actions { justify-content: center; }
+.v2-flow { display: grid; grid-template-columns: minmax(0, 3fr) minmax(2rem, 1fr) minmax(0, 4fr) minmax(2rem, 1fr) minmax(0, 3fr); align-items: center; width: min(100%, 78rem); margin-inline: auto; padding: 1.5rem 1rem; }
+.v2-flow h2 { margin: 0 0 1rem; font-size: 1.15rem; text-align: center; }
+.v2-node { position: relative; display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: .75rem; align-items: center; margin: 0 0 .9rem; padding: .85rem; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.v2-node figcaption { color: var(--muted); font-size: .9rem; line-height: 1.3; }
+.v2-node strong { display: block; color: var(--ink); font-size: 1rem; }
+.v2-person { position: absolute; top: -.6rem; left: -.6rem; z-index: 1; width: 2.6rem; height: 2.6rem; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 3px #fff; }
+.v2-link { height: 6px; border-radius: 3px; background: repeating-linear-gradient(90deg, var(--action) 0 12px, transparent 12px 22px); background-size: 22px 100%; animation: v2-flow 1s linear infinite; }
+@keyframes v2-flow { to { background-position-x: 22px; } }
+.v2-hub { padding: 1.25rem; border-radius: 18px; background: var(--panel); color: #fff; box-shadow: 0 26px 50px -24px rgb(20 34 47 / .7); }
+.v2-screen { padding: .75rem; border-radius: 10px; background: #0f1b26; }
+.v2-led { padding: .5rem .9rem; border-radius: 8px; background: #070d13; color: var(--amber); }
+.v2-led .display__digits { font-size: clamp(3rem, 6vw, 4.5rem); }
+.v2-screen p { display: flex; align-items: center; gap: .5rem; padding: .5rem .25rem; border-top: 1px solid #2c3e4e; font-weight: 600; font-size: .95rem; }
+.v2-screen p:first-of-type { border-top: 0; }
+.v2-screen span:not(.display__digits, .display__label) { margin-left: auto; color: #a9bac9; font-weight: 400; font-size: .85rem; text-align: right; }
+.v2-dot { width: .6rem; height: .6rem; flex: none; border-radius: 50%; }
+.v2-dot--wa { background: var(--wa-green); }
+.v2-dot--form { background: #b39ae6; }
+.v2-note { margin-top: .75rem; color: #c3d0dc; font-size: .95rem; text-align: center; }
+.v2-return { max-width: 46rem; margin: 1rem auto 0; padding: .9rem 1rem; border-radius: 12px; background: var(--action-soft); font-weight: 600; text-align: center; }
+.v2-steps { width: min(100%, 74rem); margin-inline: auto; padding: clamp(3rem, 6vw, 4.5rem) 1rem 2rem; }
+.v2-steps h2, .v2-end h2 { margin: 0 0 1.25rem; font-size: clamp(1.7rem, 3.5vw, 2.5rem); letter-spacing: -.02em; }
+.v2-steps ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; margin: 0; padding: 0; list-style: none; }
+.v2-steps li { padding-top: .75rem; border-top: 3px solid var(--action); }
+.v2-steps h3 { margin: 0 0 .3rem; font-size: 1.1rem; }
+.v2-steps p { color: var(--muted); }
+.v2-end { padding: 2rem 1rem clamp(3rem, 6vw, 5rem); text-align: center; }
+
+/* V3 : commerciale. Une promesse nette, le produit à l'écran, les objections traitées. */
+.lv3 { background: #fff; }
+.lv3 .l-top { width: 100%; max-width: none; padding-inline: max(1rem, calc((100% - 72rem) / 2)); background: var(--panel); color: #fff; }
+.v3-hero { padding: clamp(2.5rem, 6vw, 4.5rem) 1rem 0; background: linear-gradient(var(--panel) 72%, #fff 72%); color: #fff; text-align: center; }
+.v3-hero h1 { max-width: 56rem; margin-inline: auto; font-size: clamp(2.5rem, 6.2vw, 4.75rem); line-height: 1.03; letter-spacing: -.03em; }
+.v3-hero > p { max-width: 42rem; margin: 1.25rem auto 1.75rem; color: #c3d0dc; font-size: 1.25rem; line-height: 1.45; }
+.v3-hero .l-actions { justify-content: center; }
+.v3-app { display: grid; grid-template-columns: 11rem minmax(0, 1fr); max-width: 62rem; margin: clamp(2rem, 5vw, 3.5rem) auto 0; overflow: hidden; border-radius: 14px; background: var(--paper); box-shadow: 0 0 0 1px #2c3e4e, 0 30px 70px -25px rgb(20 34 47 / .7); color: var(--ink); text-align: left; }
+.v3-app__rail { padding: .9rem .7rem; background: #0f1b26; color: #dbe4ec; font-size: .95rem; }
+.v3-app__rail p { padding: .35rem .55rem; border-radius: 4px; }
+.v3-app__rail .is-on { background: #22364a; font-weight: 600; }
+.v3-app__led { margin-bottom: .9rem; padding: .55rem .75rem; border-radius: 6px; background: #070d13; color: var(--amber); }
+.v3-app__led .display__digits { font-size: 2.75rem; }
+.v3-app__led .display__label { font-size: .75rem; }
+.v3-app__main { padding: 1.1rem 1.25rem; min-width: 0; }
+.v3-app__title { margin-bottom: .6rem; font-weight: 700; font-size: 1.3rem; }
+.v3-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem 1rem; padding: .6rem .75rem; border-top: 1px solid var(--line); border-left: 4px solid; }
+.v3-row--wa { border-left-color: var(--whatsapp); }
+.v3-row--form { border-left-color: var(--form); }
+.v3-row time { color: var(--muted); font-size: .85rem; }
+.v3-row span { color: var(--muted); overflow-wrap: anywhere; }
+.v3-row em { font-style: normal; align-self: end; justify-self: end; }
+.v3-pains, .v3-benefits, .v3-trust, .v3-faq { width: min(100%, 74rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4.5rem) 1rem 0; }
+.lv3 h2 { margin: 0 0 1.25rem; font-size: clamp(1.8rem, 4vw, 2.75rem); line-height: 1.1; letter-spacing: -.025em; }
+.v3-pains ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 3rem; margin: 0; padding: 0; list-style: none; }
+.v3-pains li { padding-block: .8rem; border-top: 1px solid var(--line); font-size: 1.15rem; }
+.v3-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+.v3-grid article { padding-top: .8rem; border-top: 3px solid var(--action); }
+.v3-grid h3 { margin: 0 0 .35rem; font-size: 1.2rem; }
+.v3-grid p { color: var(--muted); }
+.v3-sectors { margin-top: clamp(2.5rem, 6vw, 4.5rem); padding: clamp(2.5rem, 5vw, 4rem) max(1rem, calc((100% - 72rem) / 2)); background: var(--action-soft); }
+.v3-sectors p { max-width: 46rem; font-size: 1.2rem; }
+.v3-trust ul { margin: 0 0 1rem; padding: 0; list-style: none; }
+.v3-trust li { padding-block: .6rem; border-top: 1px solid var(--line); font-size: 1.1rem; }
+.v3-faq details { border-top: 1px solid var(--line); }
+.v3-faq summary { padding-block: .9rem; font-weight: 600; font-size: 1.1rem; cursor: pointer; }
+.v3-faq details p { padding-bottom: 1rem; color: var(--muted); }
+.v3-end { margin-top: clamp(3rem, 6vw, 4.5rem); padding: clamp(3rem, 7vw, 5rem) 1rem; background: var(--panel); color: #fff; text-align: center; }
+.v3-end h2 { max-width: 44rem; margin-inline: auto; margin-bottom: 1.5rem; }
+
+@media (max-width: 860px) {
+    .v1-hero, .v1-talk { grid-template-columns: minmax(0, 1fr); }
+    .v1-team { aspect-ratio: 1 / 1.3; }
+    .v1-face--a { top: 0; left: 0; width: 50%; }
+    .v1-face--b { top: 3%; right: 0; width: 38%; }
+    .v1-face--c { top: 36%; bottom: auto; right: 6%; width: 42%; }
+    .v1-bubble { max-width: 13rem; font-size: .95rem; }
+    .v1-bubble--a { top: 42%; bottom: auto; left: 0; }
+    .v1-bubble--b { top: auto; bottom: 2%; left: 18%; }
+    .v1-promises ul, .v3-pains ul { grid-template-columns: minmax(0, 1fr); }
+    .v2-flow { grid-template-columns: minmax(0, 1fr); }
+    .v2-link { justify-self: center; width: 6px; height: 2.5rem; margin-block: .25rem .75rem; background: repeating-linear-gradient(180deg, var(--action) 0 12px, transparent 12px 22px); background-size: 100% 22px; animation-name: v2-flow-down; }
+    .v2-steps ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .v3-grid { grid-template-columns: minmax(0, 1fr); }
+    .v3-app { grid-template-columns: minmax(0, 1fr); }
+    .v3-app__rail p { display: none; }
+    .v3-app__led { margin-bottom: 0; }
+}
+
+@keyframes v2-flow-down { to { background-position-y: 22px; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .v2-link { animation: none; }
+}

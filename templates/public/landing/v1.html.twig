@@ -1,0 +1,60 @@
+{% extends 'public/landing/layout.html.twig' %}
+{% import 'public/landing/_advisor.html.twig' as people %}
+
+{% block title %}Relation clients : derrière chaque message, quelqu'un vous répond{% endblock %}
+{% block body_class %}lv1{% endblock %}
+
+{% block landing %}
+    <main>
+        <section class="v1-hero">
+            <div>
+                <h1>Derrière chaque message, quelqu'un qui répond vraiment.</h1>
+                <p class="v1-lead">Remplacez le répondeur que vous n'avez pas le temps d'écouter. Vos clients écrivent, votre équipe les lit, et personne ne reste sans réponse.</p>
+                <div class="l-actions">
+                    {% if waUrl %}
+                        <a class="l-btn l-btn--wa" href="{{ waUrl }}">{{ include('_whatsapp_logo.html.twig') }} Discuter sur WhatsApp</a>
+                    {% endif %}
+                    <a class="l-btn l-btn--ghost" href="{{ path('contact', {slug: 'itroom'}) }}">Laisser un message</a>
+                </div>
+            </div>
+
+            {# Illustration : personnes et messages fictifs. #}
+            <div class="v1-team" aria-hidden="true">
+                <figure class="v1-face v1-face--a">{{ people.advisor('#f2c9a8', '#3b2a20', '#0f6e6e', '#bfe8df', true) }}</figure>
+                <figure class="v1-face v1-face--b">{{ people.advisor('#8d5a3c', '#1d1612', '#ff6b5e', '#ffd9a8') }}</figure>
+                <figure class="v1-face v1-face--c">{{ people.advisor('#e8b48f', '#a9592d', '#2b4c9b', '#d6dcfb', true) }}</figure>
+                <p class="v1-bubble v1-bubble--a">Bonjour Camille, je regarde votre dossier.</p>
+                <p class="v1-bubble v1-bubble--b">C'est bon, votre devis est prêt !</p>
+            </div>
+        </section>
+
+        <section class="v1-talk">
+            <div class="v1-talk__intro">
+                <h2>Une vraie conversation, pas un numéro d'attente</h2>
+                <p>Vos clients vous parlent comme à un proche : sur WhatsApp, à l'écrit ou en vocal. Vous leur répondez avec vos mots, quand vous êtes disponible.</p>
+            </div>
+            <div class="v1-chat" aria-hidden="true">
+                <p class="v1-msg v1-msg--in">Bonjour, ma commande n'est pas arrivée.</p>
+                <p class="v1-msg v1-msg--auto">Merci pour votre message, nous revenons vers vous très vite.</p>
+                <p class="v1-msg v1-msg--out">Bonjour, je viens de vérifier : elle sera livrée demain matin.</p>
+                <p class="v1-msg v1-msg--in">Parfait, merci beaucoup !</p>
+            </div>
+        </section>
+
+        <section class="v1-promises">
+            <h2>Ce que ça change pour vous</h2>
+            <ul>
+                <li><strong>Plus personne n'est oublié.</strong> Une demande reste visible tant que vous n'y avez pas répondu.</li>
+                <li><strong>Vous savez à qui vous parlez.</strong> Chaque client a sa fiche, avec tout votre historique et vos notes.</li>
+                <li><strong>Toute l'équipe peut aider.</strong> Chacun a son compte et reçoit une alerte à chaque nouveau message.</li>
+                <li><strong>Les vocaux se lisent.</strong> Le message est transcrit, et le client voit ce que vous avez compris.</li>
+            </ul>
+        </section>
+
+        <section class="v1-end">
+            <h2>Et si on en parlait ?</h2>
+            <p>Écrivez-nous. Une vraie personne vous répondra.</p>
+            <a class="l-btn l-btn--dark" href="{{ path('contact', {slug: 'itroom'}) }}">Nous écrire</a>
+        </section>
+    </main>
+{% endblock %}

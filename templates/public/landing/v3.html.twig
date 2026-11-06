@@ -1,0 +1,86 @@
+{% extends 'public/landing/layout.html.twig' %}
+
+{% block title %}Relation clients : ne perdez plus aucune demande client{% endblock %}
+{% block body_class %}lv3{% endblock %}
+
+{% block landing %}
+    <main>
+        <section class="v3-hero">
+            <h1>Chaque demande perdue est un client qui part ailleurs.</h1>
+            <p>Relation clients remplace votre répondeur par un dashboard : WhatsApp et formulaires y arrivent ensemble, et rien ne reste sans réponse.</p>
+            <div class="l-actions">
+                <a class="l-btn l-btn--action" href="{{ path('contact', {slug: 'itroom'}) }}">Demander une démonstration</a>
+                {% if waUrl %}
+                    <a class="l-btn l-btn--wa" href="{{ waUrl }}">{{ include('_whatsapp_logo.html.twig') }} Une question ? WhatsApp</a>
+                {% endif %}
+            </div>
+
+            {# Illustration : données fictives. #}
+            <div class="v3-app" aria-hidden="true">
+                <div class="v3-app__rail">
+                    <div class="v3-app__led"><span class="display__digits" data-ghost="88">07</span><span class="display__label">à traiter</span></div>
+                    <p class="is-on">Messages</p><p>Clients</p><p>Réglages</p>
+                </div>
+                <div class="v3-app__main">
+                    <p class="v3-app__title">Messages</p>
+                    <div class="v3-row v3-row--wa"><strong>Camille Martin</strong><time>il y a 2 min</time><span>Où en est ma commande ?</span><em class="tag tag--whatsapp">WhatsApp</em></div>
+                    <div class="v3-row v3-row--form"><strong>Dominique Petit</strong><time>il y a 18 min</time><span>Pouvez-vous m'envoyer un devis ?</span><em class="tag tag--form">Formulaire</em></div>
+                    <div class="v3-row v3-row--wa"><strong>Sacha Bernard</strong><time>il y a 1 h</time><span>Message vocal, transcrit : êtes-vous ouverts samedi ?</span><em class="tag tag--whatsapp">WhatsApp</em></div>
+                    <div class="v3-row v3-row--wa"><strong>Lou Fontaine</strong><time>il y a 3 h</time><span>Je voudrais modifier mon rendez-vous.</span><em class="tag tag--whatsapp">WhatsApp</em></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="v3-pains">
+            <h2>Vous reconnaissez-vous ?</h2>
+            <ul>
+                <li>Le téléphone sonne pendant que vous êtes avec un client.</li>
+                <li>Les messages s'accumulent sur le répondeur et le portable d'un collègue.</li>
+                <li>Personne ne sait qui a répondu à qui.</li>
+                <li>Un prospect sans réponse a déjà contacté votre concurrent.</li>
+            </ul>
+        </section>
+
+        <section class="v3-benefits">
+            <h2>Reprenez la main sur chaque demande</h2>
+            <div class="v3-grid">
+                <article><h3>Rien ne passe à côté</h3><p>Une demande reste à traiter tant que personne n'y a répondu, et chaque message déclenche une alerte.</p></article>
+                <article><h3>Le canal de vos clients</h3><p>WhatsApp, qu'ils utilisent déjà, ou un formulaire avec suivi privé, sans compte à créer.</p></article>
+                <article><h3>Toute l'équipe, un seul outil</h3><p>Un compte par personne, un historique par client. Fini les messages sur des téléphones personnels.</p></article>
+                <article><h3>Les vocaux se lisent</h3><p>Les messages vocaux arrivent transcrits. Vous traitez une demande en quelques secondes.</p></article>
+                <article><h3>Une réponse immédiate</h3><p>Votre message automatique rassure le client dès son premier contact, même en votre absence.</p></article>
+                <article><h3>À votre image</h3><p>Votre logo, vos couleurs, votre adresse d'envoi. Vos clients n'ont affaire qu'à vous.</p></article>
+            </div>
+        </section>
+
+        <section class="v3-sectors">
+            <h2>Pour toutes les entreprises qui reçoivent des demandes</h2>
+            <p>Artisans, agences immobilières, syndics, commerces, cabinets, services clients : dès que des clients vous écrivent, vous gagnez à tout centraliser.</p>
+        </section>
+
+        <section class="v3-trust">
+            <h2>Sérieux sur vos données</h2>
+            <ul>
+                <li><strong>Hébergé en France,</strong> chez OVH à Roubaix</li>
+                <li><strong>WhatsApp officiel,</strong> par l'API de Meta</li>
+                <li><strong>Données cloisonnées :</strong> chaque entreprise ne voit que les siennes</li>
+                <li><strong>Conçu et édité par IT-Room,</strong> à Hem, dans le Nord</li>
+            </ul>
+            <p><a href="{{ path('legal_privacy') }}">Lire notre politique de confidentialité</a></p>
+        </section>
+
+        <section class="v3-faq">
+            <h2>Vos questions</h2>
+            <details><summary>Mes clients doivent-ils installer quelque chose ?</summary><p>Non. Ils utilisent WhatsApp, qu'ils ont déjà, ou un simple formulaire avec un lien privé pour suivre l'échange.</p></details>
+            <details><summary>Et ceux qui n'ont pas WhatsApp ?</summary><p>Ils remplissent le formulaire de votre page de contact et reçoivent un lien privé par courriel pour poursuivre la conversation.</p></details>
+            <details><summary>Plusieurs personnes peuvent-elles répondre ?</summary><p>Oui. Chaque personne a son compte, et toute l'équipe est prévenue à chaque message.</p></details>
+            <details><summary>Faut-il un ordinateur pour répondre ?</summary><p>Non. L'outil fonctionne dans un navigateur, sur ordinateur comme sur smartphone.</p></details>
+            <details><summary>Combien ça coûte ?</summary><p>Le tarif dépend de vos besoins et fait l'objet d'un devis. Parlons-en.</p></details>
+        </section>
+
+        <section class="v3-end">
+            <h2>Votre prochain client est peut-être en train de vous écrire.</h2>
+            <a class="l-btn l-btn--amber" href="{{ path('contact', {slug: 'itroom'}) }}">Demander une démonstration</a>
+        </section>
+    </main>
+{% endblock %}
