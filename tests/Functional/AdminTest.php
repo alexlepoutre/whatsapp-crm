@@ -338,4 +338,12 @@ class AdminTest extends AppTestCase
 
         self::assertResponseStatusCodeSame(422);
     }
+
+    public function testSessionLastsSevenDays(): void
+    {
+        $options = self::getContainer()->getParameter('session.storage.options');
+
+        self::assertSame(604800, $options['cookie_lifetime']);
+        self::assertSame(604800, $options['gc_maxlifetime']);
+    }
 }

@@ -9,6 +9,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    volumes:
+      - sessions:/var/www/app/var/sessions/prod
     restart: unless-stopped
     mem_limit: 256m
     networks:
@@ -75,6 +77,7 @@ services:
 
 volumes:
   database_data:
+  sessions:
 
 networks:
   internal:

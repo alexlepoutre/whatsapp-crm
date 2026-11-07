@@ -28,6 +28,7 @@ ARG APP_SECRET=build-time-placeholder
 RUN composer dump-autoload --no-dev --optimize --no-interaction \
     && composer run-script --no-dev post-install-cmd --no-interaction \
     && rm /usr/bin/composer \
+    && mkdir -p var/sessions/prod \
     && chown -R www-data:www-data var
 
 # Aussi pour les commandes console : un cache écrit en root bloquerait php-fpm.

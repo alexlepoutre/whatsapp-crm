@@ -24,6 +24,7 @@ make test      # la base whatsapp_crm_test se crée avec :
 
 Ports non standard volontaires : la machine héberge beaucoup d'autres projets Docker.
 Les commandes console passent par le conteneur (`make console <cmd>`).
+Hors terminal interactif, `make test` échoue : `docker compose exec -T -e APP_ENV=test php bin/phpunit`.
 
 ## Tester sans Meta
 
@@ -74,7 +75,8 @@ Un seul numéro et un seul webhook Meta pour tous les projets IT-Room : le hook
 `ubuntu@51.38.187.88:/home/ubuntu/whatsapp-crm`, https://ma-relation-clients.fr derrière Traefik.
 `www` et l'ancienne adresse crm.v1.re7itroom.fr redirigent, sauf `/webhook/` sur cette dernière : le
 hook y relaie encore (`CRM_RELAY_URL` dans son `.env`). Ne pas retirer cette exception sans changer le hook.
-Déployer : récupérer le code puis `./deploy.sh`. Les secrets sont dans `.env.prod` sur le
+Déployer : récupérer le code puis `./deploy.sh`, qui applique aussi les migrations. Comparer le
+nombre de clients et de messages avant et après. Les secrets sont dans `.env.prod` sur le
 serveur (modèle : `.env.prod.example`). Après une modification de ce fichier :
 `docker compose -f compose.prod.yaml --env-file .env.prod up -d`.
 
@@ -135,7 +137,20 @@ Le serveur manque de mémoire : garder les `mem_limit` de `compose.prod.yaml`.
   accès qu'à ce fil, même si plusieurs demandes partagent la même adresse.
 - **Formulaire** : données déclaratives, elles complètent une fiche et ne l'écrasent jamais.
 - **Statistiques** : `/admin/statistiques` pour l'organisation courante, `/admin/statistiques/organisations` pour le
-  super-admin seul. Jours à l'heure de Paris. « Envoyé » ne compte que ce qui est vraiment parti. Le délai de clôture
-  repose sur `Conversation.closedAt`, nul pour ce qui a été clôturé avant le 6 novembre 2026 : ne pas l'inventer.
+  super-admin seul. Jours à l'heure de Paris. « Envoyé » ne compte que ce qui est vraiment parti ; les réponses
+  automatiques et les messages non partis sont comptés à part. Le délai de réponse part du premier message client
+  sans réponse et s'arrête à la réponse de l'équipe, sans compter le bot. « En attente » est l'état présent, il ne dépend
+  pas de la période. Le délai de clôture repose sur `Conversation.closedAt`, nul pour ce qui a été clôturé avant le
+  6 novembre 2026 : ne pas l'inventer.
 - **Référencement** : une page avec un bloc `description` reçoit canonique et aperçu de partage (`_seo.html.twig`) ; sans description, elle n'en a pas. Noter toute nouvelle page publique dans `public/sitemap.xml`. Les organisations clientes n'y figurent pas, pour ne pas publier la liste des clients. L'image `public/og-image.png` se régénère depuis `/linkedin/partage` en local.
+- **Adresses réservées** : `/<slug>` capte tout le premier niveau. Toute nouvelle route publique de ce niveau s'ajoute à
+  `Organization::RESERVED_SLUGS`.
+- **Accueil** : `/` affiche `public/landing/v1.html.twig`, et `/v1` y redirige. `/v2` et `/v3` sont d'anciennes propositions.
+- **Tarifs** : aucun prix publié, il faut nous contacter. La mention est dans `v1.html.twig`, `_faq.html.twig` et
+  `public/llms.txt` : les garder alignées.
+- **Supports de communication** : `/linkedin` et `/article` sont en ligne mais en noindex, absents du sitemap, avec leurs
+  images dans `public/marketing`. Les sources des diapositives (`SlideController`) n'existent qu'en dev : garder son
+  `#[When(env: 'dev')]`, et leurs gabarits dans `.dockerignore`.
+- **Session** : 7 jours après la connexion, sans prolongation à chaque visite, comme `remember_me`. Fichiers dans `var/sessions`, sur un volume en production pour
+  survivre aux déploiements. Changer la durée impose de modifier aussi `/confidentialite`.
 - **Referrer-Policy** : `same-origin`, pas `no-referrer` qui enverrait `Origin: null` sur les POST.

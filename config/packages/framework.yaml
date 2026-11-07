@@ -3,7 +3,13 @@ framework:
     secret: '%env(APP_SECRET)%'
 
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    # 7 jours, comme remember_me. Les fichiers sont hors de /tmp : un volume les garde en production
+    # d'un déploiement à l'autre, sinon les formulaires ouverts et l'organisation choisie sont perdus.
+    session:
+        handler_id: session.handler.native_file
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        cookie_lifetime: 604800
+        gc_maxlifetime: 604800
 
     #esi: true
     #fragments: true
